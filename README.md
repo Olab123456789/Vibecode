@@ -4,7 +4,7 @@
 
 Se hva som er i sesong i Norge nå, hvor du får tak i det, oppskrifter, handleliste og vinforslag. Ingen innlogging.
 
-Appen ligger i `sesong/`. Den kan legges på hjemskjermen på iPhone (Safari → Del → Legg til på Hjem-skjerm).
+Appen ligger i `sesong/` og er på nett her: https://olab123456789.github.io/Vibecode/sesong/ Den kan legges på hjemskjermen på iPhone (Safari → Del → Legg til på Hjem-skjerm).
 
 ### Oppdatere appen
 
