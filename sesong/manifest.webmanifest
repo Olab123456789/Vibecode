@@ -1,0 +1,16 @@
+{
+  "name": "Sesong",
+  "short_name": "Sesong",
+  "description": "Hva er i sesong i Norge nå, hvor du får tak i det, oppskrifter og vinforslag.",
+  "lang": "nb",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#EDE3D2",
+  "theme_color": "#EDE3D2",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -1,0 +1,1121 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#EDE3D2">
+<meta name="description" content="Hva er i sesong i Norge nå, hvor du får tak i det, oppskrifter og vinforslag.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sesong">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<style>
+:root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; font: 14px/1.4 system-ui, sans-serif; overscroll-behavior-y: none; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+<title>Sesong</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&display=swap">
+<style>
+/* Layout: market-stall shelf of packaging-like cards on warm paper; featured carousel up top, sticky tab bar at the bottom. */
+:root {
+  --bg: #EDE3D2;
+  --card: #F6EFE3;
+  --card-2: #EBDFCB;
+  --ink: #2B2924;
+  --muted: #6F685D;
+  --line: #2B2924;
+  --hair: #D8CBB5;
+  --sage: #93AC86;
+  --sea: #A7BDD1;
+  --terra: #D8735C;
+  --ochre: #E2B04F;
+  --rose: #DB9C98;
+  --tan: #C59D70;
+  --warn-bg: #F6E2C4;
+  --ok: #5E7F52;
+  --shadow: 0 1px 0 rgba(60,40,20,.05), 0 10px 24px -16px rgba(60,40,20,.45);
+  --font: "Albert Sans", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --step--1: 0.8125rem;
+  --step-0: 1rem;
+  --step-1: 1.25rem;
+  --step-2: 1.75rem;
+  --step-3: 2.5rem;
+  --step-4: clamp(3.25rem, 14vw, 6rem);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1E1B17; --card: #29251F; --card-2: #332D25; --ink: #EFE6D6; --muted: #B3A893;
+    --line: #EFE6D6; --hair: #463E33; --sage: #7F9873; --sea: #7F98AE; --terra: #C2654F;
+    --ochre: #C99A3E; --rose: #B9807D; --tan: #A9845C; --warn-bg: #3A2F1F; --ok: #9CC48C;
+    --shadow: 0 10px 24px -16px rgba(0,0,0,.8); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1E1B17; --card: #29251F; --card-2: #332D25; --ink: #EFE6D6; --muted: #B3A893;
+  --line: #EFE6D6; --hair: #463E33; --sage: #7F9873; --sea: #7F98AE; --terra: #C2654F;
+  --ochre: #C99A3E; --rose: #B9807D; --tan: #A9845C; --warn-bg: #3A2F1F; --ok: #9CC48C;
+  --shadow: 0 10px 24px -16px rgba(0,0,0,.8); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font); font-weight: 400;
+  font-size: var(--step-0); line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px calc(96px + env(safe-area-inset-bottom, 0px));
+  -webkit-tap-highlight-color: transparent;
+}
+.wrap { max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; width: 100%; }
+h1, h2, h3, h4 { font-weight: 400; letter-spacing: -0.02em; text-wrap: balance; margin: 0; line-height: 1.05; }
+em.v { font-style: italic; font-weight: inherit; }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+.top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.mark { font-size: 1.7rem; font-weight: 300; letter-spacing: -0.03em; }
+.pill {
+  display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px;
+  padding: 2px 10px; font-size: var(--step--1); line-height: 1.5; white-space: nowrap; background: transparent;
+}
+.pill.solid { background: var(--ink); color: var(--bg); }
+
+.hero { display: grid; gap: 10px; }
+.hero .eyebrow { font-size: var(--step--1); color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+.hero h1 { font-size: var(--step-4); font-weight: 300; letter-spacing: -0.045em; }
+.hero p { margin: 0; max-width: 34ch; font-size: var(--step-1); font-weight: 300; color: var(--muted); }
+.hero p strong { color: var(--ink); font-weight: 500; }
+
+.feature { display: flex; flex-direction: column; gap: 12px; }
+.feature-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.feature-head h2 { font-size: var(--step-2); font-weight: 300; }
+.feature-head span { font-size: var(--step--1); color: var(--muted); }
+.rail {
+  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(250px, 78%); gap: 14px;
+  overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 4px 10px; margin-inline: -4px;
+  scrollbar-width: none;
+}
+.rail::-webkit-scrollbar { display: none; }
+@media (min-width: 720px) { .rail { grid-auto-columns: minmax(280px, 34%); } }
+.hcard {
+  scroll-snap-align: start; border: 0; text-align: left; cursor: pointer; border-radius: 6px; padding: 18px;
+  background: var(--card); box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 6px; min-width: 0;
+}
+.hcard .tags { display: flex; justify-content: space-between; gap: 8px; }
+.hcard .art { height: 180px; }
+.hcard h3 { font-size: 2.25rem; font-weight: 400; }
+.hcard .sub { color: var(--muted); font-size: 0.9375rem; }
+.hcard .dish { border-top: 1px solid var(--hair); padding-top: 10px; margin-top: 4px; font-size: 0.9375rem; display: flex; justify-content: space-between; gap: 10px; }
+.hcard .dish b { font-weight: 500; }
+.hcard .dish span:last-child { color: var(--muted); white-space: nowrap; }
+
+.month-row { display: flex; flex-direction: column; gap: 8px; }
+.months { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px; }
+.months button {
+  border: 1px solid var(--hair); background: var(--card); border-radius: 999px; padding: 8px 0;
+  font-size: var(--step--1); cursor: pointer;
+}
+.months button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.months button.today:not([aria-pressed="true"]) { border-color: var(--ink); }
+@media (max-width: 520px) { .months { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+.month-row .hint { font-size: var(--step--1); color: var(--muted); display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.linkbtn { background: none; border: 0; padding: 0; text-decoration: underline; cursor: pointer; font-size: var(--step--1); }
+
+.filters { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin-inline: -4px; padding: 2px 4px; }
+.filters::-webkit-scrollbar { display: none; }
+.filters button {
+  border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; background: transparent; cursor: pointer;
+  font-size: 0.9375rem; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; flex: none;
+}
+.filters button .dot { width: 10px; height: 10px; border-radius: 50%; }
+.filters button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+
+.group { display: flex; flex-direction: column; gap: 14px; }
+.group h2 { font-size: var(--step-2); font-weight: 300; display: flex; align-items: baseline; gap: 10px; }
+.group h2 small { font-size: var(--step--1); color: var(--muted); letter-spacing: 0; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (min-width: 720px) { .grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; } }
+.card {
+  background: var(--card); border: 0; border-radius: 6px; padding: 12px 12px 10px; text-align: left; cursor: pointer;
+  display: flex; flex-direction: column; gap: 4px; min-width: 0; box-shadow: var(--shadow);
+  transition: transform .18s ease;
+}
+.card:active, .hcard:active { transform: scale(.98); }
+.hcard { transition: transform .18s ease; }
+@media (hover: hover) { .card:hover, .hcard:hover { transform: translateY(-2px); } }
+.card .row { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+.card .brand { font-size: 0.875rem; font-weight: 300; color: var(--muted); }
+.card .pill { font-size: 0.6875rem; padding: 1px 8px; }
+.card h3 { font-size: 1.375rem; font-weight: 400; margin-top: 2px; overflow-wrap: anywhere; }
+.card .art { height: 96px; margin: 2px -4px; }
+.card .foot { display: flex; justify-content: space-between; align-items: end; gap: 6px; font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
+.card .foot b { font-weight: 400; color: var(--ink); font-size: 0.9375rem; }
+.art { position: relative; }
+.art svg { width: 100%; height: 100%; display: block; }
+.art.photo { overflow: hidden; border-radius: 4px; background: var(--hair); }
+.art.photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.card .art.photo { margin: 4px 0 2px; height: 110px; }
+.sheet .head .art.photo { height: 260px; }
+.credits { color: var(--muted); font-size: 0.8125rem; border-top: 1px solid var(--hair); padding-top: 14px; }
+.credits summary { cursor: pointer; color: var(--ink); font-size: 0.9375rem; }
+.credits ul { margin: 10px 0 0; padding-left: 1.1em; display: grid; gap: 3px; }
+.credits a { color: inherit; }
+.art .initial {
+  position: absolute; inset: 0; display: grid; place-items: center; font-weight: 300; font-style: italic;
+  letter-spacing: -0.04em; color: var(--card); font-size: 3rem; line-height: 1;
+}
+.hcard .art .initial { font-size: 5rem; }
+.empty { color: var(--muted); }
+
+.bar { display: grid; grid-template-columns: repeat(12, 1fr); gap: 2px; }
+.bar i { height: 5px; border-radius: 2px; background: var(--hair); display: block; }
+.bar i.on { background: var(--c); opacity: .5; }
+.bar i.pk { background: var(--c); opacity: 1; }
+.bar i.now { outline: 1.5px solid var(--ink); outline-offset: 1px; }
+.bar.big i { height: 22px; border-radius: 3px; }
+.barlabels { display: grid; grid-template-columns: repeat(12, 1fr); gap: 2px; font-size: 0.6875rem; color: var(--muted); text-align: center; margin-top: 4px; }
+
+dialog {
+  border: 0; padding: 0; width: min(720px, 100%); max-width: 100%; max-height: 94dvh; margin: auto auto 0; border-radius: 16px 16px 0 0;
+  background: var(--card); color: var(--ink); overscroll-behavior: contain;
+}
+dialog[open] { animation: up .28s cubic-bezier(.2,.8,.2,1); }
+@keyframes up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (min-width: 760px) { dialog { margin: auto; border-radius: 8px; } }
+dialog::backdrop { background: rgba(30, 24, 16, .5); }
+.sheet { display: flex; flex-direction: column; gap: 24px; padding: 14px max(18px, env(safe-area-inset-left, 0px)) calc(32px + env(safe-area-inset-bottom, 0px)) max(18px, env(safe-area-inset-right, 0px)); }
+.sheet .close {
+  position: sticky; top: 0; align-self: flex-end; border: 1px solid var(--line); border-radius: 999px; background: var(--card);
+  padding: 4px 14px; cursor: pointer; z-index: 2; font-size: 0.875rem;
+}
+.sheet .head { margin-top: -26px; display: flex; flex-direction: column; gap: 8px; }
+.sheet .head .art { height: 200px; }
+.sheet .head .art .initial { font-size: 7rem; }
+.sheet h2 { font-size: var(--step-3); font-weight: 400; }
+.sheet .lede { margin: 0; font-size: 1.0625rem; font-weight: 300; max-width: 60ch; }
+.sheet .pills { display: flex; gap: 6px; flex-wrap: wrap; }
+.sec { display: flex; flex-direction: column; gap: 10px; }
+.sec > h3 { font-size: var(--step-1); font-weight: 500; letter-spacing: -0.01em; }
+.sec p { margin: 0; max-width: 62ch; }
+.where { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.where li { display: grid; grid-template-columns: 10px 1fr; gap: 10px; align-items: baseline; }
+.where li::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c); transform: translateY(-1px); }
+.where li span { color: var(--muted); font-size: 0.9375rem; }
+
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tabs button { border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; background: transparent; cursor: pointer; font-size: 0.9375rem; }
+.tabs button[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+.recipe { background: var(--card-2); border-radius: 6px; padding: 16px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.recipe h4 { font-size: 1.5rem; font-weight: 400; line-height: 1.15; }
+.recipe .facts { display: flex; gap: 6px; flex-wrap: wrap; }
+.recipe .facts .pill { border-color: var(--muted); color: var(--muted); }
+.recipe .cols { display: grid; gap: 16px; grid-template-columns: 1fr; }
+@media (min-width: 640px) { .recipe .cols.two { grid-template-columns: 2fr 3fr; } }
+.recipe h5 { margin: 0 0 6px; font-size: var(--step--1); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 500; }
+.ing { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.ing li { padding: 6px 0; border-bottom: 1px solid var(--hair); font-size: 0.9375rem; }
+.ing li:last-child { border-bottom: 0; }
+.steps { margin: 0; padding: 0; list-style: none; counter-reset: s; display: flex; flex-direction: column; gap: 10px; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 26px 1fr; gap: 8px; font-size: 0.9375rem; }
+.steps li::before { content: counter(s); font-style: italic; font-size: 1.25rem; line-height: 1.1; color: var(--muted); }
+.tip { font-size: 0.9375rem; border-left: 2px solid var(--c); padding-left: 10px; }
+.tip b { font-weight: 500; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--ink); background: var(--ink); color: var(--bg);
+  border-radius: 999px; padding: 10px 18px; cursor: pointer; font-size: 0.9375rem; font-weight: 500;
+}
+.btn.ghost { background: transparent; color: var(--ink); }
+.btn.done { background: var(--ok); border-color: var(--ok); color: var(--card); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.wine { border: 1px solid var(--line); border-radius: 6px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+.wine .style { font-size: 1.25rem; font-style: italic; }
+.wine a { font-weight: 500; }
+.wine .af { font-size: 0.875rem; color: var(--muted); }
+.note { background: var(--warn-bg); border-radius: 6px; padding: 12px 14px; font-size: 0.9375rem; }
+.links { display: flex; gap: 8px; flex-wrap: wrap; }
+.links a { text-decoration: none; }
+
+#view-list { display: flex; flex-direction: column; gap: 22px; }
+#view-list h1 { font-size: var(--step-4); font-weight: 300; letter-spacing: -0.045em; }
+.list-sub { color: var(--muted); margin: 0; font-size: var(--step-1); font-weight: 300; }
+.listbox { background: var(--card); border-radius: 6px; box-shadow: var(--shadow); padding: 6px 16px; }
+.listbox h3 { font-size: var(--step--1); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 500; padding: 12px 0 4px; }
+.li { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--hair); }
+.li:last-child { border-bottom: 0; }
+.li input { width: 22px; height: 22px; accent-color: var(--ok); flex: none; }
+.li label { flex: 1; min-width: 0; overflow-wrap: anywhere; cursor: pointer; }
+.li.checked label { text-decoration: line-through; color: var(--muted); }
+.li .x { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 1.25rem; line-height: 1; padding: 4px 6px; }
+.addrow { display: flex; gap: 8px; }
+.addrow input { flex: 1; min-width: 0; border: 1px solid var(--hair); background: var(--card); border-radius: 999px; padding: 10px 16px; font: inherit; color: var(--ink); }
+.empty-list { text-align: center; padding: 28px 16px; color: var(--muted); display: flex; flex-direction: column; gap: 6px; align-items: center; }
+.empty-list p { margin: 0; }
+.empty-list .art { width: 220px; max-width: 100%; height: 110px; }
+.status { font-size: 0.875rem; color: var(--ok); min-height: 1.3em; }
+#copy-fallback { width: 100%; min-height: 160px; font: inherit; border-radius: 6px; padding: 10px; background: var(--card); color: var(--ink); border: 1px solid var(--hair); }
+
+.tabbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; display: flex; justify-content: center;
+  padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  pointer-events: none;
+}
+.tabbar nav {
+  pointer-events: auto; display: flex; gap: 4px; background: var(--ink); border-radius: 999px; padding: 5px;
+  box-shadow: 0 12px 30px -12px rgba(30,20,10,.6);
+}
+.tabbar button { border: 0; background: transparent; color: var(--bg); border-radius: 999px; padding: 9px 18px; cursor: pointer; font-size: 0.9375rem; display: inline-flex; gap: 8px; align-items: center; }
+.tabbar button[aria-current="page"] { background: var(--bg); color: var(--ink); }
+.tabbar .count { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--terra); color: var(--card); font-size: 0.75rem; display: inline-grid; place-items: center; font-variant-numeric: tabular-nums; }
+.toast {
+  position: fixed; left: 50%; bottom: calc(80px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%) translateY(10px); z-index: 20;
+  background: var(--ok); color: var(--card); padding: 8px 16px; border-radius: 999px; font-size: 0.9375rem; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%); }
+
+.about { border-top: 1px solid var(--hair); padding-top: 22px; display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); color: var(--muted); font-size: 0.9375rem; }
+.about h2 { font-size: var(--step-1); color: var(--ink); font-weight: 400; margin-bottom: 6px; }
+.about ul { margin: 0; padding-left: 1.1em; display: flex; flex-direction: column; gap: 4px; }
+.about p { margin: 0; }
+.tagline { text-align: center; color: var(--muted); font-size: 0.9375rem; margin: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .card, .hcard, .toast { transition: none; } dialog[open] { animation: none; }
+  .card:active, .hcard:active { transform: none; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="mark" aria-label="Sesong">ses<em class="v">o</em>ng</div>
+    <span class="pill">Uten innlogging</span>
+  </header>
+
+  <div id="view-season" class="wrap">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="eyebrow" id="hero-eyebrow">I sesong i Norge nå</div>
+      <h1 id="hero-title">Oktober</h1>
+      <p id="hero-text"></p>
+    </section>
+
+    <section class="feature" aria-labelledby="feat-title">
+      <div class="feature-head"><h2 id="feat-title">På sitt beste nå</h2><span>Sveip for flere</span></div>
+      <div class="rail" id="rail"></div>
+    </section>
+
+    <div class="month-row">
+      <div class="months" id="months" role="group" aria-label="Velg måned"></div>
+      <div class="hint"><span>Trykk på en måned for å se hva som er i sesong da.</span><button class="linkbtn" id="today-btn" type="button">Tilbake til i dag</button></div>
+    </div>
+
+    <div class="filters" id="filters" role="group" aria-label="Filtrer etter type"></div>
+
+    <main id="list" class="wrap" style="gap:32px"></main>
+
+    <section class="about" aria-label="Om Sesong">
+      <div>
+        <h2>Om denne versjonen</h2>
+        <p>Dette er en prøveversjon. Sesongene er håndplukket og gjelder Norge generelt, og nord i landet kommer mye litt senere. Butikkinfo er veiledende, ikke lagerstatus.</p>
+      </div>
+      <div>
+        <h2>Kommer snart</h2>
+        <ul>
+          <li>Kart med naturtyper der du kan plukke selv</li>
+          <li>Hvilke butikker nær deg som har varen</li>
+          <li>Vinforslag hentet rett fra Vinmonopolet</li>
+        </ul>
+      </div>
+    </section>
+    <details class="credits">
+      <summary>Bildekreditering</summary>
+      <ul>
+          <li>Asparges: Foodie Girl, <a href="https://stocksnap.io/photo/green-asparagus-BRFCJNGOFT" target="_blank" rel="noopener">StockSnap</a> (CC0)</li>
+          <li>Blomkål: <a href="https://www.rawpixel.com/image/5919941/photo-image-public-domain-food-free" target="_blank" rel="noopener">rawpixel</a> (CC0)</li>
+          <li>Blåbær: Anne Nygård, <a href="https://unsplash.com/license" target="_blank" rel="noopener">Unsplash</a> (Unsplash-lisens)</li>
+          <li>Blåskjell: <a href="https://www.rawpixel.com/image/5906752/photo-image-public-domain-food-white" target="_blank" rel="noopener">rawpixel</a> (CC0)</li>
+          <li>Elg og hjort: Jez Timms, <a href="https://unsplash.com/license" target="_blank" rel="noopener">Unsplash</a> (Unsplash-lisens)</li>
+          <li>Epler: <a href="https://www.rawpixel.com/image/6029237/photo-image-public-domain-fruit-red" target="_blank" rel="noopener">rawpixel</a> (CC0)</li>
+          <li>Gresskar: Aaron Burden, <a href="https://stocksnap.io/photo/orange-pumpkins-15J9JFRC1K" target="_blank" rel="noopener">StockSnap</a> (CC0)</li>
+          <li>Grønnkål: Nutrition, Food Safety &amp; Health, <a href="https://www.flickr.com/photos/93936679@N05/30896469698" target="_blank" rel="noopener">Flickr</a> (CC0)</li>
+          <li>Hodekål: shilpa poonattil, <a href="https://unsplash.com/license" target="_blank" rel="noopener">Unsplash</a> (Unsplash-lisens)</li>
+          <li>Hummer: Monika Borys, <a href="https://unsplash.com/license" target="_blank" rel="noopener">Unsplash</a> (Unsplash-lisens)</li>
+          <li>Jordbær: Jessica Lewis, <a href="https://stocksnap.io/photo/strawberry-fruit-TUJE5XIJT3" target="_blank" rel="noopener">StockSnap</a> (CC0)</li>
+          <li>Jordskokk: ©HTO3, <a href="https://www.flickr.com/photos/33534994@N00/6850678940" target="_blank" rel="noopener">Flickr</a> (CC BY-SA 2.0)</li>
+          <li>Kamskjell: Tim Sullivan, <a href="https://stocksnap.io/photo/scallops-seafood-DBCBPQBRVV" target="_blank" rel="noopener">StockSnap</a> (CC0)</li>
+          <li>Kantarell: <a href="https://www.rawpixel.com/image/5949500/free-public-domain-cc0-photo" target="_blank" rel="noopener">rawpixel</a> (CC0)</li>
+          <li>Kongekrabbe: Mads Egmose, <a href="https://unsplash.com/license" target="_blank" rel="noopener">Unsplash</a> (Unsplash-lisens)</li>
+          <li>Kålrot: pin add, <a href="https://commons.wikimedia.org/wiki/File:Swede_-_rutabaga_-_veggiegroup.jpg" target="_blank" rel="noopener">Wikimedia Commons</a> (CC BY 2.0)</li>
+          <li>Lam: StuartWebster, <a href="https://www.flickr.com/photos/34883952@N02/4854152944" target="_blank" rel="noopener">Flickr</a> (CC BY 2.0)</li>
+          <li>Makrell: <a href="https://www.rawpixel.com/image/5905042/photo-image-public-domain-leaf-blue" target="_blank" rel="noopener">rawpixel</a> (CC0)</li>
+          <li>Multer: kahvikisu, <a href="https://www.flickr.com/photos/75897997@N00/193862919" target="_blank" rel="noopener">Flickr</a> (CC BY 2.0)</li>
+          <li>Nypoteter: <a href="https://www.rawpixel.com/image/5910137/image-public-domain-plant-nature" target="_blank" rel="noopener">rawpixel</a> (CC0)</li>
+          <li>Pastinakk: <a href="https://www.rawpixel.com/image/5916318/image-public-domain-plant-wooden" target="_blank" rel="noopener">rawpixel</a> (CC0)</li>
+          <li>Piggsopp: Ephemeral Impressions, <a href="https://www.flickr.com/photos/145400091@N04/30087695611" target="_blank" rel="noopener">Flickr</a> (CC BY-SA 2.0)</li>
+          <li>Plommer: <a href="https://www.rawpixel.com/image/5926968/free-plum-image-public-domain-fruit-cc0-photo" target="_blank" rel="noopener">rawpixel</a> (CC0)</li>
+          <li>Purre: <a href="https://www.rawpixel.com/image/6021915/leek-vegetable-free-public-domain-cc0-photo" target="_blank" rel="noopener">rawpixel</a> (CC0)</li>
+          <li>Pærer: Foodie Girl, <a href="https://stocksnap.io/photo/pears-fruit-QIXV1AILYQ" target="_blank" rel="noopener">StockSnap</a> (CC0)</li>
+          <li>Ramsløk: <a href="https://www.rawpixel.com/image/5940605/free-public-domain-cc0-photo" target="_blank" rel="noopener">rawpixel</a> (CC0)</li>
+          <li>Rosenkål: <a href="https://www.rawpixel.com/image/3282959/free-photo-image-brussels-sprouts-brussel-cabbage" target="_blank" rel="noopener">rawpixel</a> (CC0)</li>
+          <li>Rødbeter: <a href="https://www.rawpixel.com/image/6016688/beetroot-vegetable-free-public-domain-cc0-photo" target="_blank" rel="noopener">rawpixel</a> (CC0)</li>
+          <li>Sellerirot: simpleprovisions, <a href="https://www.flickr.com/photos/80665970@N03/8708931125" target="_blank" rel="noopener">Flickr</a> (CC BY 2.0)</li>
+          <li>Sild: <a href="https://www.rawpixel.com/image/5975303/little-fish-fish-market" target="_blank" rel="noopener">rawpixel</a> (CC0)</li>
+          <li>Skrei: Stephane Lesbats / Ifremer, <a href="https://commons.wikimedia.org/wiki/File:Morue_(Gadus_morhua)_sur_une_table_(Ifremer_00533-64440).jpg" target="_blank" rel="noopener">Wikimedia Commons</a> (CC BY 4.0)</li>
+          <li>Steinsopp: Bernard Spragg, <a href="https://www.flickr.com/photos/88123769@N02/32805133003" target="_blank" rel="noopener">Flickr</a> (CC0)</li>
+          <li>Taskekrabbe: Paul Einerhand, <a href="https://unsplash.com/license" target="_blank" rel="noopener">Unsplash</a> (Unsplash-lisens)</li>
+          <li>Torsk: Geoffrey Moffett, <a href="https://unsplash.com/license" target="_blank" rel="noopener">Unsplash</a> (Unsplash-lisens)</li>
+          <li>Traktkantarell: Björn S..., <a href="https://www.flickr.com/photos/40948266@N04/38187749892" target="_blank" rel="noopener">Flickr</a> (CC BY-SA 2.0)</li>
+          <li>Tyttebær: <a href="https://www.rawpixel.com/image/6035330/photo-image-public-domain-leaf-tree" target="_blank" rel="noopener">rawpixel</a> (CC0)</li>
+          <li>Østers: <a href="https://www.rawpixel.com/image/5922502/photo-image-public-domain-food-free" target="_blank" rel="noopener">rawpixel</a> (CC0)</li>
+      </ul>
+    </details>
+    <p class="tagline">Spis godt med <em class="v">sesong</em></p>
+  </div>
+
+  <section id="view-list" hidden aria-labelledby="list-title">
+    <h1 id="list-title">Handle<em class="v">l</em>iste</h1>
+    <p class="list-sub" id="list-sub"></p>
+    <form class="addrow" id="add-form">
+      <input id="add-input" type="text" placeholder="Legg til noe selv, f.eks. smør" autocomplete="off" aria-label="Legg til vare">
+      <button class="btn" type="submit">Legg til</button>
+    </form>
+    <div id="list-body"></div>
+    <div class="actions" id="list-actions">
+      <button class="btn ghost" type="button" id="copy-list">Kopier listen</button>
+      <button class="btn ghost" type="button" id="clear-checked">Fjern det som er krysset av</button>
+    </div>
+    <div class="status" id="list-status" role="status"></div>
+    <textarea id="copy-fallback" hidden readonly aria-label="Handlelisten som tekst"></textarea>
+  </section>
+</div>
+
+<div class="tabbar"><nav aria-label="Hovedmeny">
+  <button type="button" id="tab-season" aria-current="page">I sesong</button>
+  <button type="button" id="tab-list">Handleliste <span class="count" id="tab-count" hidden>0</span></button>
+</nav></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<dialog id="sheet" aria-labelledby="sheet-title"><div class="sheet" id="sheet-body"></div></dialog>
+
+<script>
+const MONTHS = ["januar","februar","mars","april","mai","juni","juli","august","september","oktober","november","desember"];
+const MSHORT = ["jan","feb","mar","apr","mai","jun","jul","aug","sep","okt","nov","des"];
+const r = (a, b) => { const out = []; let m = a; for (;;) { out.push(m); if (m === b) break; m = m % 12 + 1; } return out; };
+const ALL = r(1, 12);
+
+const CATS = {
+  gronn: { name: "Grønnsaker", color: "var(--sage)" },
+  sjo:   { name: "Fisk og sjømat", color: "var(--sea)" },
+  sopp:  { name: "Sopp", color: "var(--tan)" },
+  baer:  { name: "Bær og frukt", color: "var(--rose)" },
+  vilt:  { name: "Kjøtt og vilt", color: "var(--terra)" },
+};
+
+const BUY = {
+  dagligvare: ["Dagligvarebutikken", "De fleste kjeder. Størst utvalg hos de store butikkene som Meny og Coop Mega."],
+  fisk: ["Fiskebutikk eller fiskedisk", "Spør hva som kom inn i dag. Ofte ferskere enn ferdigpakket."],
+  bonde: ["Bondens marked og REKO-ring", "Kjøp rett fra produsenten. REKO-ringer finner du på Facebook der du bor."],
+  gard: ["Gårdsbutikk eller selvplukk", "Mange gårder har egen butikk eller lar deg plukke selv i sesongen."],
+  spesial: ["Spesialbutikk eller delikatesse", "Fiskeforretninger, vilthandlere og delikatessebutikker i byene."],
+  natur: ["Plukk selv i naturen", "Allemannsretten lar deg plukke bær og sopp i utmark til eget bruk."],
+};
+
+/* Recipe: kind, t, time, level, serves, ing[], steps[], tip. Photos: set img:"img/<id>.webp" on an item when one exists. */
+const ITEMS = [
+  // ---------- Grønnsaker ----------
+  { id:"asparges", img:"img/asparges.webp", cat:"gronn", name:"Asparges", sub:"Grønn og hvit fra Lier og Østfold", months:r(5,6), peak:[6],
+    about:"Norsk asparges har en kort og intens sesong. Den er søtest de første dagene etter høsting, så kjøp den så fersk som mulig. Bunnen skal være saftig, ikke tørr.",
+    buy:["dagligvare","bonde","gard"],
+    recipes:[
+      {kind:"Klassisk", t:"Asparges med smørsaus og egg", time:"25 min", level:"Enkel", serves:4,
+        ing:["2 bunter asparges","4 egg","100 g smør","1 sjalottløk","1 dl hvitvin eller vann","½ sitron","Persille","Salt og pepper"],
+        steps:["Knekk av den treaktige enden på aspargesen. Den knekker naturlig der den blir seig.","Kok eggene i 6½ minutt, og legg dem i kaldt vann.","Finhakk sjalottløken og kok den med hvitvin til det nesten er borte.","Sett kjelen på lav varme og pisk inn smøret i terninger, litt om gangen. Smak til med sitron og salt.","Kok aspargesen 2 til 3 minutter i godt saltet vann.","Legg asparges på fat, del eggene over og hell over sausen. Strø over persille."],
+        tip:"Hvit asparges skal skrelles og trenger 6 til 8 minutter."},
+      {kind:"Restaurant", t:"Grillet asparges, brunt smør og ramsløk", time:"30 min", level:"Middels", serves:4,
+        ing:["2 bunter grønn asparges","100 g smør","1 neve ramsløk eller gressløk","1 dl nøytral olje","50 g lagret ost","4 eggeplommer","Flaksalt"],
+        steps:["Kjør ramsløk og olje i en blender, og sil gjennom et kaffefilter. Nå har du ramsløkolje.","Brun smøret i en kjele til det lukter nøtter og bunnen blir gyllen.","Grill eller stek aspargesen på høy varme i 2 til 3 minutter.","Legg en eggeplomme på hver tallerken og asparges ved siden av.","Hell over brunt smør og noen dråper ramsløkolje. Høvle over ost og strø på flaksalt."],
+        tip:"Brunt smør blir brent fort. Ta kjelen av platen når det begynner å dufte."}],
+    wine:{style:"Grüner Veltliner", why:"Frisk og litt pepprete. Tåler den grønne, litt bitre smaken i asparges.", q:"gruner veltliner", af:"Alkoholfri musserende med eple"} },
+
+  { id:"nypoteter", img:"img/nypoteter.webp", cat:"gronn", name:"Nypoteter", sub:"Tynt skall, søt smak", months:r(6,8), peak:[7],
+    about:"De første norske potetene kommer i juni. Skallet er så tynt at du bare trenger å skylle dem. Kjøp små mengder ofte, for de mister sødmen raskt.",
+    buy:["dagligvare","bonde","gard"],
+    recipes:[
+      {kind:"Klassisk", t:"Nypoteter med smør og dill", time:"20 min", level:"Enkel", serves:4,
+        ing:["1 kg nypoteter","50 g smør","1 bunt dill","Flaksalt"],
+        steps:["Skyll potetene godt. Ikke skrell dem.","Kok dem i godt saltet vann i 12 til 15 minutter, til de er møre.","Hell av vannet og la dem dampe av et minutt.","Vend potetene i smør, hakket dill og flaksalt."],
+        tip:"Perfekt til spekemat, makrell eller rømme."},
+      {kind:"Restaurant", t:"Sprø knuste nypoteter med løyrom", time:"45 min", level:"Middels", serves:4,
+        ing:["1 kg små nypoteter","3 ss smør","3 ss olivenolje","2 dl rømme","50 g løyrom","1 rødløk","1 bunt gressløk","1 sitron","Flaksalt"],
+        steps:["Kok potetene møre og la dem dampe av.","Legg dem på et stekebrett og knus hver potet lett med bunnen av et glass.","Hell over smør og olje, og stek ved 230 grader i 25 minutter, til kantene er sprø.","Rør rømme med revet sitronskall og litt salt.","Finhakk rødløk og gressløk.","Server potetene med en klatt rømme, løyrom, rødløk og gressløk på toppen."],
+        tip:"Jo tørrere potetene er før steking, jo sprøere blir de."}],
+    wine:{style:"Champagne eller annen tørr musserende", why:"Bobler og syre løfter smør og rømme.", q:"champagne brut", af:"Alkoholfri musserende"} },
+
+  { id:"blomkal", img:"img/blomkal.webp", cat:"gronn", name:"Blomkål", sub:"Tett, hvit og nøtteaktig", months:r(7,10), peak:[8,9],
+    about:"Norsk blomkål er best på sensommeren og høsten. Se etter hvite, tette hoder uten brune flekker. De grønne bladene kan også stekes.",
+    buy:["dagligvare","bonde"],
+    recipes:[
+      {kind:"Klassisk", t:"Fløyelsmyk blomkålsuppe", time:"35 min", level:"Enkel", serves:4,
+        ing:["1 stort blomkålhode","1 løk","1 fedd hvitløk","2 ss smør","8 dl grønnsakskraft","2 dl fløte","Muskat","Salt og pepper"],
+        steps:["Hakk løk og hvitløk, og fres i smør til det er blankt.","Del blomkålen i buketter og ha den i kjelen sammen med kraften.","Kok under lokk i 15 minutter, til alt er helt mørt.","Tilsett fløte og kjør suppen glatt med stavmikser.","Smak til med revet muskat, salt og pepper."],
+        tip:"Stek noen små buketter gylne i smør og legg dem på toppen."},
+      {kind:"Restaurant", t:"Helstekt blomkål med brunt smør og kapers", time:"60 min", level:"Middels", serves:4,
+        ing:["1 helt blomkålhode","150 g smør","2 ss kapers","3 ss rosiner","50 g hasselnøtter","1 sitron","1 bunt persille","Flaksalt"],
+        steps:["Skjær bort de største bladene, men behold de små.","Kok hele hodet i saltet vann i 5 minutter, og la det renne godt av.","Pensle med smeltet smør, og stek ved 220 grader i 35 til 45 minutter. Pensle flere ganger.","Rist hasselnøttene i en tørr panne og grovhakk dem.","Brun resten av smøret, og ha i kapers, rosiner og sitronsaft.","Sett blomkålen på et fat, hell over smøret og strø over nøtter og persille."],
+        tip:"Del blomkålen i tykke skiver ved bordet, som en stek."}],
+    wine:{style:"Hvit Burgund (Chardonnay)", why:"Rund og smøraktig. Passer til nøttesmaken i stekt blomkål.", q:"bourgogne blanc", af:"Alkoholfri hvitvin"} },
+
+  { id:"kal", img:"img/kal.webp", cat:"gronn", name:"Hodekål", sub:"Grunnmuren i fårikål", months:r(8,3), peak:[9,10,11], stored:true,
+    about:"Ny kål kommer i august. Den lagres godt, så du finner norsk kål helt til våren. Spisskål er mildere og passer til steking.",
+    buy:["dagligvare","bonde"],
+    recipes:[
+      {kind:"Klassisk", t:"Fårikål", time:"2,5 t", level:"Enkel", serves:6,
+        ing:["2 kg fårikålkjøtt av lam","2 kg hodekål","2 ss hel sort pepper","1 ss salt","2 ss hvetemel","5 dl vann","Poteter til servering"],
+        steps:["Del kålen i store båter.","Legg et lag kjøtt med fettsiden ned i en stor gryte, og deretter et lag kål.","Strø salt, pepper og litt mel mellom hvert lag. Fortsett til alt er brukt.","Hell vannet over, og kok opp.","La gryten trekke under lokk på lav varme i 2 timer, til kjøttet slipper beinet.","Server med kokte poteter og tyttebær."],
+        tip:"Fårikål blir enda bedre dagen etter."},
+      {kind:"Restaurant", t:"Svidd spisskål med beurre blanc", time:"35 min", level:"Middels", serves:4,
+        ing:["2 spisskål","150 g kaldt smør","2 sjalottløk","1 dl hvitvin","2 ss hvitvinseddik","1 ss olje","50 g løyrom eller bacon","Gressløk"],
+        steps:["Del spisskålen i to på langs.","Varm en støpejernspanne godt med olje, og stek kålen på snittflaten i 5 minutter til den er nesten svart.","Snu, legg på lokk og la den dampe i 5 minutter til.","Kok finhakket sjalottløk med hvitvin og eddik til det er nesten borte.","Pisk inn kaldt smør i terninger på lav varme, til sausen er blank og tykk.","Server kålen i sausen, med løyrom og gressløk over."],
+        tip:"Den svidde overflaten gir en søt, røkt smak. Ikke vær redd for fargen."}],
+    wine:{style:"Lett rødvin, for eksempel Pinot Noir", why:"Lite garvestoff og frisk syre, som ikke kjemper mot kål og pepper.", q:"pinot noir", af:"Alkoholfri rødvin eller eplemost"} },
+
+  { id:"gronnkal", img:"img/gronnkal.webp", cat:"gronn", name:"Grønnkål", sub:"Blir søtere etter frost", months:r(9,1), peak:[11,12],
+    about:"Grønnkål tåler kulde godt, og frost gjør bladene søtere. Den er en klassiker til jul.",
+    buy:["dagligvare","bonde"],
+    recipes:[
+      {kind:"Klassisk", t:"Stuet grønnkål", time:"30 min", level:"Enkel", serves:4,
+        ing:["400 g grønnkål","2 ss smør","2 ss hvetemel","4 dl melk","Muskat","Salt og pepper"],
+        steps:["Riv bladene av stilkene og skyll dem godt.","Kok bladene i saltet vann i 5 minutter, og hakk dem fint.","Smelt smør, rør inn melet og spe med melk litt om gangen.","La sausen småkoke i 5 minutter.","Rør inn grønnkålen, og smak til med muskat, salt og pepper."],
+        tip:"Passer til ribbe, pinnekjøtt og kjøttkaker."},
+      {kind:"Restaurant", t:"Torsk med sprø grønnkål og blåskjellsaus", time:"45 min", level:"Middels", serves:4,
+        ing:["600 g torskefilet","200 g grønnkål","1 kg blåskjell","1 sjalottløk","1 dl hvitvin","2 dl fløte","50 g smør","Olje og flaksalt"],
+        steps:["Vend halvparten av grønnkålbladene i olje og salt, og bak dem ved 150 grader i 15 minutter til de er sprø.","Damp blåskjellene med sjalottløk og hvitvin under lokk i 5 minutter. Sil av kraften og plukk ut skjellene.","Kok kraften med fløte til den tykner litt.","Fres resten av grønnkålen raskt i smør.","Stek torsken på skinnsiden i 5 minutter, og snu den det siste minuttet.","Anrett grønnkål, torsk og blåskjell, hell over sausen og topp med sprø grønnkål."],
+        tip:"Sjekk at alle blåskjell er lukket før koking, og kast de som ikke åpner seg."}],
+    wine:{style:"Riesling, tørr", why:"Høy syre som skjærer gjennom fløte og grønne smaker.", q:"riesling trocken", af:"Alkoholfri riesling"} },
+
+  { id:"rosenkal", img:"img/rosenkal.webp", cat:"gronn", name:"Rosenkål", sub:"Små kålhoder på stilk", months:r(9,12), peak:[10,11],
+    about:"Rosenkål er best når den er stekt så den blir karamellisert. Det tar bort det bitre.",
+    buy:["dagligvare","bonde"],
+    recipes:[
+      {kind:"Klassisk", t:"Smørdampet rosenkål", time:"15 min", level:"Enkel", serves:4,
+        ing:["500 g rosenkål","2 ss smør","½ dl vann","Salt og pepper"],
+        steps:["Skjær av roten og fjern de ytterste bladene.","Del rosenkålen i to.","Ha alt i en kjele med lokk, og damp i 6 til 8 minutter.","Ta av lokket og la vannet koke bort. Smak til."],
+        tip:"Den skal være mør, men fortsatt grønn."},
+      {kind:"Restaurant", t:"Stekt rosenkål med bacon og eplesirup", time:"25 min", level:"Enkel", serves:4,
+        ing:["500 g rosenkål","150 g bacon","1 ss smør","2 ss eplesirup eller lønnesirup","50 g valnøtter","1 eple","Flaksalt"],
+        steps:["Del rosenkålen i to.","Stek baconet sprøtt i en stor panne, og ta det ut.","Legg rosenkålen med snittflaten ned i baconfettet, og stek uten å røre i 5 minutter til den er mørk.","Tilsett smør og stek videre i et par minutter.","Vend inn bacon, sirup og ristede valnøtter.","Topp med tynne staver friskt eple."],
+        tip:"Ikke fyll pannen for full, da koker kålen i stedet for å stekes."}],
+    wine:{style:"Alsace Pinot Gris", why:"Litt fyldig og med et hint av sødme som matcher karamellisert kål.", q:"pinot gris alsace", af:"Eplemost"} },
+
+  { id:"kalrot", img:"img/kalrot.webp", cat:"gronn", name:"Kålrot", sub:"Norges appelsin", months:r(8,3), peak:[9,10,11], stored:true,
+    about:"Kålrot dyrkes over hele landet. Ny kålrot om høsten er søt og saftig.",
+    buy:["dagligvare","bonde"],
+    recipes:[
+      {kind:"Klassisk", t:"Kålrotstappe", time:"40 min", level:"Enkel", serves:4,
+        ing:["1 kålrot (ca. 1 kg)","2 gulrøtter","50 g smør","Muskat","Salt og pepper"],
+        steps:["Skrell kålrot og gulrot, og del i terninger.","Kok i lettsaltet vann i 25 minutter, til alt er mørt.","Hell av vannet, men ta vare på litt.","Mos med smør og litt kokevann til den er myk.","Smak til med muskat, salt og pepper."],
+        tip:"Til pinnekjøtt, raspeballer og saltkjøtt."},
+      {kind:"Restaurant", t:"Saltbakt kålrot med brunt smør og ost", time:"2,5 t", level:"Middels", serves:4,
+        ing:["1 kålrot","1 kg grovt salt","3 eggehviter","100 g smør","60 g lagret ost","Frisk timian"],
+        steps:["Bland salt og eggehviter til en fuktig masse.","Legg kålroten med skall på et brett, og pakk den helt inn i saltmassen.","Bak ved 180 grader i 2 timer.","Knekk skorpen, skrell kålroten og skjær den i tykke skiver.","Stek skivene gylne i smør med timian.","Server med høvlet ost og brunt smør over."],
+        tip:"Saltskorpen gjør at kålroten damper i egen saft og blir veldig søt."}],
+    wine:{style:"Chenin Blanc fra Loire", why:"Honningaktig og frisk. Passer til søtlig rotgrønnsak.", q:"chenin blanc", af:"Alkoholfri hvitvin"} },
+
+  { id:"rodbeter", img:"img/rodbeter.webp", cat:"gronn", name:"Rødbeter", sub:"Jordaktig og søt", months:r(8,3), peak:[9,10], stored:true,
+    about:"Rødbeter høstes om høsten og lagres gjennom vinteren. Gule og stripete sorter finnes også.",
+    buy:["dagligvare","bonde"],
+    recipes:[
+      {kind:"Klassisk", t:"Syltede rødbeter", time:"1 t + natt", level:"Enkel", serves:6,
+        ing:["1 kg rødbeter","3 dl eddik (7 %)","3 dl vann","2 dl sukker","5 nellik"],
+        steps:["Kok rødbetene med skall i 40 til 50 minutter til de er møre.","Skyll dem i kaldt vann og gni av skallet.","Skjær i skiver og legg dem i rene glass.","Kok opp eddik, vann, sukker og nellik.","Hell den varme lagen over, og la glassene stå i kjøleskapet over natten."],
+        tip:"Bruk hansker, rødbeter farger mye."},
+      {kind:"Restaurant", t:"Bakte rødbeter med pisket geitost og rugsmuldre", time:"1,5 t", level:"Middels", serves:4,
+        ing:["6 rødbeter, gjerne i ulike farger","150 g myk geitost","1 dl kremfløte","2 skiver rugbrød","30 g smør","1 rødløk","1 dl eplecidereddik","1 ss sukker","Olivenolje og flaksalt"],
+        steps:["Pakk rødbetene i folie og bak dem ved 200 grader i 1 time.","Skjær rødløk i tynne ringer, og legg dem i varm eddik med sukker i 20 minutter.","Smuldre rugbrødet og stek det sprøtt i smør.","Pisk geitost med fløte til en luftig krem.","Skrell rødbetene og del dem i båter. Vend dem i olivenolje og flaksalt.","Legg geitostkrem på fatet, rødbeter oppå, og topp med rugsmuldre og syltet løk."],
+        tip:"Bak gule og røde beter hver for seg, så de ikke farger hverandre."}],
+    wine:{style:"Gamay (Beaujolais)", why:"Frisk og bæraktig rødvin som liker jordaktige smaker.", q:"beaujolais", af:"Alkoholfri rødvin"} },
+
+  { id:"sellerirot", img:"img/sellerirot.webp", cat:"gronn", name:"Sellerirot", sub:"Stygg utenpå, nydelig inni", months:r(9,3), peak:[10,11], stored:true,
+    about:"Sellerirot har en mild smak av selleri og nøtter. Den er perfekt til puré og helsteking.",
+    buy:["dagligvare","bonde"],
+    recipes:[
+      {kind:"Klassisk", t:"Sellerirotpuré", time:"30 min", level:"Enkel", serves:4,
+        ing:["1 sellerirot","5 dl melk","50 g smør","Salt og hvit pepper"],
+        steps:["Skrell sellerirot og del den i terninger.","Kok i melk med litt salt i 20 minutter til den er helt mør.","Sil av, men ta vare på litt av melken.","Kjør glatt med smør og litt melk.","Smak til med salt og hvit pepper."],
+        tip:"Perfekt til vilt, lam og stekt fisk."},
+      {kind:"Restaurant", t:"Helstekt sellerirot med traktkantarell", time:"2,5 t", level:"Middels", serves:4,
+        ing:["1 stor sellerirot","150 g smør","1 bunt timian","4 fedd hvitløk","200 g traktkantarell","2 dl kalvekraft eller soppkraft","1 ss madeira (kan sløyfes)"],
+        steps:["Skrubb sellerirota ren, men ikke skrell den.","Gni den inn med smør og salt, og stek ved 180 grader i 2 timer.","Øs over smeltet smør med timian og hvitløk hvert 20. minutt.","Kok inn kraften med madeira til halvparten.","Stek soppen tørr i en panne, og ha i en klatt smør til slutt.","Skjær sellerirota i skiver og server med sopp og saus."],
+        tip:"Ytterst blir den karamellisert og inni myk som smør."}],
+    wine:{style:"Hvit Burgund (Chardonnay)", why:"Nøtteaktig og rund. Passer sopp og smør.", q:"chardonnay bourgogne", af:"Alkoholfri hvitvin"} },
+
+  { id:"pastinakk", img:"img/pastinakk.webp", cat:"gronn", name:"Pastinakk", sub:"Søtere enn gulrot", months:r(9,3), peak:[10,11,12], stored:true,
+    about:"Pastinakk blir søtere etter de første frostnettene.",
+    buy:["dagligvare","bonde"],
+    recipes:[
+      {kind:"Klassisk", t:"Ovnsbakte rotgrønnsaker med honning", time:"45 min", level:"Enkel", serves:4,
+        ing:["4 pastinakker","4 gulrøtter","2 rødløk","3 ss olivenolje","1 ss honning","Frisk timian","Salt og pepper"],
+        steps:["Skrell pastinakk og gulrot, og del dem på langs.","Del rødløken i båter.","Vend alt i olje, timian, salt og pepper.","Bak ved 220 grader i 30 minutter.","Drypp over honning de siste 5 minuttene."],
+        tip:"Del grønnsakene i like store biter så de blir ferdige samtidig."},
+      {kind:"Restaurant", t:"Pastinakksuppe med brunt smør og eple", time:"40 min", level:"Enkel", serves:4,
+        ing:["600 g pastinakk","1 løk","1 liter kraft","2 dl fløte","75 g smør","1 syrlig eple","Gressløk"],
+        steps:["Fres løken myk i litt smør.","Ha i pastinakk i biter og kraft, og kok i 20 minutter.","Kjør glatt med fløte, og smak til med salt.","Brun resten av smøret.","Skjær eplet i små terninger.","Server suppen med eple, gressløk og en skvett brunt smør."],
+        tip:"Eplet gir friskhet som balanserer den søte suppen."}],
+    wine:{style:"Viognier", why:"Blomsteraktig og fyldig. Fint til søte rotgrønnsaker.", q:"viognier", af:"Eplemost"} },
+
+  { id:"purre", img:"img/purre.webp", cat:"gronn", name:"Purre", sub:"Mild løksmak", months:r(8,11), peak:[9,10],
+    about:"Norsk purre er god fra sensommeren og utover høsten. Skyll godt mellom lagene, der gjemmer det seg ofte jord.",
+    buy:["dagligvare","bonde"],
+    recipes:[
+      {kind:"Klassisk", t:"Potet- og purresuppe", time:"35 min", level:"Enkel", serves:4,
+        ing:["3 purre","500 g poteter","2 ss smør","1 liter kraft","1 dl fløte","100 g bacon","Salt og pepper"],
+        steps:["Skjær purren i ringer og skyll godt.","Fres purren myk i smør.","Ha i poteter i terninger og kraft, og kok i 20 minutter.","Kjør glatt med fløte og smak til.","Stek bacon sprøtt og strø over."],
+        tip:"Uten bacon blir den en fin vegetarrett."},
+      {kind:"Restaurant", t:"Svidd purre med sennepsvinaigrette og egg", time:"30 min", level:"Enkel", serves:4,
+        ing:["4 purre","3 egg","1 ss dijonsennep","1 ss hvitvinseddik","4 ss olivenolje","1 sjalottløk","2 ss kapers","Persille"],
+        steps:["Grill eller stek hele purrer på høy varme til de er svarte utenpå, ca. 15 minutter.","La dem hvile under et håndkle i 10 minutter.","Kok eggene i 9 minutter og hakk dem.","Rør sammen sennep, eddik, olje og finhakket sjalottløk.","Fjern det ytterste brente laget, og del purren på langs.","Hell over vinaigretten, og strø over egg, kapers og persille."],
+        tip:"Inni blir purren søt og myk som smør."}],
+    wine:{style:"Sauvignon Blanc fra Loire", why:"Frisk og grønn. Liker løk og sennep.", q:"sancerre", af:"Alkoholfri hvitvin"} },
+
+  { id:"gresskar", img:"img/gresskar.webp", cat:"gronn", name:"Gresskar", sub:"Høstens farge", months:r(9,10), peak:[10],
+    about:"Det dyrkes mer og mer gresskar i Norge. Hokkaido og butternut er best til mat. Hokkaido trenger du ikke engang å skrelle.",
+    buy:["dagligvare","bonde","gard"],
+    recipes:[
+      {kind:"Klassisk", t:"Gresskarsuppe med ingefær", time:"45 min", level:"Enkel", serves:4,
+        ing:["1 hokkaidogresskar (ca. 1,2 kg)","1 løk","3 cm ingefær","2 fedd hvitløk","8 dl grønnsakskraft","4 dl kokosmelk","1 lime","Gresskarkjerner"],
+        steps:["Del gresskaret og fjern kjernene. Del i biter.","Bak gresskaret ved 200 grader i 25 minutter.","Fres løk, ingefær og hvitløk.","Ha i gresskar og kraft, og kok i 10 minutter.","Kjør glatt med kokosmelk, og smak til med lime og salt.","Server med ristede gresskarkjerner."],
+        tip:"Ovnsbaking først gir mer smak enn bare koking."},
+      {kind:"Restaurant", t:"Bakt gresskar med salvie, ricotta og brunt smør", time:"50 min", level:"Middels", serves:4,
+        ing:["1 butternut","100 g smør","1 bunt salvie","250 g ricotta","1 sitron","50 g gresskarkjerner","1 ss honning","Flaksalt og chiliflak"],
+        steps:["Skjær gresskaret i tykke skiver, vend i olje og salt.","Bak ved 220 grader i 30 minutter til kantene er karamellisert.","Rør ricotta med sitronskall og litt salt.","Brun smøret og stek salviebladene sprø i det.","Rist kjernene med honning og chili.","Legg ricotta på fatet, gresskar oppå, og hell over smør og salvie. Topp med kjerner."],
+        tip:"Sprøstekt salvie er en enkel restaurantdetalj som løfter alt."}],
+    wine:{style:"Fyldig Chardonnay med eik", why:"Vanilje og smør passer til søtt, bakt gresskar.", q:"chardonnay", af:"Alkoholfri hvitvin"} },
+
+  { id:"jordskokk", img:"img/jordskokk.webp", cat:"gronn", name:"Jordskokk", sub:"Nøtteaktig rotknoll", months:r(10,3), peak:[11,12],
+    about:"Jordskokk høstes fra oktober og kan stå i jorda gjennom vinteren. Den smaker nøtter og artisjokk.",
+    buy:["dagligvare","bonde"],
+    recipes:[
+      {kind:"Klassisk", t:"Jordskokksuppe", time:"35 min", level:"Enkel", serves:4,
+        ing:["600 g jordskokk","1 løk","2 ss smør","8 dl kraft","2 dl fløte","½ sitron","Salt og pepper"],
+        steps:["Skrell eller skrubb jordskokken godt.","Fres løk i smør.","Ha i jordskokk i skiver og kraft, og kok i 20 minutter.","Kjør glatt med fløte.","Smak til med sitron, salt og pepper."],
+        tip:"Legg skrelte jordskokker i sitronvann så de ikke blir brune."},
+      {kind:"Restaurant", t:"Jordskokk tre veier", time:"1 t", level:"Avansert", serves:4,
+        ing:["1 kg jordskokk","100 g smør","2 dl fløte","Olje til frityr","1 bunt timian","Hasselnøtter","Trøffelolje (kan sløyfes)","Flaksalt"],
+        steps:["Puré: Kok halvparten i fløte til mørt, og kjør glatt med en klatt smør.","Stekt: Del noen jordskokker i to, og stek dem på snittflaten i smør med timian i 15 minutter.","Chips: Skjær 2 jordskokker i tynne skiver og frityrstek dem sprø ved 160 grader.","Rist og hakk hasselnøttene.","Legg puré på tallerkenen, stekte jordskokker oppå, og topp med chips og nøtter.","Avslutt med noen dråper trøffelolje og flaksalt."],
+        tip:"Tre teksturer av samme råvare er et klassisk grep på restauranter."}],
+    wine:{style:"Hvit Burgund (Chardonnay)", why:"Nøtteaktig vin til nøtteaktig rot.", q:"meursault", af:"Alkoholfri hvitvin"} },
+
+  { id:"ramslok", img:"img/ramslok.webp", cat:"gronn", name:"Ramsløk", sub:"Vill hvitløk i vårskogen", months:r(4,5), peak:[5],
+    about:"Ramsløk vokser i fuktig løvskog langs kysten fra Oslofjorden og vestover.",
+    buy:["bonde","natur"], forage:{where:"Fuktig løvskog og skyggefulle bekkedaler, særlig langs kysten i Sør-Norge.", tip:"Kjennes på den sterke hvitløkslukten. Ta bare noen blader fra hver plante."},
+    safety:"Ramsløk kan forveksles med giftig liljekonvall. Knus et blad. Lukter det ikke hvitløk, la det være.",
+    recipes:[
+      {kind:"Klassisk", t:"Ramsløksmør", time:"10 min", level:"Enkel", serves:8,
+        ing:["1 stor neve ramsløk","250 g mykt smør","1 ts flaksalt"],
+        steps:["Skyll og tørk ramsløken.","Finhakk den.","Bland med mykt smør og salt.","Rull smøret i bakepapir til en pølse og frys."],
+        tip:"Skjær en skive rett fra fryseren til biff, fisk eller nybakt brød."},
+      {kind:"Restaurant", t:"Torsk med ramsløkemulsjon", time:"30 min", level:"Middels", serves:4,
+        ing:["600 g torskefilet","1 stor neve ramsløk","2 dl nøytral olje","1 eggeplomme","1 ts dijonsennep","½ sitron","Nypoteter"],
+        steps:["Blanchér ramsløken i 10 sekunder og avkjøl i isvann.","Kjør med olje i blender og sil.","Pisk eggeplomme og sennep, og drypp inn ramsløkoljen til det blir en grønn majones.","Smak til med sitron og salt.","Stek torsken på skinnsiden og server med emulsjon og nypoteter."],
+        tip:"Den knallgrønne fargen kommer fra den raske blancheringen."}],
+    wine:{style:"Sauvignon Blanc", why:"Grønn og frisk som ramsløken.", q:"sauvignon blanc", af:"Alkoholfri hvitvin"} },
+
+  // ---------- Fisk og sjømat ----------
+  { id:"skrei", img:"img/skrei.webp", cat:"sjo", name:"Skrei", sub:"Vandretorsk fra Barentshavet", months:r(1,4), peak:[2,3],
+    about:"Skreien kommer til kysten av Nord-Norge for å gyte. Den har fast, hvitt kjøtt og er en vinterdelikatesse.",
+    buy:["fisk","dagligvare"],
+    recipes:[
+      {kind:"Klassisk", t:"Mølje", time:"30 min", steps:["Trekk skrei i lettsaltet vann.","Server med rogn og lever kokt hver for seg.","Til: poteter, gulrot og flatbrød."]},
+      {kind:"Restaurant", t:"Skrei med brunt smør, hasselnøtter og blomkål", time:"40 min", steps:["Stek skreien i smør på én side.","Lag blomkålpuré.","Topp med brunt smør og ristede hasselnøtter."]}],
+    wine:{style:"Chablis", why:"Mineralsk og ren. Klassisk til hvit fisk.", q:"chablis", af:"Alkoholfri musserende"} },
+
+  { id:"torsk", img:"img/torsk.webp", cat:"sjo", name:"Torsk", sub:"Kysttorsk hele året", months:ALL, peak:[1,2,3],
+    about:"Torsk fiskes langs hele kysten hele året. Spør i fiskedisken hvor fisken kommer fra.",
+    buy:["fisk","dagligvare"],
+    recipes:[
+      {kind:"Klassisk", t:"Ovnsbakt torsk med bacon", time:"30 min", steps:["Legg torsken i en form.","Topp med sprø bacon og smør.","Bak ved 200 grader i 15 minutter."]},
+      {kind:"Restaurant", t:"Torsk med beurre blanc og løyrom", time:"35 min", steps:["Damp torsken lett.","Lag beurre blanc.","Avslutt med løyrom og gressløk."]}],
+    wine:{style:"Chablis", why:"Ren syre som passer smørsauser og hvit fisk.", q:"chablis", af:"Alkoholfri hvitvin"} },
+
+  { id:"makrell", img:"img/makrell.webp", cat:"sjo", name:"Makrell", sub:"Fet høstmakrell", months:r(6,10), peak:[8,9],
+    about:"Makrellen er fetest og best fra sensommeren. Fersk makrell skal ha blanke øyne og glinsende skinn.",
+    buy:["fisk","dagligvare"], forage:{where:"Fra brygge, svaberg eller båt langs kysten fra Oslofjorden og nordover til Trøndelag.", tip:"Fritidsfiske med stang og snøre i sjøen er gratis. Følg reglene for minstemål og ta bare det du skal spise."},
+    recipes:[
+      {kind:"Klassisk", t:"Grillet makrell med rømme og agurk", time:"20 min", steps:["Grill eller stek fileter med skinnet ned.","Lag agurksalat med eddik og sukker.","Server med rømme og nypoteter."]},
+      {kind:"Restaurant", t:"Flammet makrell med pepperrot og eple", time:"25 min", steps:["Rimme filetene med salt og sukker i 20 minutter.","Svi skinnsiden med gassbrenner.","Server med revet pepperrot, eple og kjernemelk."]}],
+    wine:{style:"Albariño", why:"Salt og sitrusfrisk. Skjærer gjennom fet fisk.", q:"albarino", af:"Alkoholfri musserende"} },
+
+  { id:"sild", img:"img/sild.webp", cat:"sjo", name:"Sild", sub:"Høst- og vintersild", months:r(9,3), peak:[10,11,12],
+    about:"Norsk vårgytende sild fiskes om høsten og vinteren. Fersk sild er rimelig og veldig god stekt.",
+    buy:["fisk","dagligvare"],
+    recipes:[
+      {kind:"Klassisk", t:"Stekt sild med løk", time:"20 min", steps:["Vend fileter i rugmel med salt og pepper.","Stek i smør.","Server med stekt løk og poteter."]},
+      {kind:"Restaurant", t:"Sild tre veier med rugbrød", time:"Dagen før", steps:["Lag sennepssild, tomatsild og løksild.","Server med sprøtt rugbrød.","Ha på syltet rødløk og kald rømme."]}],
+    wine:{style:"Tørr Riesling eller akevitt", why:"Syre og krydder møter salt og eddik.", q:"riesling", af:"Alkoholfritt øl"} },
+
+  { id:"hummer", img:"img/hummer.webp", cat:"sjo", name:"Hummer", sub:"Kort og eksklusiv sesong", months:r(10,11), peak:[10],
+    about:"Hummersesongen starter 1. oktober. På Sørlandet og Østlandet varer den til 30. november, litt lenger lenger nord. Sjekk alltid gjeldende regler hos Fiskeridirektoratet.",
+    buy:["fisk","spesial"], forage:{where:"Steinbunn langs kysten, særlig fra svenskegrensen og vestover.", tip:"Fritidsfiske med teine krever påmelding hos Fiskeridirektoratet. Det er grenser for antall teiner, minstemål og maksmål, og rognhummer skal slippes ut igjen."},
+    safety:"Hummerfiske har strenge regler. Sjekk Fiskeridirektoratet før du setter teiner.",
+    recipes:[
+      {kind:"Klassisk", t:"Kokt hummer med aioli", time:"25 min", steps:["Kok hummeren i sterkt saltet vann, cirka 15 minutter per kilo.","La den kjøle seg ned.","Server med aioli, sitron og godt brød."]},
+      {kind:"Restaurant", t:"Hummer med beurre blanc og grønt eple", time:"45 min", steps:["Kok hummeren kort og ta ut kjøttet.","Varm halen forsiktig i smør.","Server med beurre blanc og tynne skiver grønt eple."]}],
+    wine:{style:"Hvit Burgund eller Champagne", why:"Rik hummer trenger en vin med kropp og syre.", q:"puligny montrachet", af:"Alkoholfri musserende"} },
+
+  { id:"krabbe", img:"img/krabbe.webp", cat:"sjo", name:"Taskekrabbe", sub:"Full av innmat om høsten", months:r(8,11), peak:[9,10],
+    about:"Taskekrabben er fullest om høsten. Velg krabber som er tunge i forhold til størrelsen.",
+    buy:["fisk","dagligvare"], forage:{where:"Fra båt eller brygge langs kysten, særlig Vestlandet og Trøndelag.", tip:"Krabbeteiner må ha fluktåpning. Sjekk reglene hos Fiskeridirektoratet."},
+    recipes:[
+      {kind:"Klassisk", t:"Krabbe med loff og majones", time:"30 min", steps:["Kok krabbene i 15 til 20 minutter i saltvann.","Plukk ut klør og innmat.","Server med loff, majones og sitron."]},
+      {kind:"Restaurant", t:"Krabbetoast med brunt smør", time:"25 min", steps:["Bland krabbekjøtt med litt majones, gressløk og sitron.","Stek brød gyllent i brunt smør.","Topp med krabbe og løyrom."]}],
+    wine:{style:"Riesling eller Champagne", why:"Syre og frukt som balanserer det søte krabbekjøttet.", q:"riesling", af:"Alkoholfri musserende"} },
+
+  { id:"blaskjell", img:"img/blaskjell.webp", cat:"sjo", name:"Blåskjell", sub:"Best i måneder med r", months:r(9,4), peak:[10,11,12,1,2],
+    about:"Blåskjell er best i de kalde månedene. Kjøp dem levende: skjellene skal være lukket.",
+    buy:["fisk","dagligvare"], forage:{where:"Fjæresteiner og brygger langs hele kysten.", tip:"Sjekk alltid Mattilsynets blåskjellvarsel først. Skjell kan inneholde algegift selv om de ser fine ut."},
+    safety:"Plukk aldri blåskjell uten å sjekke Mattilsynets blåskjellvarsel. Algegift forsvinner ikke ved koking.",
+    recipes:[
+      {kind:"Klassisk", t:"Moules marinière", time:"20 min", steps:["Fres sjalottløk og hvitløk i smør.","Ha i skjell og hvitvin, legg på lokk i 5 minutter.","Server med persille og pommes frites."]},
+      {kind:"Restaurant", t:"Blåskjell i sidersaus med eple og estragon", time:"25 min", steps:["Damp skjellene i tørr norsk sider.","Kok inn kraften med fløte.","Server med små terninger eple og fersk estragon."]}],
+    wine:{style:"Muscadet", why:"Lett, salt og frisk. Den klassiske vinen til blåskjell.", q:"muscadet", af:"Alkoholfri sider"} },
+
+  { id:"kamskjell", img:"img/kamskjell.webp", cat:"sjo", name:"Kamskjell", sub:"Håndplukket av dykkere", months:r(10,4), peak:[11,12,1,2],
+    about:"Norske kamskjell plukkes av dykkere, mest i Trøndelag og Nordland. De er søte og faste i kjøttet.",
+    buy:["fisk","spesial"],
+    recipes:[
+      {kind:"Klassisk", t:"Stekte kamskjell med blomkål", time:"20 min", steps:["Tørk kamskjellene godt.","Stek dem 1 minutt på hver side i varm panne.","Server på blomkålpuré med brunt smør."]},
+      {kind:"Restaurant", t:"Rå kamskjell med eple, pepperrot og dill", time:"15 min", steps:["Skjær kamskjell i tynne skiver.","Hell over litt eplejuice og olje.","Topp med revet pepperrot og dill."]}],
+    wine:{style:"Champagne Blanc de Blancs", why:"Ren og elegant, lar den søte smaken komme fram.", q:"blanc de blancs", af:"Alkoholfri musserende"} },
+
+  { id:"osters", img:"img/osters.webp", cat:"sjo", name:"Østers", sub:"Flatøsters fra norske poller", months:r(9,4), peak:[10,11,12],
+    about:"Norske østers er best i de kalde månedene. De lever i kalde, rene poller, blant annet i Agder og Vestland.",
+    buy:["fisk","spesial"],
+    safety:"Kjøp fra godkjente produsenter. Ikke plukk østers selv uten å sjekke Mattilsynets varsel.",
+    recipes:[
+      {kind:"Klassisk", t:"Rå østers med sitron", time:"10 min", steps:["Åpne østersen med en østerskniv.","Server på is.","Ha på sitron og eventuelt litt sjalottløkeddik."]},
+      {kind:"Restaurant", t:"Østers med agurk og pepperrot", time:"15 min", steps:["Lag en is av agurkjuice.","Topp østersen med agurk og pepperrot.","Avslutt med dråper av dillolje."]}],
+    wine:{style:"Chablis eller Muscadet", why:"Mineralsk og salt, som havet.", q:"chablis premier cru", af:"Alkoholfri musserende"} },
+
+  { id:"kongekrabbe", img:"img/kongekrabbe.webp", cat:"sjo", name:"Kongekrabbe", sub:"Kjempen fra Finnmark", months:ALL, peak:[12,1,2,3],
+    about:"Kongekrabbe fanges i Øst-Finnmark. Den selges ofte levende eller fryst og er best i vinterhalvåret.",
+    buy:["fisk","spesial"],
+    recipes:[
+      {kind:"Klassisk", t:"Kongekrabbe med smør og sitron", time:"20 min", steps:["Damp eller kok krabbeben i 5 til 7 minutter.","Klipp opp skallet.","Server med smeltet smør og sitron."]},
+      {kind:"Restaurant", t:"Grillet kongekrabbe med tangsmør", time:"30 min", steps:["Grill bena raskt.","Lag en beurre blanc med litt tang.","Server med sprø potet."]}],
+    wine:{style:"Hvit Burgund", why:"Rik nok for det søte og fete kjøttet.", q:"bourgogne", af:"Alkoholfri hvitvin"} },
+
+  // ---------- Sopp ----------
+  { id:"kantarell", img:"img/kantarell.webp", cat:"sopp", name:"Kantarell", sub:"Skogens gull", months:r(7,10), peak:[8,9],
+    about:"Kantarell er en av de lettest gjenkjennelige matsoppene. Den lukter litt aprikos.",
+    buy:["dagligvare","bonde","natur"], forage:{where:"Blandingsskog med bjørk, gran og furu, gjerne i mose. Finnes over hele landet.", tip:"Se etter åreaktige, nedløpende ribber under hatten, ikke skiver. Falsk kantarell har tynne, oransje skiver."},
+    safety:"Spis aldri sopp du ikke er helt sikker på. Ta med soppen til soppkontroll om du er i tvil.",
+    recipes:[
+      {kind:"Klassisk", t:"Kantarell på toast", time:"15 min", steps:["Stek kantarellen tørr i pannen først.","Tilsett smør, sjalottløk og litt fløte.","Server på ristet brød med persille."]},
+      {kind:"Restaurant", t:"Kantarell, eggeplomme og brunt smør", time:"20 min", steps:["Stek kantareller i brunt smør.","Varm en eggeplomme forsiktig til den er kremete.","Server med ristet rug og flaksalt."]}],
+    wine:{style:"Hvit Burgund eller Jura", why:"Nøtter og smør passer kantarell perfekt.", q:"bourgogne blanc", af:"Alkoholfri hvitvin"} },
+
+  { id:"traktkantarell", img:"img/traktkantarell.webp", cat:"sopp", name:"Traktkantarell", sub:"Høstens beste sopp", months:r(8,11), peak:[9,10],
+    about:"Traktkantarell kommer sent og tåler litt frost. Den vokser ofte i store mengder.",
+    buy:["bonde","natur","spesial"], forage:{where:"Fuktig granskog med mose, ofte i store kolonier. Vanlig i hele Sør-Norge.", tip:"Har brun hatt med hull i midten og gul stilk. Tørker godt og er perfekt å fryse."},
+    safety:"Spis aldri sopp du ikke er helt sikker på. Ta med soppen til soppkontroll om du er i tvil.",
+    recipes:[
+      {kind:"Klassisk", t:"Soppstuing", time:"20 min", steps:["Stek soppen tørr i pannen.","Tilsett smør, løk og fløte.","Kok inn og smak til med salt og pepper."]},
+      {kind:"Restaurant", t:"Traktkantarell med hjort og madeira", time:"40 min", steps:["Stek hjort eller elg rosa.","Stek soppen i smør med timian.","Kok inn kraft med madeira og server sammen."]}],
+    wine:{style:"Pinot Noir fra Burgund", why:"Jordaktig rødvin som klinger med skogbunnen.", q:"bourgogne rouge", af:"Alkoholfri rødvin"} },
+
+  { id:"steinsopp", img:"img/steinsopp.webp", cat:"sopp", name:"Steinsopp", sub:"Porcini fra norsk skog", months:r(7,9), peak:[8],
+    about:"Steinsopp er en kraftig og ettertraktet matsopp. Den har svamp under hatten, ikke skiver.",
+    buy:["natur","spesial"], forage:{where:"Gran- og bjørkeskog, gjerne langs stier og skogsveier.", tip:"Velg unge, faste sopper. Gallerørsopp ligner, men smaker bittert og har mørkt nett på stilken."},
+    safety:"Spis aldri sopp du ikke er helt sikker på. Ta med soppen til soppkontroll om du er i tvil.",
+    recipes:[
+      {kind:"Klassisk", t:"Stekt steinsopp med persille", time:"15 min", steps:["Skjær soppen i skiver.","Stek i olje og smør på høy varme.","Avslutt med hvitløk og persille."]},
+      {kind:"Restaurant", t:"Rå steinsopp med lagret ost", time:"10 min", steps:["Skjær helt unge sopper tynt.","Drypp over god olivenolje og sitron.","Høvle over lagret ost."]}],
+    wine:{style:"Nebbiolo", why:"Italiensk klassiker til porcini.", q:"nebbiolo langhe", af:"Alkoholfri rødvin"} },
+
+  { id:"piggsopp", img:"img/piggsopp.webp", cat:"sopp", name:"Piggsopp", sub:"Pigger, ikke skiver", months:r(8,10), peak:[9],
+    about:"Piggsopp er en trygg sopp for nybegynnere. Den har små pigger under hatten.",
+    buy:["natur"], forage:{where:"Barskog og blandingsskog over hele landet.", tip:"Lett å kjenne igjen på piggene under hatten. Eldre sopp kan bli litt bitter."},
+    safety:"Spis aldri sopp du ikke er helt sikker på. Ta med soppen til soppkontroll om du er i tvil.",
+    recipes:[
+      {kind:"Klassisk", t:"Soppsuppe", time:"30 min", steps:["Stek sopp og løk i smør.","Kok med kraft og fløte.","Kjør halvparten glatt og smak til."]},
+      {kind:"Restaurant", t:"Syltet piggsopp til vilt", time:"Dagen før", steps:["Forvell små sopper.","Kok opp eddik, sukker og einebær.","Hell over soppen og server til vilt."]}],
+    wine:{style:"Syrah fra nordlige Rhône", why:"Pepper og urter som passer skogsmaker.", q:"crozes hermitage", af:"Alkoholfri rødvin"} },
+
+  // ---------- Bær og frukt ----------
+  { id:"jordbaer", img:"img/jordbaer.webp", cat:"baer", name:"Jordbær", sub:"Norske sommerbær", months:r(6,8), peak:[7],
+    about:"Norske jordbær modner sakte i lyse sommernetter og er ekstra søte.",
+    buy:["dagligvare","bonde","gard"],
+    recipes:[
+      {kind:"Klassisk", t:"Jordbær med fløte", time:"5 min", steps:["Rens bærene.","Server med lettpisket fløte.","Strø over litt sukker."]},
+      {kind:"Restaurant", t:"Jordbær med rabarbragranité og rømmeis", time:"40 min", steps:["Lag granité av rabarbrasaft.","Mariner jordbær med litt sukker og hylleblomst.","Server med rømmeis."]}],
+    wine:{style:"Moscato d'Asti", why:"Søt, lett og musserende. Matcher søte bær.", q:"moscato d'asti", af:"Alkoholfri rosé musserende"} },
+
+  { id:"blabaer", img:"img/blabaer.webp", cat:"baer", name:"Blåbær", sub:"Gratis i skogen", months:r(7,9), peak:[8],
+    about:"Blåbær vokser over hele Norge. Ville blåbær er blå helt inn, i motsetning til hagebær.",
+    buy:["natur","dagligvare"], forage:{where:"Barskog og lyngmark over hele landet.", tip:"Bruk bærplukker for å spare tid. Bærene fryser godt."},
+    recipes:[
+      {kind:"Klassisk", t:"Blåbærsyltetøy", time:"20 min", steps:["Kok blåbær med litt sukker.","La det småkoke i 5 minutter.","Fyll på rene glass."]},
+      {kind:"Restaurant", t:"Blåbær med karamellisert hvit sjokolade", time:"30 min", steps:["Bak hvit sjokolade ved 120 grader til den blir gyllen.","Mariner blåbær med lime.","Server med kesam og knust kjeks."]}],
+    wine:{style:"Søt Riesling (Auslese)", why:"Sødme og syre matcher syrlige bær.", q:"riesling auslese", af:"Blåbærsaft med kullsyre"} },
+
+  { id:"multer", img:"img/multer.webp", cat:"baer", name:"Multer", sub:"Myrens gull", months:r(7,8), peak:[8],
+    about:"Multer vokser på myr, mest i fjellet og i Nord-Norge.",
+    buy:["natur","spesial"], forage:{where:"Myrer i fjellet og i Nord-Norge.", tip:"I deler av Nord-Norge er det egne regler for multeplukking på privat grunn. Sjekk lokale regler."},
+    recipes:[
+      {kind:"Klassisk", t:"Multekrem", time:"10 min", steps:["Pisk fløte.","Vend inn multer og litt sukker.","Server til jul eller som dessert."]},
+      {kind:"Restaurant", t:"Multer med brunostkaramell", time:"30 min", steps:["Smelt brunost med fløte til en karamell.","Pisk fløte og server med multer.","Topp med knust krumkake."]}],
+    wine:{style:"Sauternes", why:"Honningsøt og frisk dessertvin.", q:"sauternes", af:"Eplemost"} },
+
+  { id:"tyttebaer", img:"img/tyttebaer.webp", cat:"baer", name:"Tyttebær", sub:"Syrlig skogsbær", months:r(8,10), peak:[9],
+    about:"Tyttebær holder seg godt fordi de har naturlig konservering. Klassisk til vilt.",
+    buy:["natur","dagligvare"], forage:{where:"Tørr furuskog og lyngmark over hele landet.", tip:"Bærene er modne når de er helt røde."},
+    recipes:[
+      {kind:"Klassisk", t:"Rørte tyttebær", time:"10 min", steps:["Rør tyttebær med sukker.","La stå til sukkeret er løst.","Server til vilt, kjøttkaker eller grøt."]},
+      {kind:"Restaurant", t:"Tyttebærgel til vilt", time:"20 min", steps:["Kok tyttebær med litt sukker og sil.","Sett med agar.","Kjør glatt og server i små klatter."]}],
+    wine:{style:"Pinot Noir", why:"Bæraktig rødvin passer viltretter med tyttebær.", q:"pinot noir", af:"Tyttebærsaft"} },
+
+  { id:"epler", img:"img/epler.webp", cat:"baer", name:"Epler", sub:"Fra Hardanger, Sogn og Telemark", months:r(8,11), peak:[9,10],
+    about:"Norske epler høstes fra august til oktober. Aroma og Gravenstein er populære sorter.",
+    buy:["dagligvare","bonde","gard"],
+    recipes:[
+      {kind:"Klassisk", t:"Tilslørte bondepiker", time:"20 min", steps:["Kok eplemos.","Rist kavring eller brødsmuler i smør og sukker.","Lag lag med eplemos, smuler og krem."]},
+      {kind:"Restaurant", t:"Bakt eple med havrecrumble og brunsmøris", time:"45 min", steps:["Bak halve epler med smør og sukker.","Lag crumble av havre, smør og sukker.","Server med is laget av brunt smør."]}],
+    wine:{style:"Norsk sider eller søt Chenin Blanc", why:"Eple til eple, med syre og sødme.", q:"norsk sider", af:"Norsk eplemost"} },
+
+  { id:"plommer", img:"img/plommer.webp", cat:"baer", name:"Plommer", sub:"Kort og søt sesong", months:r(8,9), peak:[9],
+    about:"Norske plommer har kort sesong. Victoria er den vanligste sorten.",
+    buy:["dagligvare","bonde","gard"],
+    recipes:[
+      {kind:"Klassisk", t:"Plommekompott", time:"15 min", steps:["Del plommer og fjern steinen.","Kok med litt sukker og kanel.","Server med vaniljekrem."]},
+      {kind:"Restaurant", t:"Grillet plomme med mascarpone og timian", time:"20 min", steps:["Grill plommehalvdeler.","Pisk mascarpone med honning.","Server med frisk timian."]}],
+    wine:{style:"Tawny portvin", why:"Nøtter og karamell passer modne plommer.", q:"tawny port", af:"Alkoholfri rødvin"} },
+
+  { id:"paerer", img:"img/paerer.webp", cat:"baer", name:"Pærer", sub:"Saftige høstpærer", months:r(9,10), peak:[9],
+    about:"Norske pærer kommer i september. Plukk dem litt umodne og la dem modne på kjøkkenbenken.",
+    buy:["dagligvare","gard"],
+    recipes:[
+      {kind:"Klassisk", t:"Pærer i rødvin", time:"40 min", steps:["Skrell pærene.","Kok dem i rødvin med sukker og kanel.","Server med krem."]},
+      {kind:"Restaurant", t:"Pære med blåmuggost og valnøtter", time:"15 min", steps:["Skjær pære i tynne skiver.","Server med blåmuggost og honning.","Topp med ristede valnøtter."]}],
+    wine:{style:"Sauternes eller Tokaji", why:"Søt vin og salt ost er en klassiker.", q:"tokaji", af:"Pærejuice"} },
+
+  // ---------- Kjøtt og vilt ----------
+  { id:"lam", img:"img/lam.webp", cat:"vilt", name:"Lam", sub:"Fra beite i fjellet", months:r(8,11), peak:[9,10],
+    about:"Lammene går på beite om sommeren og slaktes om høsten. Fårikålens dag er siste torsdag i september.",
+    buy:["dagligvare","spesial","bonde"],
+    recipes:[
+      {kind:"Klassisk", t:"Fårikål", time:"2,5 t", steps:["Legg lam og kål lagvis.","Strø salt og hel sort pepper mellom lagene.","Hell på litt vann og la det trekke."]},
+      {kind:"Restaurant", t:"Lammecarré med einer og sellerirot", time:"45 min", steps:["Stek carréen rosa.","Lag sellerirotpuré.","Server med en saus smaksatt med knust einebær."]}],
+    wine:{style:"Rioja eller Bordeaux", why:"Fast struktur som passer lam.", q:"rioja reserva", af:"Alkoholfri rødvin"} },
+
+  { id:"elg", img:"img/elg.webp", cat:"vilt", name:"Elg og hjort", sub:"Høstens jaktsesong", months:r(9,12), peak:[10],
+    about:"Jakten på elg og hjort foregår om høsten. Viltkjøtt er magert og smaksrikt.",
+    buy:["spesial","bonde"],
+    recipes:[
+      {kind:"Klassisk", t:"Viltgryte", time:"2 t", steps:["Brun kjøttet.","Kok med kraft, einebær, timian og fløte.","Server med tyttebær og poteter."]},
+      {kind:"Restaurant", t:"Hjortefilet med traktkantarell og rødbeter", time:"50 min", steps:["Stek filet rosa.","Lag bakte rødbeter.","Server med traktkantarell og en mørk viltsaus."]}],
+    wine:{style:"Barolo eller nordlig Rhône", why:"Kraftig, med syre og krydder til vilt.", q:"barolo", af:"Alkoholfri rødvin"} },
+];
+
+/* ---------- state ---------- */
+const TODAY = new Date().getMonth() + 1;
+let month = TODAY;
+let cat = "alle";
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+};
+const savedCat = store.get("sesong-cat", "alle");
+if (savedCat === "alle" || CATS[savedCat]) cat = savedCat;
+// Shopping list entries: {id, text, from, done}
+let list = store.get("sesong-list", []);
+if (!Array.isArray(list)) list = [];
+
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+const hash = s => { let h = 2166136261; for (const ch of s) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+const rng = seed => () => { seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+
+// One letter in italic, like the packaging this design borrows from
+function flair(word) {
+  if (word.length < 5) return esc(word);
+  const idx = 2 + hash(word) % (word.length - 3);
+  if (/\s/.test(word[idx])) return esc(word);
+  return esc(word.slice(0, idx)) + '<em class="v">' + esc(word[idx]) + "</em>" + esc(word.slice(idx + 1));
+}
+
+function blobSvg(id, color, w = 300, h = 140) {
+  const rand = rng(hash(id));
+  const pts = [];
+  const rows = 4 + Math.floor(rand() * 3);
+  for (let i = 0; i < rows; i++) {
+    const y = h * 0.2 + (h * 0.6) * (i / (rows - 1)) + (rand() - 0.5) * 14;
+    const left = w * (0.12 + rand() * 0.12), right = w * (0.76 + rand() * 0.12);
+    if (i % 2 === 0) { pts.push([left, y]); pts.push([right, y + (rand() - 0.5) * 20]); }
+    else { pts.push([right, y]); pts.push([left, y + (rand() - 0.5) * 20]); }
+  }
+  let d = `M${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+  for (let i = 1; i < pts.length; i++) {
+    const [x, y] = pts[i], [px, py] = pts[i - 1];
+    d += ` Q${((px + x) / 2 + (rand() - 0.5) * 40).toFixed(1)} ${((py + y) / 2 + (rand() - 0.5) * 30).toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)}`;
+  }
+  const sw = (h * 0.24 + rand() * h * 0.06).toFixed(1);
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+    <path d="${d}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="${d}" fill="none" stroke="${color}" stroke-width="${(sw * 0.55).toFixed(1)}" stroke-linecap="round" stroke-linejoin="round" opacity=".5" transform="translate(${(rand()*10-5).toFixed(1)} ${(rand()*8-4).toFixed(1)})"/>
+  </svg>`;
+}
+
+// Full-bleed photo when one exists; otherwise a brush stroke with the item's initial
+function art(it, seed = "", w = 300, h = 140) {
+  if (it.img) return `<div class="art photo"><img src="${esc(it.img)}" alt="${esc(it.name)}" loading="lazy"></div>`;
+  return `<div class="art">${blobSvg(it.id + seed, CATS[it.cat].color, w, h)}<span class="initial">${esc(it.name[0])}</span></div>`;
+}
+
+function rangeText(it) {
+  if (it.months.length === 12) return "Hele året";
+  const set = new Set(it.months);
+  const start = it.months.find(m => !set.has(m === 1 ? 12 : m - 1)) ?? it.months[0];
+  const end = it.months.find(m => !set.has(m % 12 + 1)) ?? it.months[it.months.length - 1];
+  return start === end ? MSHORT[start - 1] : `${MSHORT[start - 1]}–${MSHORT[end - 1]}`;
+}
+
+function status(it, m) {
+  if (!it.months.includes(m)) return null;
+  if (it.peak.includes(m)) return "Topp nå";
+  if (it.months.length === 12) return "Hele året";
+  const next = m % 12 + 1, prev = m === 1 ? 12 : m - 1;
+  if (!it.months.includes(next)) return "Siste sjanse";
+  if (!it.months.includes(prev)) return "Nettopp kommet";
+  return it.stored ? "Fra lager" : "I sesong";
+}
+
+function bar(it, m, big) {
+  let s = `<div class="bar${big ? " big" : ""}" style="--c:${CATS[it.cat].color}" aria-hidden="true">`;
+  for (let i = 1; i <= 12; i++) {
+    const cls = [it.peak.includes(i) ? "pk" : it.months.includes(i) ? "on" : "", i === m ? "now" : ""].join(" ").trim();
+    s += `<i class="${cls}"></i>`;
+  }
+  return s + "</div>";
+}
+
+function toast(msg) {
+  const t = $("toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 1800);
+}
+
+/* ---------- season view ---------- */
+function renderMonths() {
+  $("months").innerHTML = MSHORT.map((n, i) => `<button type="button" id="m-${i + 1}" class="${i + 1 === TODAY ? "today" : ""}" aria-pressed="${i + 1 === month}" data-m="${i + 1}">${n}</button>`).join("");
+  $("today-btn").hidden = month === TODAY;
+}
+
+function renderFilters() {
+  const opts = [["alle", "Alt", null], ...Object.entries(CATS).map(([k, v]) => [k, v.name, v.color])];
+  $("filters").innerHTML = opts.map(([k, n, c]) => `<button type="button" id="f-${k}" data-c="${k}" aria-pressed="${k === cat}">${c ? `<span class="dot" style="background:${c}"></span>` : ""}${n}</button>`).join("");
+}
+
+function card(it) {
+  const st = status(it, month);
+  return `<button class="card" type="button" data-id="${it.id}" aria-label="${esc(it.name)}, ${esc(st)}">
+    <div class="row"><span class="brand">ses<em class="v">o</em>ng</span><span class="pill">${esc(st)}</span></div>
+    <h3>${flair(it.name)}</h3>
+    ${art(it)}
+    ${bar(it, month)}
+    <div class="foot"><span>${esc(CATS[it.cat].name)}</span><b>${rangeText(it)}</b></div>
+  </button>`;
+}
+
+function featureCard(it) {
+  const rc = it.recipes[1];
+  return `<button class="hcard" type="button" data-id="${it.id}">
+    <div class="tags"><span class="pill solid">Topp nå</span><span class="pill">${esc(CATS[it.cat].name)}</span></div>
+    ${art(it, "f", 300, 150)}
+    <h3>${flair(it.name)}</h3>
+    <div class="sub">${esc(it.sub)}</div>
+    <div class="dish"><span>Prøv: <b>${esc(rc.t)}</b></span><span>${esc(rc.time)}</span></div>
+  </button>`;
+}
+
+function renderSeason() {
+  renderMonths(); renderFilters();
+  const inSeason = ITEMS.filter(it => it.months.includes(month));
+  const peaks = inSeason.filter(it => it.peak.includes(month));
+  const mName = MONTHS[month - 1];
+  $("hero-title").innerHTML = flair(mName[0].toUpperCase() + mName.slice(1));
+  $("hero-eyebrow").textContent = month === TODAY ? "I sesong i Norge nå" : "I sesong i Norge i";
+  $("hero-text").innerHTML = `<strong>${inSeason.length} råvarer</strong> er i sesong${month === TODAY ? " akkurat nå" : ""}, og <strong>${peaks.length}</strong> av dem er på sitt aller beste.`;
+  // Vegetables and seafood first in the carousel; they have the richest recipes
+  const prio = { gronn: 0, sjo: 1, sopp: 2, vilt: 3, baer: 4 };
+  const feat = peaks.slice().sort((a, b) => prio[a.cat] - prio[b.cat] || a.name.localeCompare(b.name, "nb")).slice(0, 8);
+  $("rail").innerHTML = feat.map(featureCard).join("");
+  $("rail").parentElement.hidden = !feat.length;
+
+  const order = it => (it.peak.includes(month) ? 0 : it.months.length === 12 ? 2 : 1);
+  const cats = cat === "alle" ? Object.keys(CATS) : [cat];
+  let html = "";
+  for (const k of cats) {
+    const items = inSeason.filter(it => it.cat === k).sort((a, b) => order(a) - order(b) || a.name.localeCompare(b.name, "nb"));
+    if (!items.length) { if (cat !== "alle") html += `<section class="group"><h2>${CATS[k].name}</h2><p class="empty">Ingenting i denne kategorien er i sesong i ${mName}. Prøv en annen måned.</p></section>`; continue; }
+    html += `<section class="group"><h2>${CATS[k].name} <small>${items.length}</small></h2><div class="grid">${items.map(card).join("")}</div></section>`;
+  }
+  $("list").innerHTML = html || `<p class="empty">Ingenting funnet.</p>`;
+}
+
+/* ---------- detail sheet ---------- */
+let current = null, recipeIdx = 0;
+
+function recipeItems(it, rc) { return Array.isArray(rc.ing) && rc.ing.length ? rc.ing : [it.name]; }
+
+function recipeHtml(it, rc, i) {
+  const has = Array.isArray(rc.ing) && rc.ing.length;
+  const allIn = recipeItems(it, rc).every(x => list.some(l => l.text === x && l.from === rc.t));
+  const facts = [rc.kind === "Restaurant" ? "Inspirert av restaurant" : "Klassisk", rc.time, rc.level, rc.serves ? `${rc.serves} pers.` : null].filter(Boolean);
+  return `<article class="recipe" style="--c:${CATS[it.cat].color}">
+    <div class="facts">${facts.map(f => `<span class="pill">${esc(f)}</span>`).join("")}</div>
+    <h4>${esc(rc.t)}</h4>
+    <div class="cols${has ? " two" : ""}">
+      ${has ? `<div><h5>Du trenger</h5><ul class="ing">${rc.ing.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
+      <div><h5>Slik gjør du</h5><ol class="steps">${rc.steps.map(s => `<li><span>${esc(s)}</span></li>`).join("")}</ol></div>
+    </div>
+    ${rc.tip ? `<p class="tip"><b>Tips:</b> ${esc(rc.tip)}</p>` : ""}
+    <div class="actions"><button type="button" class="btn${allIn ? " done" : ""}" data-add="${i}">${allIn ? "Lagt i handlelisten ✓" : has ? "Legg ingrediensene i handlelisten" : `Legg ${esc(it.name.toLowerCase())} i handlelisten`}</button></div>
+  </article>`;
+}
+
+function renderRecipe() {
+  const it = current;
+  $("recipe-tabs").innerHTML = it.recipes.map((rc, i) => `<button type="button" role="tab" id="rt-${i}" aria-selected="${i === recipeIdx}" data-r="${i}">${rc.kind === "Restaurant" ? "Restaurant" : "Klassisk"}</button>`).join("");
+  $("recipe-body").innerHTML = recipeHtml(it, it.recipes[recipeIdx], recipeIdx);
+}
+
+function openItem(id) {
+  const it = ITEMS.find(x => x.id === id); if (!it) return;
+  current = it; recipeIdx = 0;
+  const c = CATS[it.cat].color;
+  const st = status(it, month);
+  let h = `<button class="close" type="button" id="sheet-close">Lukk</button>
+    <div class="head">${art(it, "x", 600, 200)}<h2 id="sheet-title">${flair(it.name)}</h2></div>
+    <div class="pills">${st ? `<span class="pill solid">${esc(st)}</span>` : `<span class="pill">Ikke i sesong i ${MONTHS[month - 1]}</span>`}<span class="pill">${esc(CATS[it.cat].name)}</span><span class="pill">${rangeText(it)}</span></div>
+    <p class="lede">${esc(it.about)}</p>
+    <div class="sec"><h3>Lag dette</h3><div class="tabs" role="tablist" id="recipe-tabs"></div><div id="recipe-body"></div></div>
+    <div class="sec"><h3>Sesong gjennom året</h3>${bar(it, month, true)}<div class="barlabels">${MSHORT.map(m => `<span>${m[0].toUpperCase()}</span>`).join("")}</div></div>
+    <div class="sec"><h3>Hvor får du tak i det</h3><ul class="where" style="--c:${c}">${it.buy.map(b => `<li><div><div>${BUY[b][0]}</div><span>${BUY[b][1]}</span></div></li>`).join("")}</ul></div>`;
+  if (it.forage) h += `<div class="sec"><h3>Plukk eller fisk selv</h3><p><b style="font-weight:500">Hvor:</b> ${esc(it.forage.where)}</p><p>${esc(it.forage.tip)}</p>
+    <div class="links"><a class="pill" href="https://artskart.artsdatabanken.no/" target="_blank" rel="noopener">Se funn i Artskart ↗</a><a class="pill" href="https://kilden.nibio.no/" target="_blank" rel="noopener">Skogkart hos NIBIO ↗</a></div></div>`;
+  if (it.safety) h += `<div class="note">${esc(it.safety)}</div>`;
+  h += `<div class="sec"><h3>Drikke til</h3><div class="wine"><div class="style">${esc(it.wine.style)}</div><p>${esc(it.wine.why)}</p>
+      <a href="https://www.vinmonopolet.no/search?q=${encodeURIComponent(it.wine.q)}" target="_blank" rel="noopener">Se utvalget hos Vinmonopolet ↗</a>
+      <div class="af">Uten alkohol: ${esc(it.wine.af)}</div></div></div>`;
+  $("sheet-body").innerHTML = h;
+  renderRecipe();
+  const dlg = $("sheet");
+  if (!dlg.open) dlg.showModal();
+  dlg.scrollTop = 0;
+}
+
+function addRecipe(i) {
+  const it = current, rc = it.recipes[i];
+  let added = 0;
+  for (const text of recipeItems(it, rc)) {
+    if (!list.some(l => l.text === text && l.from === rc.t)) { list.push({ id: newId(), text, from: rc.t, done: false }); added++; }
+  }
+  store.set("sesong-list", list);
+  updateCount(); renderRecipe();
+  toast(added ? `${added} ${added === 1 ? "vare" : "varer"} lagt i handlelisten` : "Alt ligger allerede i listen");
+}
+
+/* ---------- shopping list ---------- */
+function updateCount() {
+  const n = list.filter(l => !l.done).length;
+  $("tab-count").textContent = n; $("tab-count").hidden = n === 0;
+}
+
+function renderList() {
+  const open = list.filter(l => !l.done).length;
+  $("list-sub").textContent = list.length ? `${open} ting igjen å handle.` : "Listen lagres på denne telefonen. Ingen innlogging.";
+  $("list-actions").hidden = !list.length;
+  $("copy-fallback").hidden = true; $("list-status").textContent = "";
+  if (!list.length) {
+    $("list-body").innerHTML = `<div class="listbox empty-list"><div class="art">${blobSvg("tom-liste", "var(--ochre)", 300, 140)}</div><p>Handlelisten er tom.</p><p>Åpne en råvare og trykk på «Legg ingrediensene i handlelisten».</p></div>`;
+    return;
+  }
+  const groups = new Map();
+  for (const l of list) { const g = l.from || "Egne varer"; if (!groups.has(g)) groups.set(g, []); groups.get(g).push(l); }
+  let h = `<div class="listbox">`;
+  for (const [g, items] of groups) {
+    h += `<h3>${esc(g)}</h3>`;
+    for (const l of items) h += `<div class="li${l.done ? " checked" : ""}"><input type="checkbox" id="li-${l.id}" data-id="${l.id}"${l.done ? " checked" : ""}><label for="li-${l.id}">${esc(l.text)}</label><button type="button" class="x" data-del="${l.id}" aria-label="Fjern ${esc(l.text)}">×</button></div>`;
+  }
+  $("list-body").innerHTML = h + `</div>`;
+}
+
+function listText() {
+  const groups = new Map();
+  for (const l of list.filter(l => !l.done)) { const g = l.from || "Egne varer"; if (!groups.has(g)) groups.set(g, []); groups.get(g).push(l.text); }
+  return "Handleliste fra Sesong\n\n" + [...groups].map(([g, xs]) => `${g}\n${xs.map(x => "- " + x).join("\n")}`).join("\n\n");
+}
+
+function setView(v) {
+  $("view-season").hidden = v !== "season";
+  $("view-list").hidden = v !== "list";
+  $("tab-season").setAttribute("aria-current", v === "season" ? "page" : "false");
+  $("tab-list").setAttribute("aria-current", v === "list" ? "page" : "false");
+  if (v === "list") renderList();
+  window.scrollTo(0, 0);
+}
+
+/* ---------- events ---------- */
+$("months").addEventListener("click", e => { const b = e.target.closest("button[data-m]"); if (!b) return; month = +b.dataset.m; renderSeason(); });
+$("today-btn").addEventListener("click", () => { month = TODAY; renderSeason(); });
+$("filters").addEventListener("click", e => { const b = e.target.closest("button[data-c]"); if (!b) return; cat = b.dataset.c; store.set("sesong-cat", cat); renderSeason(); });
+$("list").addEventListener("click", e => { const b = e.target.closest(".card"); if (b) openItem(b.dataset.id); });
+$("rail").addEventListener("click", e => { const b = e.target.closest(".hcard"); if (b) openItem(b.dataset.id); });
+const dlg = $("sheet");
+dlg.addEventListener("click", e => {
+  if (e.target === dlg || e.target.id === "sheet-close") { dlg.close(); return; }
+  const t = e.target.closest("[data-r]"); if (t) { recipeIdx = +t.dataset.r; renderRecipe(); return; }
+  const a = e.target.closest("[data-add]"); if (a) addRecipe(+a.dataset.add);
+});
+$("tab-season").addEventListener("click", () => setView("season"));
+$("tab-list").addEventListener("click", () => setView("list"));
+$("list-body").addEventListener("change", e => {
+  const l = list.find(x => x.id === e.target.dataset.id); if (!l) return;
+  l.done = e.target.checked; store.set("sesong-list", list); updateCount(); renderList();
+});
+$("list-body").addEventListener("click", e => {
+  const id = e.target.dataset.del; if (!id) return;
+  list = list.filter(x => x.id !== id); store.set("sesong-list", list); updateCount(); renderList();
+});
+$("add-form").addEventListener("submit", e => {
+  e.preventDefault(); const v = $("add-input").value.trim(); if (!v) return;
+  list.push({ id: newId(), text: v, from: "Egne varer", done: false });
+  $("add-input").value = ""; store.set("sesong-list", list); updateCount(); renderList();
+});
+$("clear-checked").addEventListener("click", () => { list = list.filter(l => !l.done); store.set("sesong-list", list); updateCount(); renderList(); });
+$("copy-list").addEventListener("click", () => {
+  const text = listText();
+  const fallback = () => { const ta = $("copy-fallback"); ta.value = text; ta.hidden = false; ta.select(); $("list-status").textContent = "Marker teksten og kopier den."; };
+  try { navigator.clipboard.writeText(text).then(() => { $("list-status").textContent = "Kopiert. Lim inn i en melding eller et notat."; }, fallback); }
+  catch (err) { fallback(); }
+});
+
+updateCount();
+renderSeason();
+</script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
+}
+</script>
+</body>
+</html>
