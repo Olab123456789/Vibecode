@@ -172,9 +172,10 @@ dialog[open] { animation: up .28s cubic-bezier(.2,.8,.2,1); }
 @media (min-width: 760px) { dialog { margin: auto; border-radius: 8px; } }
 dialog::backdrop { background: rgba(30, 24, 16, .5); }
 .sheet { display: flex; flex-direction: column; gap: 24px; padding: 14px max(18px, env(safe-area-inset-left, 0px)) calc(32px + env(safe-area-inset-bottom, 0px)) max(18px, env(safe-area-inset-right, 0px)); }
-.sheet .close {
-  position: sticky; top: 0; align-self: flex-end; border: 1px solid var(--line); border-radius: 999px; background: var(--card);
-  padding: 4px 14px; cursor: pointer; z-index: 2; font-size: 0.875rem;
+.sheet .topbar { position: sticky; top: 0; z-index: 2; display: flex; justify-content: space-between; gap: 8px; pointer-events: none; }
+.sheet .topbar button {
+  pointer-events: auto; border: 1px solid var(--line); border-radius: 999px; background: var(--card);
+  padding: 4px 14px; cursor: pointer; font-size: 0.875rem; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .sheet .head { margin-top: -26px; display: flex; flex-direction: column; gap: 8px; }
 .sheet .head .art { height: 200px; }
@@ -190,13 +191,35 @@ dialog::backdrop { background: rgba(30, 24, 16, .5); }
 .where li::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c); transform: translateY(-1px); }
 .where li span { color: var(--muted); font-size: 0.9375rem; }
 
-.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
-.tabs button { border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; background: transparent; cursor: pointer; font-size: 0.9375rem; }
-.tabs button[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+.sec > h3 small { font-size: var(--step--1); color: var(--muted); font-weight: 400; margin-left: 4px; }
+.sec .hint { color: var(--muted); font-size: 0.9375rem; }
+.rgroup { display: flex; flex-direction: column; gap: 6px; }
+.rgroup h4 { font-size: var(--step--1); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 500; margin-top: 4px; }
+.rlist { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.rcard {
+  display: grid; grid-template-columns: 1fr auto; column-gap: 12px; row-gap: 2px; align-items: center; text-decoration: none;
+  background: var(--card-2); border-radius: 6px; padding: 12px 14px; border-left: 3px solid transparent;
+}
+.rcard.chef { border-left-color: var(--c); }
+.rcard:hover { background: var(--hair); }
+.rcard .who { font-size: var(--step--1); color: var(--muted); }
+.rcard .who b { color: var(--ink); font-weight: 500; }
+.rcard .rt { font-size: 1.125rem; line-height: 1.25; text-wrap: balance; }
+.rcard .meta { font-size: var(--step--1); color: var(--muted); }
+.rcard > span:not(.go) { grid-column: 1; min-width: 0; }
+.rcard .go { grid-column: 2; grid-row: 1 / span 3; font-size: 1.25rem; color: var(--muted); }
+.sheet .rhead { margin-top: -26px; }
+.sheet .rhead .art { height: 140px; }
+.rtitle { display: flex; flex-direction: column; gap: 6px; }
+.rtitle .eyebrow { font-size: var(--step--1); color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+.rtitle h2 { font-size: var(--step-2); line-height: 1.1; }
+.credit { border: 1px solid var(--line); border-left: 4px solid var(--c); border-radius: 6px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.credit b { font-weight: 500; }
+.credit p { margin: 0; font-size: 0.875rem; color: var(--muted); max-width: 60ch; }
+.credit .btn { padding: 7px 14px; font-size: 0.875rem; }
+.ing li.sub { border-bottom: 0; padding: 12px 0 2px; font-size: var(--step--1); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 500; }
+.ing li.sub:first-child { padding-top: 0; }
 .recipe { background: var(--card-2); border-radius: 6px; padding: 16px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
-.recipe h4 { font-size: 1.5rem; font-weight: 400; line-height: 1.15; }
-.recipe .facts { display: flex; gap: 6px; flex-wrap: wrap; }
-.recipe .facts .pill { border-color: var(--muted); color: var(--muted); }
 .recipe .cols { display: grid; gap: 16px; grid-template-columns: 1fr; }
 @media (min-width: 640px) { .recipe .cols.two { grid-template-columns: 2fr 3fr; } }
 .recipe h5 { margin: 0 0 6px; font-size: var(--step--1); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 500; }
@@ -612,32 +635,64 @@ const ITEMS = [
     about:"Skreien kommer til kysten av Nord-Norge for å gyte. Den har fast, hvitt kjøtt og er en vinterdelikatesse.",
     buy:["fisk","dagligvare"],
     recipes:[
-      {kind:"Klassisk", t:"Mølje", time:"30 min", steps:["Trekk skrei i lettsaltet vann.","Server med rogn og lever kokt hver for seg.","Til: poteter, gulrot og flatbrød."]},
-      {kind:"Restaurant", t:"Skrei med brunt smør, hasselnøtter og blomkål", time:"40 min", steps:["Stek skreien i smør på én side.","Lag blomkålpuré.","Topp med brunt smør og ristede hasselnøtter."]}],
+      {kind:"Klassisk", t:"Mølje med rogn og lever", time:"40 min", level:"Enkel", serves:4,
+        intro:"Kystens egen festmiddag når skreien kommer. Fisk, rogn og lever kokes hver for seg og serveres sammen med poteter og flatbrød.",
+        ing:["1,2 kg skrei i skiver, gjerne med bein","1 skreirogn","1 skreilever","Salt (ca. 1 ss per liter vann)","800 g poteter","3 gulrøtter","Flatbrød","Pepper og eddik etter smak"],
+        steps:["Kok potetene og gulrøttene møre i hver sin kjele.","Pakk rognen stramt i bakepapir eller folie. Legg den i lettsaltet vann og la den trekke på svak varme i ca. 25 minutter.","Skjær leveren i biter og legg den i en liten kjele med litt vann og salt. La den trekke på svak varme i ca. 10 minutter, til fettet begynner å flyte opp. Krydre med pepper og litt eddik.","Kok opp vann med salt i en stor kjele. Ta kjelen av varmen og legg i fiskeskivene. La dem trekke uten å koke i 6 til 8 minutter, til fisken så vidt slipper beinet.","Server fisk, rogn og lever på hvert sitt fat, med poteter, gulrot og flatbrød ved siden av."],
+        tip:"Vannet skal aldri koke når fisken ligger i. Da blir den løs og tørr."},
+      {kind:"Restaurant", t:"Skrei med brunt smør, hasselnøtter og blomkål", time:"40 min", level:"Middels", serves:4,
+        intro:"Stekt skrei med sprø overflate, en silkemyk blomkålpuré og nøttesmør over. Enkelt, men smaker som på restaurant.",
+        ing:["600 g skreifilet, ryggstykke","1 blomkål","2 dl melk","50 g smør til puré","100 g smør til brunt smør","50 g hasselnøtter","½ sitron","2 ss kapers","Persille","Olje, salt og pepper"],
+        steps:["Del blomkålen i små buketter. Kok dem møre i melk med litt salt, ca. 12 minutter.","Kjør blomkålen glatt med litt av melken og 50 g smør. Smak til med salt.","Rist hasselnøttene i en tørr panne og grovhakk dem.","Del fisken i fire stykker, tørk dem med papir og strø over salt.","Stek fisken i olje på middels høy varme, 4 minutter på den ene siden og 1 til 2 på den andre.","Brun 100 g smør i en kjele til det lukter nøtter. Ha i hasselnøtter, kapers og en skvis sitron.","Legg puré på tallerkenen, fisken oppå og skje over smøret. Strø over persille."],
+        tip:"Ikke flytt på fisken de første minuttene. Da slipper den pannen av seg selv når den har fått stekeskorpe."}],
     wine:{style:"Chablis", why:"Mineralsk og ren. Klassisk til hvit fisk.", q:"chablis", af:"Alkoholfri musserende"} },
 
   { id:"torsk", img:"img/torsk.webp", cat:"sjo", name:"Torsk", sub:"Kysttorsk hele året", months:ALL, peak:[1,2,3],
     about:"Torsk fiskes langs hele kysten hele året. Spør i fiskedisken hvor fisken kommer fra.",
     buy:["fisk","dagligvare"],
     recipes:[
-      {kind:"Klassisk", t:"Ovnsbakt torsk med bacon", time:"30 min", steps:["Legg torsken i en form.","Topp med sprø bacon og smør.","Bak ved 200 grader i 15 minutter."]},
-      {kind:"Restaurant", t:"Torsk med beurre blanc og løyrom", time:"35 min", steps:["Damp torsken lett.","Lag beurre blanc.","Avslutt med løyrom og gressløk."]}],
+      {kind:"Klassisk", t:"Ovnsbakt torsk med bacon", time:"30 min", level:"Enkel", serves:4,
+        intro:"En hverdagsklassiker der baconfettet gir smak til fisken. Server med poteter og ertestuing eller gulrøtter.",
+        ing:["700 g torskefilet","150 g bacon i terninger","40 g smør","1 sitron","Persille","Salt og pepper","800 g poteter til servering"],
+        steps:["Sett ovnen på 200 grader. Sett potetene over til koking.","Stek baconet sprøtt i en panne og la det renne av på papir.","Del torsken i porsjonsstykker og legg dem i en smurt ildfast form. Krydre med salt og pepper.","Legg smørklatter over fisken og skjær sitronen i båter og legg dem rundt.","Bak i ovnen i 12 til 15 minutter, til fisken så vidt flaker seg.","Strø bacon og hakket persille over rett før servering."],
+        tip:"Tykke stykker trenger litt lenger tid. Fisken er ferdig når den er hvit helt inn og deler seg i flak."},
+      {kind:"Restaurant", t:"Torsk med beurre blanc og løyrom", time:"35 min", level:"Middels", serves:4,
+        intro:"Lett dampet torsk, en blank smørsaus og salte perler av løyrom. Klassisk fransk saus til norsk fisk.",
+        ing:["600 g torskefilet","2 sjalottløk","1 dl hvitvin","½ dl hvitvinseddik","1 dl fløte","200 g kaldt smør i terninger","50 g løyrom","Gressløk","Salt"],
+        steps:["Finhakk sjalottløken. Kok den med hvitvin og eddik til det er igjen ca. 2 ss væske.","Ha i fløten og kok opp.","Senk varmen og pisk inn smøret, noen terninger om gangen. Sausen skal bli blank og tykk. Ikke la den koke.","Smak til med salt og hold sausen lun.","Legg fiskestykkene i en dampinnsats eller på et fat over kokende vann. Damp i 6 til 8 minutter.","Hell saus på tallerkenen, legg fisken oppå og topp med løyrom og finklippet gressløk."],
+        tip:"Skiller sausen seg, pisk inn en skvett kald fløte."}],
     wine:{style:"Chablis", why:"Ren syre som passer smørsauser og hvit fisk.", q:"chablis", af:"Alkoholfri hvitvin"} },
 
   { id:"makrell", img:"img/makrell.webp", cat:"sjo", name:"Makrell", sub:"Fet høstmakrell", months:r(6,10), peak:[8,9],
     about:"Makrellen er fetest og best fra sensommeren. Fersk makrell skal ha blanke øyne og glinsende skinn.",
     buy:["fisk","dagligvare"], forage:{where:"Fra brygge, svaberg eller båt langs kysten fra Oslofjorden og nordover til Trøndelag.", tip:"Fritidsfiske med stang og snøre i sjøen er gratis. Følg reglene for minstemål og ta bare det du skal spise."},
     recipes:[
-      {kind:"Klassisk", t:"Grillet makrell med rømme og agurk", time:"20 min", steps:["Grill eller stek fileter med skinnet ned.","Lag agurksalat med eddik og sukker.","Server med rømme og nypoteter."]},
-      {kind:"Restaurant", t:"Flammet makrell med pepperrot og eple", time:"25 min", steps:["Rimme filetene med salt og sukker i 20 minutter.","Svi skinnsiden med gassbrenner.","Server med revet pepperrot, eple og kjernemelk."]}],
+      {kind:"Klassisk", t:"Grillet makrell med rømme og agurk", time:"25 min", level:"Enkel", serves:4,
+        intro:"Sommerens enkleste fiskemiddag. Fet makrell rett fra grillen med kald agurksalat og rømme.",
+        ing:["4 hele makrell, renset","1 agurk","1 ss eddik","1 ss sukker","3 dl rømme","1 bunt dill","Nypoteter","Olje, salt og pepper"],
+        steps:["Skjær agurken i tynne skiver. Bland med eddik, sukker og en klype salt, og la det stå mens du griller.","Lag tre skrå snitt på hver side av fisken. Pensle med olje og strø salt og pepper både utenpå og i buken.","Grill fisken på høy varme i 4 til 5 minutter på hver side. Den er ferdig når kjøttet slipper ryggbeinet.","Rør hakket dill inn i rømmen.","Server makrellen med agurksalat, dillrømme og kokte nypoteter."],
+        tip:"Grillristen må være ren og varm, ellers setter skinnet seg fast."},
+      {kind:"Restaurant", t:"Flammet makrell med pepperrot og eple", time:"30 min", level:"Middels", serves:4,
+        intro:"Rå makrell som får sprø, svidd skinn fra en gassbrenner eller het panne. Syrlig eple og pepperrot balanserer fettet.",
+        ing:["4 ferske makrellfileter, uten bein","1 grønt eple","1 dl crème fraîche","1 ss revet pepperrot","½ sitron","Dill","Flaksalt","Litt olje"],
+        steps:["Strø salt på kjøttsiden av filetene og la dem ligge i 10 minutter. Tørk av med papir.","Legg filetene med skinnsiden opp på et brett. Svi skinnet med en gassbrenner til det bobler og blir svart i flekker. Har du ikke brenner, stek bare skinnsiden i 30 sekunder i en veldig varm panne.","Rør crème fraîche med pepperrot og litt sitron.","Skjær eplet i tynne staver og vend med en skvis sitron.","Skjær makrellen i skiver og anrett med pepperrotkrem, eple og dill. Strø over flaksalt."],
+        tip:"Bruk bare makrell som er helt fersk når den skal spises nesten rå. Kjøp den samme dag."}],
     wine:{style:"Albariño", why:"Salt og sitrusfrisk. Skjærer gjennom fet fisk.", q:"albarino", af:"Alkoholfri musserende"} },
 
   { id:"sild", img:"img/sild.webp", cat:"sjo", name:"Sild", sub:"Høst- og vintersild", months:r(9,3), peak:[10,11,12],
     about:"Norsk vårgytende sild fiskes om høsten og vinteren. Fersk sild er rimelig og veldig god stekt.",
     buy:["fisk","dagligvare"],
     recipes:[
-      {kind:"Klassisk", t:"Stekt sild med løk", time:"20 min", steps:["Vend fileter i rugmel med salt og pepper.","Stek i smør.","Server med stekt løk og poteter."]},
-      {kind:"Restaurant", t:"Sild tre veier med rugbrød", time:"Dagen før", steps:["Lag sennepssild, tomatsild og løksild.","Server med sprøtt rugbrød.","Ha på syltet rødløk og kald rømme."]}],
+      {kind:"Klassisk", t:"Stekt sild med løk", time:"30 min", level:"Enkel", serves:4,
+        intro:"Rimelig, rask og veldig god. Sild vendt i mel og stekt sprø, med søt brun løk og poteter.",
+        ing:["8 ferske sildefileter","1 dl hvetemel eller rugmel","2 store løk","50 g smør","1 ss sukker","Salt og pepper","Kokte poteter","Tyttebær eller rødbeter til"],
+        steps:["Skjær løken i tynne ringer. Stek den i halve smøret på middels varme i 10 til 15 minutter, til den er myk og brun. Strø over sukker mot slutten.","Strø salt og pepper på filetene og vend dem i mel.","Stek silden i resten av smøret i 2 minutter på hver side, til den er gyllen og sprø.","Legg løken over silden og server med poteter og tyttebær."],
+        tip:"Brett filetene sammen to og to med skinnet ut, og fyll dem med persille og hakket løk."},
+      {kind:"Restaurant", t:"Sild tre veier med rugbrød", time:"Ca. 1 døgn (30 min arbeid)", level:"Middels", serves:4,
+        intro:"Tre små smaker på ett fat: kortsaltet, stekt og syltet sild. Perfekt som lunsj eller forrett.",
+        ing:["## Kortsaltet","2 sildefileter","2 ss salt","1 ss sukker","## Syltet","2 sildefileter","1 dl 7 % eddik","1,5 dl sukker","2 dl vann","1 rødløk","4 allehånde, 2 laurbærblad","## Stekt","2 sildefileter","Rugmel og smør","## Til servering","Rugbrød, smør, rømme, dill, rødløk og kokte egg"],
+        steps:["Syltet: Kok opp eddik, sukker, vann, allehånde og laurbær. Avkjøl helt. Legg sild i biter og rødløk i ringer i et glass og hell over laken. La det stå i kjøleskapet i minst ett døgn.","Kortsaltet: Strø salt og sukker over to fileter og la dem ligge kaldt i 4 til 6 timer. Skyll og tørk.","Stekt: Vend de siste filetene i rugmel og stek dem i smør rett før servering.","Smør rugbrød og legg en bit av hver sild på, med rømme, dill, rødløk og egg."],
+        tip:"Ferskfryst sild er trygg å bruke rå. Har fisken ikke vært fryst, frys den i minst ett døgn først."}],
     wine:{style:"Tørr Riesling eller akevitt", why:"Syre og krydder møter salt og eddik.", q:"riesling", af:"Alkoholfritt øl"} },
 
   { id:"hummer", img:"img/hummer.webp", cat:"sjo", name:"Hummer", sub:"Kort og eksklusiv sesong", months:r(10,11), peak:[10],
@@ -645,16 +700,32 @@ const ITEMS = [
     buy:["fisk","spesial"], forage:{where:"Steinbunn langs kysten, særlig fra svenskegrensen og vestover.", tip:"Fritidsfiske med teine krever påmelding hos Fiskeridirektoratet. Det er grenser for antall teiner, minstemål og maksmål, og rognhummer skal slippes ut igjen."},
     safety:"Hummerfiske har strenge regler. Sjekk Fiskeridirektoratet før du setter teiner.",
     recipes:[
-      {kind:"Klassisk", t:"Kokt hummer med aioli", time:"25 min", steps:["Kok hummeren i sterkt saltet vann, cirka 15 minutter per kilo.","La den kjøle seg ned.","Server med aioli, sitron og godt brød."]},
-      {kind:"Restaurant", t:"Hummer med beurre blanc og grønt eple", time:"45 min", steps:["Kok hummeren kort og ta ut kjøttet.","Varm halen forsiktig i smør.","Server med beurre blanc og tynne skiver grønt eple."]}],
+      {kind:"Klassisk", t:"Kokt hummer med aioli", time:"40 min", level:"Middels", serves:2,
+        intro:"Det enkleste er ofte best med hummer. Kok den i godt saltet vann og server med hjemmelaget aioli og brød.",
+        ing:["2 levende hummer, ca. 500 g hver","Salt (ca. 1 dl per 3 liter vann)","1 eggeplomme","1 ts dijonsennep","1 fedd hvitløk","2 dl nøytral olje","½ sitron","Loff eller baguette"],
+        steps:["Kok opp rikelig vann med salt i en stor kjele.","Legg hummeren raskt ned med hodet først, så den dør med en gang, og legg på lokk.","Kok i 10 til 12 minutter for en hummer på 500 g. Den skal bli knallrød.","Aioli: Visp eggeplomme, sennep og revet hvitløk. Drypp inn oljen, litt om gangen, mens du visper. Smak til med sitron og salt.","Del hummeren på langs med en stor kniv og knekk klørne.","Server med aioli, sitron og godt brød."],
+        tip:"Sjekk minstemål og fredningsregler hos Fiskeridirektoratet før du fisker hummer selv."},
+      {kind:"Restaurant", t:"Hummer med beurre blanc og grønt eple", time:"50 min", level:"Avansert", serves:4,
+        intro:"Hummerkjøtt lettvarmet i smør, en syrlig smørsaus og sprø eplestaver. Festmat for en spesiell kveld.",
+        ing:["2 kokte hummer","2 sjalottløk","1 dl hvitvin","½ dl eplecidereddik","200 g kaldt smør i terninger","1 grønt eple","1 ss gressløk","Salt"],
+        steps:["Ta kjøttet ut av hale og klør. Skjær halen i medaljonger.","Kok finhakket sjalottløk med hvitvin og eddik til ca. 2 ss er igjen.","Pisk inn 150 g av smøret på lav varme til sausen er blank. Smak til med salt.","Smelt resten av smøret i en panne på lav varme og la hummerkjøttet bli lunt i det, ca. 2 minutter. Det skal ikke steke.","Skjær eplet i fyrstikker.","Anrett hummer, saus og eplestaver, og strø over gressløk."],
+        tip:"Skallet kan kokes til en kraftig kraft med løk, tomatpuré og vann. Den er god i suppe."}],
     wine:{style:"Hvit Burgund eller Champagne", why:"Rik hummer trenger en vin med kropp og syre.", q:"puligny montrachet", af:"Alkoholfri musserende"} },
 
   { id:"krabbe", img:"img/krabbe.webp", cat:"sjo", name:"Taskekrabbe", sub:"Full av innmat om høsten", months:r(8,11), peak:[9,10],
     about:"Taskekrabben er fullest om høsten. Velg krabber som er tunge i forhold til størrelsen.",
     buy:["fisk","dagligvare"], forage:{where:"Fra båt eller brygge langs kysten, særlig Vestlandet og Trøndelag.", tip:"Krabbeteiner må ha fluktåpning. Sjekk reglene hos Fiskeridirektoratet."},
     recipes:[
-      {kind:"Klassisk", t:"Krabbe med loff og majones", time:"30 min", steps:["Kok krabbene i 15 til 20 minutter i saltvann.","Plukk ut klør og innmat.","Server med loff, majones og sitron."]},
-      {kind:"Restaurant", t:"Krabbetoast med brunt smør", time:"25 min", steps:["Bland krabbekjøtt med litt majones, gressløk og sitron.","Stek brød gyllent i brunt smør.","Topp med krabbe og løyrom."]}],
+      {kind:"Klassisk", t:"Krabbe med loff og majones", time:"45 min", level:"Enkel", serves:4,
+        intro:"Høstens krabbekos. Kokte krabber på bordet, alle plukker selv, og loff, majones og sitron står klart.",
+        ing:["4 store krabber","Salt (ca. 1 dl per 3 liter vann)","Loff","Majones","Sitron","Smør","Pepper"],
+        steps:["Kok opp vann med salt. Legg i krabbene og kok dem i 15 til 20 minutter, avhengig av størrelse.","La dem avkjøle seg. Krabbe smaker best lunken eller kald.","Brekk av klør og bein. Løft av ryggskjoldet og fjern de grå, svampete gjellene.","Skrap ut den brune innmaten fra skallet. Knekk klørne og plukk ut det hvite kjøttet.","Server på loff med majones, sitron og litt pepper."],
+        tip:"Velg krabber som er tunge for størrelsen. Lette krabber har lite kjøtt."},
+      {kind:"Restaurant", t:"Krabbetoast med brunt smør", time:"20 min", level:"Enkel", serves:4,
+        intro:"Sprø brioche, krabbekjøtt med sitron og urter og varmt nøttesmør over. Liten rett, stor smak.",
+        ing:["200 g krabbekjøtt, hvitt og brunt","2 ss majones","½ sitron, skall og saft","1 ss gressløk","1 ss dill","4 skiver brioche eller loff","75 g smør","Chiliflak eller espelette","Salt"],
+        steps:["Bland krabbekjøtt, majones, sitronskall, sitronsaft, gressløk og dill. Smak til med salt.","Stek brødskivene gylne i litt av smøret.","Brun resten av smøret i en liten kjele til det lukter nøtter.","Legg krabbe på brødet, hell over litt brunt smør og strø på chili."],
+        tip:"Den brune innmaten har mest smak. Bland gjerne litt inn i det hvite kjøttet."}],
     wine:{style:"Riesling eller Champagne", why:"Syre og frukt som balanserer det søte krabbekjøttet.", q:"riesling", af:"Alkoholfri musserende"} },
 
   { id:"blaskjell", img:"img/blaskjell.webp", cat:"sjo", name:"Blåskjell", sub:"Best i måneder med r", months:r(9,4), peak:[10,11,12,1,2],
@@ -662,16 +733,32 @@ const ITEMS = [
     buy:["fisk","dagligvare"], forage:{where:"Fjæresteiner og brygger langs hele kysten.", tip:"Sjekk alltid Mattilsynets blåskjellvarsel først. Skjell kan inneholde algegift selv om de ser fine ut."},
     safety:"Plukk aldri blåskjell uten å sjekke Mattilsynets blåskjellvarsel. Algegift forsvinner ikke ved koking.",
     recipes:[
-      {kind:"Klassisk", t:"Moules marinière", time:"20 min", steps:["Fres sjalottløk og hvitløk i smør.","Ha i skjell og hvitvin, legg på lokk i 5 minutter.","Server med persille og pommes frites."]},
-      {kind:"Restaurant", t:"Blåskjell i sidersaus med eple og estragon", time:"25 min", steps:["Damp skjellene i tørr norsk sider.","Kok inn kraften med fløte.","Server med små terninger eple og fersk estragon."]}],
+      {kind:"Klassisk", t:"Moules marinière", time:"25 min", level:"Enkel", serves:4,
+        intro:"Blåskjell dampet i hvitvin med løk og persille. Klar på et kvarter, og kraften er nesten det beste.",
+        ing:["2 kg blåskjell","2 sjalottløk","2 fedd hvitløk","30 g smør","2 dl tørr hvitvin","1 dl fløte (kan sløyfes)","1 bunt persille","Godt brød"],
+        steps:["Skyll skjellene i kaldt vann. Riv av «skjegget» og kast skjell som er knust, eller som er åpne og ikke lukker seg når du banker på dem.","Finhakk løk og hvitløk og fres dem myke i smør i en stor kjele.","Ha i skjellene og vinen. Legg på lokk og damp på høy varme i 4 til 5 minutter. Rist kjelen et par ganger.","Kast skjell som ikke har åpnet seg.","Rør inn fløte og hakket persille, og server i dype skåler med brød."],
+        tip:"Bruk en kjele som er stor nok. Skjellene trenger plass for å åpne seg."},
+      {kind:"Restaurant", t:"Blåskjell i sidersaus med eple og estragon", time:"30 min", level:"Middels", serves:4,
+        intro:"Norsk vri på den franske klassikeren, med tørr eplesider, syrlig eple og anisaktig estragon.",
+        ing:["2 kg blåskjell","1 purre","1 grønt eple","30 g smør","3 dl tørr eplesider","1 dl crème fraîche","2 ss frisk estragon","Pepper","Brød"],
+        steps:["Rens skjellene som i den klassiske oppskriften.","Skjær purren i tynne ringer og eplet i små terninger.","Fres purre i smør til den er myk. Ha i eplet og stek et minutt til.","Ha i skjell og sider. Legg på lokk og damp i 4 til 5 minutter.","Løft skjellene over i skåler. Kok kraften inn i 2 minutter og rør inn crème fraîche og estragon.","Hell sausen over skjellene og server straks."],
+        tip:"Har du ikke estragon, bruk dill eller fennikelgrønt."}],
     wine:{style:"Muscadet", why:"Lett, salt og frisk. Den klassiske vinen til blåskjell.", q:"muscadet", af:"Alkoholfri sider"} },
 
   { id:"kamskjell", img:"img/kamskjell.webp", cat:"sjo", name:"Kamskjell", sub:"Håndplukket av dykkere", months:r(10,4), peak:[11,12,1,2],
     about:"Norske kamskjell plukkes av dykkere, mest i Trøndelag og Nordland. De er søte og faste i kjøttet.",
     buy:["fisk","spesial"],
     recipes:[
-      {kind:"Klassisk", t:"Stekte kamskjell med blomkål", time:"20 min", steps:["Tørk kamskjellene godt.","Stek dem 1 minutt på hver side i varm panne.","Server på blomkålpuré med brunt smør."]},
-      {kind:"Restaurant", t:"Rå kamskjell med eple, pepperrot og dill", time:"15 min", steps:["Skjær kamskjell i tynne skiver.","Hell over litt eplejuice og olje.","Topp med revet pepperrot og dill."]}],
+      {kind:"Klassisk", t:"Stekte kamskjell med blomkål", time:"30 min", level:"Middels", serves:4,
+        intro:"Søte kamskjell med gyllen stekeskorpe på en myk blomkålpuré. Klassisk forrett som er enklere enn den ser ut.",
+        ing:["8 til 12 rensede kamskjell","½ blomkål","2 dl melk","30 g smør","1 ss olje","1 ss smør til steking","½ sitron","Salt"],
+        steps:["Kok blomkålbukettene møre i melk, ca. 12 minutter. Kjør glatt med smør og litt av melken. Smak til med salt.","Tørk kamskjellene godt med papir. De må være helt tørre for å få farge.","Varm olje i en panne til den ryker lett. Stek skjellene i 1½ minutt uten å røre dem.","Snu, ha i smøret, og stek 1 minutt til. Øs smøret over.","Server på puréen med en dråpe sitron og flaksalt."],
+        tip:"Kamskjell skal være glassaktige i midten. Stekes de for lenge, blir de seige."},
+      {kind:"Restaurant", t:"Rå kamskjell med eple, pepperrot og dill", time:"15 min", level:"Enkel", serves:4,
+        intro:"Tynne skiver av helt ferske kamskjell, syrlig eple og pepperrot. Nordisk og friskt.",
+        ing:["6 veldig ferske kamskjell","1 grønt eple","1 sitron","3 ss god rapsolje","Fersk pepperrot","Dill","Flaksalt"],
+        steps:["Legg kamskjellene i fryseren i 10 minutter. Da blir de lettere å skjære.","Skjær dem i tynne skiver og legg dem på kalde tallerkener.","Skjær eplet i små terninger.","Visp sitronsaft og rapsolje og drypp over.","Strø over eple, dill og flaksalt, og riv litt pepperrot over til slutt."],
+        tip:"Spør i fiskedisken om skjellene kan spises rå. Dykkerplukkede skjell fra kalde farvann er best."}],
     wine:{style:"Champagne Blanc de Blancs", why:"Ren og elegant, lar den søte smaken komme fram.", q:"blanc de blancs", af:"Alkoholfri musserende"} },
 
   { id:"osters", img:"img/osters.webp", cat:"sjo", name:"Østers", sub:"Flatøsters fra norske poller", months:r(9,4), peak:[10,11,12],
@@ -679,16 +766,32 @@ const ITEMS = [
     buy:["fisk","spesial"],
     safety:"Kjøp fra godkjente produsenter. Ikke plukk østers selv uten å sjekke Mattilsynets varsel.",
     recipes:[
-      {kind:"Klassisk", t:"Rå østers med sitron", time:"10 min", steps:["Åpne østersen med en østerskniv.","Server på is.","Ha på sitron og eventuelt litt sjalottløkeddik."]},
-      {kind:"Restaurant", t:"Østers med agurk og pepperrot", time:"15 min", steps:["Lag en is av agurkjuice.","Topp østersen med agurk og pepperrot.","Avslutt med dråper av dillolje."]}],
+      {kind:"Klassisk", t:"Rå østers med sitron", time:"15 min", level:"Middels", serves:4,
+        intro:"Ferske østers trenger nesten ingenting. Lær å åpne dem, så har du en luksus som tar minutter.",
+        ing:["12 til 24 levende østers","2 sitroner","Knust is eller grovt salt til fatet","Østerskniv og et kjøkkenhåndkle"],
+        steps:["Skyll østersene i kaldt vann. Kast østers som er åpne og ikke lukker seg.","Hold østersen med den flate siden opp i et brettet håndkle.","Stikk kniven inn i hengselet bak og vri til lokket løsner.","Skjær langs innsiden av lokket for å løsne muskelen, og ta av lokket. Skjær så under østersen så den ligger løs.","Legg østersene på is eller salt og server med sitronbåter."],
+        tip:"Behold væsken i skallet. Den smaker hav og hører med."},
+      {kind:"Restaurant", t:"Østers med agurk og pepperrot", time:"20 min", level:"Middels", serves:4,
+        intro:"Kald agurk og skarp pepperrot på nyåpnede østers. Rent, friskt og litt sterkt.",
+        ing:["12 levende østers","½ agurk","1 ss riseddik eller eplecidereddik","1 ts sukker","Fersk pepperrot","Dill"],
+        steps:["Skjær agurken i bitesmå terninger og bland med eddik og sukker. La stå kaldt i 10 minutter.","Åpne østersene og legg dem på is.","Legg en liten skje agurk på hver østers.","Riv pepperrot over og pynt med en dillkvist."],
+        tip:"Server østersene så kalde som mulig."}],
     wine:{style:"Chablis eller Muscadet", why:"Mineralsk og salt, som havet.", q:"chablis premier cru", af:"Alkoholfri musserende"} },
 
   { id:"kongekrabbe", img:"img/kongekrabbe.webp", cat:"sjo", name:"Kongekrabbe", sub:"Kjempen fra Finnmark", months:ALL, peak:[12,1,2,3],
     about:"Kongekrabbe fanges i Øst-Finnmark. Den selges ofte levende eller fryst og er best i vinterhalvåret.",
     buy:["fisk","spesial"],
     recipes:[
-      {kind:"Klassisk", t:"Kongekrabbe med smør og sitron", time:"20 min", steps:["Damp eller kok krabbeben i 5 til 7 minutter.","Klipp opp skallet.","Server med smeltet smør og sitron."]},
-      {kind:"Restaurant", t:"Grillet kongekrabbe med tangsmør", time:"30 min", steps:["Grill bena raskt.","Lag en beurre blanc med litt tang.","Server med sprø potet."]}],
+      {kind:"Klassisk", t:"Kongekrabbe med smør og sitron", time:"20 min", level:"Enkel", serves:4,
+        intro:"Kongekrabbe er så god i seg selv at du bare trenger smør, sitron og brød. Kjøpes som regel ferdig kokt.",
+        ing:["1,5 kg kokte kongekrabbebein","150 g smør","2 sitroner","Loff eller grovt brød","Flaksalt"],
+        steps:["Tin frosne bein sakte i kjøleskapet over natten.","Klipp opp skallet på langs med en kraftig saks, så kjøttet er lett å få tak i.","Varm beina i ovnen på 180 grader i 6 til 8 minutter, eller server dem kalde.","Smelt smøret og hell det i små skåler.","Server med smør, sitronbåter, brød og flaksalt."],
+        tip:"Kokt krabbe skal bare varmes. Varmes den for lenge, blir kjøttet seigt."},
+      {kind:"Restaurant", t:"Grillet kongekrabbe med tangsmør", time:"30 min", level:"Middels", serves:4,
+        intro:"Krabbebein på grillen med smør smaksatt med tørket tang. Salt, søtt og røykfylt på en gang.",
+        ing:["1,5 kg kongekrabbebein","150 g romtemperert smør","1 ss tørket tang (sukkertare eller dulse), smuldret","1 sitron, skall og saft","1 fedd hvitløk","Gressløk"],
+        steps:["Rør smøret med tang, revet sitronskall, revet hvitløk og en skvis sitron.","Klipp beina opp på langs.","Legg dem på en varm grill med skallsiden ned i 2 til 3 minutter.","Smør tangsmør over kjøttet og la det smelte i 1 til 2 minutter til under lokk.","Strø over gressløk og server med grillet sitron."],
+        tip:"Tørket tang får du i helsekost, på nett og i godt utstyrte butikker."}],
     wine:{style:"Hvit Burgund", why:"Rik nok for det søte og fete kjøttet.", q:"bourgogne", af:"Alkoholfri hvitvin"} },
 
   // ---------- Sopp ----------
@@ -697,8 +800,16 @@ const ITEMS = [
     buy:["dagligvare","bonde","natur"], forage:{where:"Blandingsskog med bjørk, gran og furu, gjerne i mose. Finnes over hele landet.", tip:"Se etter åreaktige, nedløpende ribber under hatten, ikke skiver. Falsk kantarell har tynne, oransje skiver."},
     safety:"Spis aldri sopp du ikke er helt sikker på. Ta med soppen til soppkontroll om du er i tvil.",
     recipes:[
-      {kind:"Klassisk", t:"Kantarell på toast", time:"15 min", steps:["Stek kantarellen tørr i pannen først.","Tilsett smør, sjalottløk og litt fløte.","Server på ristet brød med persille."]},
-      {kind:"Restaurant", t:"Kantarell, eggeplomme og brunt smør", time:"20 min", steps:["Stek kantareller i brunt smør.","Varm en eggeplomme forsiktig til den er kremete.","Server med ristet rug og flaksalt."]}],
+      {kind:"Klassisk", t:"Kantarell på toast", time:"15 min", level:"Enkel", serves:2,
+        intro:"Den beste måten å smake nyplukket kantarell på. Smør, sopp og ristet brød.",
+        ing:["300 g kantarell","1 sjalottløk","30 g smør","2 skiver godt brød","1 ss persille","Salt og pepper"],
+        steps:["Rens soppen med en kniv og en børste. Skyll bare hvis den er veldig skitten.","Del store sopper i to.","Stek soppen i en tørr, varm panne til vannet har kokt bort.","Ha i smør og finhakket sjalottløk og stek til soppen er gyllen, ca. 4 minutter.","Rist brødet og legg soppen over. Strø over persille, salt og pepper."],
+        tip:"Den tørre stekingen først gjør at soppen blir gyllen i stedet for vassen."},
+      {kind:"Restaurant", t:"Kantarell, eggeplomme og brunt smør", time:"25 min", level:"Middels", serves:4,
+        intro:"Rennende eggeplomme, smørstekt kantarell og nøttesmør. En liten rett med mye høst i.",
+        ing:["300 g kantarell","4 egg","100 g smør","1 sjalottløk","50 g lagret ost (f.eks. Fanaost eller parmesan)","Gressløk","Flaksalt"],
+        steps:["Skill eggene og legg plommene i et glass med litt olje, så de holder seg hele.","Brun 75 g smør til det lukter nøtter. Sett til side.","Stek soppen tørr i pannen, og så i resten av smøret med finhakket sjalottløk.","Legg sopp i dype tallerkener og lag en grop i midten. Legg en eggeplomme i hver.","Hell over varmt brunt smør, høvle over ost og strø på gressløk og flaksalt."],
+        tip:"Det varme smøret varmer plommen akkurat nok."}],
     wine:{style:"Hvit Burgund eller Jura", why:"Nøtter og smør passer kantarell perfekt.", q:"bourgogne blanc", af:"Alkoholfri hvitvin"} },
 
   { id:"traktkantarell", img:"img/traktkantarell.webp", cat:"sopp", name:"Traktkantarell", sub:"Høstens beste sopp", months:r(8,11), peak:[9,10],
@@ -706,8 +817,16 @@ const ITEMS = [
     buy:["bonde","natur","spesial"], forage:{where:"Fuktig granskog med mose, ofte i store kolonier. Vanlig i hele Sør-Norge.", tip:"Har brun hatt med hull i midten og gul stilk. Tørker godt og er perfekt å fryse."},
     safety:"Spis aldri sopp du ikke er helt sikker på. Ta med soppen til soppkontroll om du er i tvil.",
     recipes:[
-      {kind:"Klassisk", t:"Soppstuing", time:"20 min", steps:["Stek soppen tørr i pannen.","Tilsett smør, løk og fløte.","Kok inn og smak til med salt og pepper."]},
-      {kind:"Restaurant", t:"Traktkantarell med hjort og madeira", time:"40 min", steps:["Stek hjort eller elg rosa.","Stek soppen i smør med timian.","Kok inn kraft med madeira og server sammen."]}],
+      {kind:"Klassisk", t:"Soppstuing", time:"20 min", level:"Enkel", serves:4,
+        intro:"Kremet sopp i fløte, perfekt til vilt, kjøttkaker eller bare på brød.",
+        ing:["400 g traktkantarell","1 løk","30 g smør","3 dl fløte","1 ts soyasaus","Timian","Salt og pepper"],
+        steps:["Rens soppen godt. Traktkantarell er hul, så del den på langs og børst ut barnåler.","Stek soppen tørr i en varm panne.","Ha i smør og finhakket løk og stek videre i 3 minutter.","Hell i fløten og la det koke inn i 5 til 8 minutter, til stuingen er tykk.","Smak til med soyasaus, timian, salt og pepper."],
+        tip:"Traktkantarell tørker veldig godt. Tørk det du ikke spiser, og bruk det i sauser hele vinteren."},
+      {kind:"Restaurant", t:"Traktkantarell med hjort og madeira", time:"45 min", level:"Middels", serves:4,
+        intro:"Rosa hjortefilet med smørstekt traktkantarell og en blank madeirasaus.",
+        ing:["600 g hjortefilet","300 g traktkantarell","2 sjalottløk","1 dl madeira","3 dl viltkraft","50 g kaldt smør","4 einebær, knust","Timian","Salt og pepper"],
+        steps:["Ta kjøttet ut av kjøleskapet en halvtime før. Krydre med salt og pepper.","Brun filetene på alle sider i en varm panne. Stek videre i ovnen på 150 grader til 54 grader inni, ca. 15 minutter. La kjøttet hvile.","Fres hakket sjalottløk i stekepannen. Ha i madeira, kraft og einebær, og kok inn til halvparten.","Pisk inn kaldt smør og smak til.","Stek soppen tørr, og så i smør med timian.","Skjær kjøttet i skiver og server med sopp og saus."],
+        tip:"Bruk steketermometer. Hjort blir tørr hvis den stekes for mye."}],
     wine:{style:"Pinot Noir fra Burgund", why:"Jordaktig rødvin som klinger med skogbunnen.", q:"bourgogne rouge", af:"Alkoholfri rødvin"} },
 
   { id:"steinsopp", img:"img/steinsopp.webp", cat:"sopp", name:"Steinsopp", sub:"Porcini fra norsk skog", months:r(7,9), peak:[8],
@@ -715,8 +834,16 @@ const ITEMS = [
     buy:["natur","spesial"], forage:{where:"Gran- og bjørkeskog, gjerne langs stier og skogsveier.", tip:"Velg unge, faste sopper. Gallerørsopp ligner, men smaker bittert og har mørkt nett på stilken."},
     safety:"Spis aldri sopp du ikke er helt sikker på. Ta med soppen til soppkontroll om du er i tvil.",
     recipes:[
-      {kind:"Klassisk", t:"Stekt steinsopp med persille", time:"15 min", steps:["Skjær soppen i skiver.","Stek i olje og smør på høy varme.","Avslutt med hvitløk og persille."]},
-      {kind:"Restaurant", t:"Rå steinsopp med lagret ost", time:"10 min", steps:["Skjær helt unge sopper tynt.","Drypp over god olivenolje og sitron.","Høvle over lagret ost."]}],
+      {kind:"Klassisk", t:"Stekt steinsopp med persille", time:"15 min", level:"Enkel", serves:2,
+        intro:"Skiver av steinsopp stekt gylne i smør med hvitløk og persille. Godt alene eller til kjøtt.",
+        ing:["300 g steinsopp","2 ss olivenolje","30 g smør","1 fedd hvitløk","1 neve persille","Salt og pepper"],
+        steps:["Børst soppen ren og skjær den i skiver på ca. 1 cm.","Varm olje i en stor panne til den er godt varm.","Legg i skivene i ett lag og stek dem gylne, 2 minutter på hver side.","Ha i smør og hakket hvitløk de siste 30 sekundene.","Strø over persille, salt og pepper."],
+        tip:"Sjekk at soppen er fast og uten mark. Skjær bort bløte deler under hatten på store sopper."},
+      {kind:"Restaurant", t:"Rå steinsopp med lagret ost", time:"10 min", level:"Enkel", serves:4,
+        intro:"Små, faste steinsopp i tynne skiver med god olje og ost. En italiensk klassiker.",
+        ing:["2 til 3 små, helt faste steinsopp","3 ss god olivenolje","½ sitron","50 g lagret ost","En neve ruccola","Flaksalt og pepper"],
+        steps:["Bruk bare unge, faste sopper uten mark.","Skjær dem i papirtynne skiver med en mandolin eller skarp kniv.","Legg skivene på et fat og drypp over olje og sitron.","Høvle over ost og strø over ruccola, flaksalt og pepper."],
+        tip:"Er du usikker på soppen, stek den i stedet. Steinsopp er trygg rå, men bare når den er helt fersk."}],
     wine:{style:"Nebbiolo", why:"Italiensk klassiker til porcini.", q:"nebbiolo langhe", af:"Alkoholfri rødvin"} },
 
   { id:"piggsopp", img:"img/piggsopp.webp", cat:"sopp", name:"Piggsopp", sub:"Pigger, ikke skiver", months:r(8,10), peak:[9],
@@ -724,8 +851,16 @@ const ITEMS = [
     buy:["natur"], forage:{where:"Barskog og blandingsskog over hele landet.", tip:"Lett å kjenne igjen på piggene under hatten. Eldre sopp kan bli litt bitter."},
     safety:"Spis aldri sopp du ikke er helt sikker på. Ta med soppen til soppkontroll om du er i tvil.",
     recipes:[
-      {kind:"Klassisk", t:"Soppsuppe", time:"30 min", steps:["Stek sopp og løk i smør.","Kok med kraft og fløte.","Kjør halvparten glatt og smak til."]},
-      {kind:"Restaurant", t:"Syltet piggsopp til vilt", time:"Dagen før", steps:["Forvell små sopper.","Kok opp eddik, sukker og einebær.","Hell over soppen og server til vilt."]}],
+      {kind:"Klassisk", t:"Soppsuppe", time:"35 min", level:"Enkel", serves:4,
+        intro:"Kremet suppe som passer til all skogsopp. Piggsopp gir fin, mild smak og fast konsistens.",
+        ing:["400 g piggsopp","1 løk","1 fedd hvitløk","30 g smør","1 dl hvitvin (kan sløyfes)","5 dl grønnsakskraft","2 dl fløte","Timian","Salt, pepper og sitron"],
+        steps:["Rens soppen og skrap av piggene hvis de er store. Ta vare på noen fine sopper til pynt.","Fres løk og hvitløk i smør. Ha i soppen og stek i 5 minutter.","Ha i vin og kok litt inn. Hell i kraft og fløte.","La suppen småkoke i 15 minutter.","Kjør den glatt og smak til med timian, salt, pepper og sitron.","Stek pyntesoppen i smør og legg den på toppen."],
+        tip:"Store piggsopper kan smake bittert. Skrap av piggene på dem."},
+      {kind:"Restaurant", t:"Syltet piggsopp til vilt", time:"20 min + 1 døgn", level:"Enkel", serves:8,
+        intro:"Søtsur sopp på glass. Syrligheten løfter viltretter, ost og spekemat.",
+        ing:["400 g små piggsopp","2 dl eplecidereddik","1 dl vann","1 dl sukker","1 ts salt","5 einebær","2 laurbærblad","1 ts sennepsfrø"],
+        steps:["Rens soppen. Del store sopper.","Kok soppen i lettsaltet vann i 3 minutter og la den renne av.","Kok opp eddik, vann, sukker, salt og krydder.","Legg soppen på et rent glass og hell over varm lake.","Sett på lokk og la det stå i kjøleskapet i minst ett døgn."],
+        tip:"Holder seg et par uker i kjøleskapet."}],
     wine:{style:"Syrah fra nordlige Rhône", why:"Pepper og urter som passer skogsmaker.", q:"crozes hermitage", af:"Alkoholfri rødvin"} },
 
   // ---------- Bær og frukt ----------
@@ -733,56 +868,112 @@ const ITEMS = [
     about:"Norske jordbær modner sakte i lyse sommernetter og er ekstra søte.",
     buy:["dagligvare","bonde","gard"],
     recipes:[
-      {kind:"Klassisk", t:"Jordbær med fløte", time:"5 min", steps:["Rens bærene.","Server med lettpisket fløte.","Strø over litt sukker."]},
-      {kind:"Restaurant", t:"Jordbær med rabarbragranité og rømmeis", time:"40 min", steps:["Lag granité av rabarbrasaft.","Mariner jordbær med litt sukker og hylleblomst.","Server med rømmeis."]}],
+      {kind:"Klassisk", t:"Jordbær med fløte", time:"10 min", level:"Enkel", serves:4,
+        intro:"Når de norske jordbærene er gode, trenger de lite hjelp. Litt sukker og kald fløte.",
+        ing:["600 g norske jordbær","1 til 2 ss sukker","3 dl kremfløte eller melk"],
+        steps:["Skyll bærene før du tar av stilken, så de ikke blir vassne.","Del store bær i to.","Strø over litt sukker og la dem stå i 5 minutter, så de slipper litt saft.","Server i skåler med kald fløte over."],
+        tip:"Jordbær smaker mest når de har romtemperatur."},
+      {kind:"Restaurant", t:"Jordbær med rabarbragranité og rømmeis", time:"30 min + frysing", level:"Middels", serves:4,
+        intro:"Søte bær, iskald syrlig granité og en is av rømme. Sommer i en skål.",
+        ing:["## Granité","400 g rabarbra","1 dl sukker","3 dl vann","## Rømmeis","3 dl rømme","1 dl melis","1 dl kremfløte","½ sitron, skall","## Til servering","400 g jordbær","Mynte eller sitronmelisse"],
+        steps:["Granité: Kok rabarbra i biter med sukker og vann i 10 minutter. Sil saften og avkjøl.","Hell saften i en flat boks og sett i fryseren. Skrap med en gaffel hver halvtime i ca. 3 timer, til du får iskrystaller.","Rømmeis: Visp rømme, melis, fløte og sitronskall. Kjør i iskremmaskin, eller frys og rør hver halvtime.","Del jordbærene og legg dem i kalde skåler.","Legg på en kule is og skje over granité. Pynt med mynte."],
+        tip:"Granité og is kan lages dagen før."}],
     wine:{style:"Moscato d'Asti", why:"Søt, lett og musserende. Matcher søte bær.", q:"moscato d'asti", af:"Alkoholfri rosé musserende"} },
 
   { id:"blabaer", img:"img/blabaer.webp", cat:"baer", name:"Blåbær", sub:"Gratis i skogen", months:r(7,9), peak:[8],
     about:"Blåbær vokser over hele Norge. Ville blåbær er blå helt inn, i motsetning til hagebær.",
     buy:["natur","dagligvare"], forage:{where:"Barskog og lyngmark over hele landet.", tip:"Bruk bærplukker for å spare tid. Bærene fryser godt."},
     recipes:[
-      {kind:"Klassisk", t:"Blåbærsyltetøy", time:"20 min", steps:["Kok blåbær med litt sukker.","La det småkoke i 5 minutter.","Fyll på rene glass."]},
-      {kind:"Restaurant", t:"Blåbær med karamellisert hvit sjokolade", time:"30 min", steps:["Bak hvit sjokolade ved 120 grader til den blir gyllen.","Mariner blåbær med lime.","Server med kesam og knust kjeks."]}],
+      {kind:"Klassisk", t:"Blåbærsyltetøy", time:"20 min", level:"Enkel", serves:"2 glass",
+        intro:"Rørt eller kokt? Dette er en lett kokt variant med lite sukker som holder seg i kjøleskapet.",
+        ing:["1 kg blåbær","300 g sukker","½ sitron, saft","2 rene glass med lokk"],
+        steps:["Skyll bærene og plukk bort blader og kvister.","Kok bær og sitronsaft i en kjele i 5 minutter.","Ha i sukkeret og kok videre i 5 til 10 minutter. Skum av underveis.","Hell syltetøyet på varme, rene glass og sett på lokk.","Oppbevar i kjøleskapet."],
+        tip:"Vil du ha det lenger, frys deler av syltetøyet i bokser."},
+      {kind:"Restaurant", t:"Blåbær med karamellisert hvit sjokolade", time:"30 min", level:"Middels", serves:4,
+        intro:"Ville blåbær, gyllen og nøtteaktig hvit sjokolade og syrlig skyr. Kontrastene gjør det.",
+        ing:["150 g hvit sjokolade","300 g ville blåbær","2 dl skyr eller gresk yoghurt","1 ss honning","Havrekjeks eller havregryn ristet i smør"],
+        steps:["Sett ovnen på 120 grader. Hakk sjokoladen og legg den i en ildfast form.","Bak i 40 til 60 minutter. Rør hvert 10. minutt til den er gyllen som karamell.","Hell sjokoladen på bakepapir og la den stivne. Bryt den i biter.","Rør skyr med honning.","Anrett skyr, blåbær, sjokolade og knuste kjeks i glass."],
+        tip:"Sjokoladen ser klumpete ut underveis. Fortsett å røre, så blir den glatt."}],
     wine:{style:"Søt Riesling (Auslese)", why:"Sødme og syre matcher syrlige bær.", q:"riesling auslese", af:"Blåbærsaft med kullsyre"} },
 
   { id:"multer", img:"img/multer.webp", cat:"baer", name:"Multer", sub:"Myrens gull", months:r(7,8), peak:[8],
     about:"Multer vokser på myr, mest i fjellet og i Nord-Norge.",
     buy:["natur","spesial"], forage:{where:"Myrer i fjellet og i Nord-Norge.", tip:"I deler av Nord-Norge er det egne regler for multeplukking på privat grunn. Sjekk lokale regler."},
     recipes:[
-      {kind:"Klassisk", t:"Multekrem", time:"10 min", steps:["Pisk fløte.","Vend inn multer og litt sukker.","Server til jul eller som dessert."]},
-      {kind:"Restaurant", t:"Multer med brunostkaramell", time:"30 min", steps:["Smelt brunost med fløte til en karamell.","Pisk fløte og server med multer.","Topp med knust krumkake."]}],
+      {kind:"Klassisk", t:"Multekrem", time:"15 min", level:"Enkel", serves:4,
+        intro:"Julens dessert for mange. Pisket krem og multer, med litt sukker.",
+        ing:["4 dl kremfløte","2 til 3 ss sukker","1 ts vaniljesukker","3 dl multer, ferske eller tinte"],
+        steps:["Pisk fløten med sukker og vaniljesukker til myk krem.","Vend multene forsiktig inn. Ta vare på noen til pynt.","Sett kaldt til servering.","Server i glass med noen hele multer på toppen, gjerne med krumkaker."],
+        tip:"Multer har store kjerner. Noen sikter halvparten av bærene og blander mosen i kremen."},
+      {kind:"Restaurant", t:"Multer med brunostkaramell", time:"25 min", level:"Middels", serves:4,
+        intro:"Syrlige multer og en karamell laget med brunost. Søtt, salt og veldig norsk.",
+        ing:["1 dl sukker","1 dl fløte","50 g brunost, revet","20 g smør","En klype salt","3 dl multer","2 dl crème fraîche eller rømme"],
+        steps:["Smelt sukkeret i en kjele til gyllen karamell. Ikke rør, bare vipp kjelen.","Ta kjelen av varmen og hell forsiktig i fløten. Det bobler kraftig.","Rør til karamellen er glatt. Ha i brunost, smør og salt og rør til osten har smeltet.","La karamellen bli lunken.","Legg crème fraîche i skåler, multer over og drypp på karamell."],
+        tip:"Karamellen tykner når den blir kald. Varm den forsiktig hvis den blir for stiv."}],
     wine:{style:"Sauternes", why:"Honningsøt og frisk dessertvin.", q:"sauternes", af:"Eplemost"} },
 
   { id:"tyttebaer", img:"img/tyttebaer.webp", cat:"baer", name:"Tyttebær", sub:"Syrlig skogsbær", months:r(8,10), peak:[9],
     about:"Tyttebær holder seg godt fordi de har naturlig konservering. Klassisk til vilt.",
     buy:["natur","dagligvare"], forage:{where:"Tørr furuskog og lyngmark over hele landet.", tip:"Bærene er modne når de er helt røde."},
     recipes:[
-      {kind:"Klassisk", t:"Rørte tyttebær", time:"10 min", steps:["Rør tyttebær med sukker.","La stå til sukkeret er løst.","Server til vilt, kjøttkaker eller grøt."]},
-      {kind:"Restaurant", t:"Tyttebærgel til vilt", time:"20 min", steps:["Kok tyttebær med litt sukker og sil.","Sett med agar.","Kjør glatt og server i små klatter."]}],
+      {kind:"Klassisk", t:"Rørte tyttebær", time:"15 min", level:"Enkel", serves:"2 glass",
+        intro:"Tyttebær rørt med sukker, uten koking. Det klassiske tilbehøret til vilt, kjøttkaker og lapskaus.",
+        ing:["1 kg tyttebær","300 til 400 g sukker","Rene glass"],
+        steps:["Plukk bort blader og umodne bær. Skyll og la bærene renne godt av.","Ha bær og sukker i en stor bolle.","Rør med en tresleiv, av og til, i 10 til 15 minutter, til sukkeret har løst seg opp.","Ha bærene på rene glass og oppbevar kjølig."],
+        tip:"Tyttebær inneholder naturlig konserveringsmiddel, så rørte tyttebær holder seg i flere måneder."},
+      {kind:"Restaurant", t:"Tyttebærgel til vilt", time:"20 min + avkjøling", level:"Middels", serves:6,
+        intro:"Blank, syrlig gel som gir restaurantfinish på viltretten.",
+        ing:["300 g tyttebær","1 dl vann","75 g sukker","1 ts agar-agar (fra helsekost)"],
+        steps:["Kok bær, vann og sukker i 5 minutter.","Kjør glatt og sil gjennom en fin sil.","Kok opp igjen, strø i agar-agar og kok i 1 minutt under omrøring.","Hell over i en form og la stivne i kjøleskapet.","Kjør den stivnede gelen glatt i en blender. Fyll på en flaske eller pose og legg små prikker på tallerkenen."],
+        tip:"Uten agar kan du koke saften inn til sirup i stedet."}],
     wine:{style:"Pinot Noir", why:"Bæraktig rødvin passer viltretter med tyttebær.", q:"pinot noir", af:"Tyttebærsaft"} },
 
   { id:"epler", img:"img/epler.webp", cat:"baer", name:"Epler", sub:"Fra Hardanger, Sogn og Telemark", months:r(8,11), peak:[9,10],
     about:"Norske epler høstes fra august til oktober. Aroma og Gravenstein er populære sorter.",
     buy:["dagligvare","bonde","gard"],
     recipes:[
-      {kind:"Klassisk", t:"Tilslørte bondepiker", time:"20 min", steps:["Kok eplemos.","Rist kavring eller brødsmuler i smør og sukker.","Lag lag med eplemos, smuler og krem."]},
-      {kind:"Restaurant", t:"Bakt eple med havrecrumble og brunsmøris", time:"45 min", steps:["Bak halve epler med smør og sukker.","Lag crumble av havre, smør og sukker.","Server med is laget av brunt smør."]}],
+      {kind:"Klassisk", t:"Tilslørte bondepiker", time:"40 min", level:"Enkel", serves:6,
+        intro:"Eplemos, sprø søte smuler og krem i lag. En gammel norsk dessert som alle liker.",
+        ing:["1 kg syrlige epler (f.eks. Gravenstein)","1 dl vann","50 g sukker til eplemos","1 kanelstang","4 dl loffsmuler eller kavringsmuler","50 g smør","3 ss sukker til smuler","4 dl kremfløte"],
+        steps:["Skrell eplene og skjær dem i biter. Kok dem med vann, sukker og kanel til mos, ca. 15 minutter. Avkjøl.","Smelt smøret i en panne. Ha i smuler og sukker og stek under omrøring til de er gylne og sprø. Avkjøl.","Pisk fløten til myk krem.","Legg eplemos, smuler og krem lagvis i glass eller en bolle. Avslutt med smuler på toppen.","Server med en gang, så smulene holder seg sprø."],
+        tip:"Bland gjerne noen knuste makroner i smulene."},
+      {kind:"Restaurant", t:"Bakt eple med havrecrumble og brunsmøris", time:"45 min", level:"Middels", serves:4,
+        intro:"Hele bakte epler med sprø havretopp, servert med en kule vaniljeis rørt med brunt smør.",
+        ing:["4 faste epler","50 g smør","1 dl havregryn","½ dl hvetemel","½ dl brunt sukker","1 ts kanel","## Brunsmøris","50 g smør","5 dl vaniljeis"],
+        steps:["Sett ovnen på 190 grader. Skjær toppen av eplene og ta ut kjernehuset med en skje.","Smuldre smør, havregryn, mel, sukker og kanel sammen.","Fyll eplene med crumble og legg resten rundt i formen.","Bak i 25 til 30 minutter, til eplene er møre.","Brun smøret og avkjøl det litt. La isen bli myk og rør inn smøret. Frys i 30 minutter.","Server eplene lune med isen."],
+        tip:"Norske Aroma og Discovery holder formen godt i ovnen."}],
     wine:{style:"Norsk sider eller søt Chenin Blanc", why:"Eple til eple, med syre og sødme.", q:"norsk sider", af:"Norsk eplemost"} },
 
   { id:"plommer", img:"img/plommer.webp", cat:"baer", name:"Plommer", sub:"Kort og søt sesong", months:r(8,9), peak:[9],
     about:"Norske plommer har kort sesong. Victoria er den vanligste sorten.",
     buy:["dagligvare","bonde","gard"],
     recipes:[
-      {kind:"Klassisk", t:"Plommekompott", time:"15 min", steps:["Del plommer og fjern steinen.","Kok med litt sukker og kanel.","Server med vaniljekrem."]},
-      {kind:"Restaurant", t:"Grillet plomme med mascarpone og timian", time:"20 min", steps:["Grill plommehalvdeler.","Pisk mascarpone med honning.","Server med frisk timian."]}],
+      {kind:"Klassisk", t:"Plommekompott", time:"20 min", level:"Enkel", serves:4,
+        intro:"Plommer kokt møre med litt sukker og krydder. God til grøt, vafler, is eller yoghurt.",
+        ing:["800 g plommer","1 dl sukker","1 dl vann","1 kanelstang","½ vaniljestang","1 ss potetmel rørt ut i litt kaldt vann (kan sløyfes)"],
+        steps:["Del plommene og ta ut steinen.","Kok opp sukker, vann, kanel og vanilje.","Ha i plommene og la dem småkoke i 8 til 10 minutter, til de er møre.","Vil du ha den tykkere, rør inn potetmel og ta kjelen av varmen med en gang det koker opp.","Server lun eller kald."],
+        tip:"Victoria-plommer blir nesten som syltetøy. Mørke plommer holder bedre på formen."},
+      {kind:"Restaurant", t:"Grillet plomme med mascarpone og timian", time:"20 min", level:"Enkel", serves:4,
+        intro:"Varme, karamelliserte plommer med kald mascarpone og honning med timian.",
+        ing:["6 plommer","1 ss smør","2 ss honning","4 kvister timian","250 g mascarpone","1 ss melis","½ sitron, skall","Ristede mandler"],
+        steps:["Del plommene og ta ut steinen.","Varm honning og timian i en liten kjele og la det trekke.","Pensle snittflaten på plommene med smeltet smør.","Grill eller stek dem på snittflaten på høy varme i 3 til 4 minutter.","Rør mascarpone med melis og sitronskall.","Legg plommene på mascarponen, drypp over timianhonning og strø på mandler."],
+        tip:"Fungerer fint på engangsgrill til sommerkvelden."}],
     wine:{style:"Tawny portvin", why:"Nøtter og karamell passer modne plommer.", q:"tawny port", af:"Alkoholfri rødvin"} },
 
   { id:"paerer", img:"img/paerer.webp", cat:"baer", name:"Pærer", sub:"Saftige høstpærer", months:r(9,10), peak:[9],
     about:"Norske pærer kommer i september. Plukk dem litt umodne og la dem modne på kjøkkenbenken.",
     buy:["dagligvare","gard"],
     recipes:[
-      {kind:"Klassisk", t:"Pærer i rødvin", time:"40 min", steps:["Skrell pærene.","Kok dem i rødvin med sukker og kanel.","Server med krem."]},
-      {kind:"Restaurant", t:"Pære med blåmuggost og valnøtter", time:"15 min", steps:["Skjær pære i tynne skiver.","Server med blåmuggost og honning.","Topp med ristede valnøtter."]}],
+      {kind:"Klassisk", t:"Pærer i rødvin", time:"45 min", level:"Enkel", serves:4,
+        intro:"Hele pærer kokt i krydret rødvin til de blir dyprøde. Lages gjerne dagen før.",
+        ing:["4 faste pærer","7,5 dl rødvin (eller solbærsaft og vann)","1,5 dl sukker","1 kanelstang","2 stjerneanis","1 stykke appelsinskall","Krem eller vaniljeis"],
+        steps:["Skrell pærene, men la stilken sitte. Skjær en tynn skive av bunnen så de står.","Kok opp vin, sukker, krydder og appelsinskall.","Legg i pærene og la dem småkoke under lokk i 25 til 35 minutter. Snu dem underveis.","La dem avkjøle seg i laken, gjerne over natten.","Kok inn litt av laken til sirup og server pærene med sirup og krem."],
+        tip:"Pærene skal være møre, men ikke falle fra hverandre. Kjenn med en tynn kniv."},
+      {kind:"Restaurant", t:"Pære med blåmuggost og valnøtter", time:"15 min", level:"Enkel", serves:4,
+        intro:"Søt pære, salt blåmuggost og ristede nøtter. Fungerer som forrett, salat eller ostefat.",
+        ing:["2 modne pærer","120 g norsk blåmuggost (f.eks. Kraftkar)","50 g valnøtter","2 ss honning","En neve salat eller ruccola","1 ss eplecidereddik","2 ss olivenolje"],
+        steps:["Rist valnøttene i en tørr panne og grovhakk dem.","Skjær pærene i tynne båter.","Visp eddik og olje og vend salaten i.","Legg salat, pære og smuler av blåmuggost på et fat.","Strø over nøtter og drypp over honning."],
+        tip:"Er pærene harde, la dem modne et par dager på kjøkkenbenken."}],
     wine:{style:"Sauternes eller Tokaji", why:"Søt vin og salt ost er en klassiker.", q:"tokaji", af:"Pærejuice"} },
 
   // ---------- Kjøtt og vilt ----------
@@ -790,18 +981,411 @@ const ITEMS = [
     about:"Lammene går på beite om sommeren og slaktes om høsten. Fårikålens dag er siste torsdag i september.",
     buy:["dagligvare","spesial","bonde"],
     recipes:[
-      {kind:"Klassisk", t:"Fårikål", time:"2,5 t", steps:["Legg lam og kål lagvis.","Strø salt og hel sort pepper mellom lagene.","Hell på litt vann og la det trekke."]},
-      {kind:"Restaurant", t:"Lammecarré med einer og sellerirot", time:"45 min", steps:["Stek carréen rosa.","Lag sellerirotpuré.","Server med en saus smaksatt med knust einebær."]}],
+      {kind:"Klassisk", t:"Fårikål", time:"2½ t", level:"Enkel", serves:4,
+        intro:"Norges nasjonalrett. Lam og kål i lag med hel pepper, som får trekke til kjøttet faller av beinet.",
+        ing:["1,5 kg fårikålkjøtt (lam med bein)","1,5 kg kål","2 ss hel sort pepper","3 ts salt","2 ss hvetemel (kan sløyfes)","3 dl vann","Kokte poteter","Flatbrød"],
+        steps:["Del kålen i båter. Behold stilken så de holder sammen.","Legg kjøtt med fettsiden ned i bunnen av en stor gryte, så et lag kål.","Fortsett lagvis. Strø salt, pepper og litt mel mellom hvert lag.","Hell vannet over og kok opp.","Legg på lokk og la gryta trekke på lav varme i ca. 2 timer, til kjøttet er mørt.","Server med kokte poteter og flatbrød."],
+        tip:"Fårikål blir enda bedre dagen etter."},
+      {kind:"Restaurant", t:"Lammecarré med einer og sellerirot", time:"1 t", level:"Middels", serves:4,
+        intro:"Rosa lammecarré med en skorpe av einebær og urter, servert med sellerirotpuré.",
+        ing:["2 lammecarré, ca. 400 g hver","10 einebær","1 ss timian","1 ss rosmarin","1 dl panko","1 ss dijonsennep","1 sellerirot","2 dl melk","50 g smør","Salt og pepper"],
+        steps:["Kok sellerirot i biter mør i melk, og kjør glatt med smør. Smak til.","Knus einebær og hakk urtene. Bland med panko.","Brun lammet på alle sider i en varm panne. Krydre med salt og pepper.","Smør fettsiden med sennep og trykk på urteskorpen.","Stek i ovnen på 200 grader i 12 til 15 minutter, til 56 grader inni.","La kjøttet hvile i 10 minutter før du skjærer mellom beina."],
+        tip:"Hviletiden gjør at kjøttsaften blir i kjøttet."}],
     wine:{style:"Rioja eller Bordeaux", why:"Fast struktur som passer lam.", q:"rioja reserva", af:"Alkoholfri rødvin"} },
 
   { id:"elg", img:"img/elg.webp", cat:"vilt", name:"Elg og hjort", sub:"Høstens jaktsesong", months:r(9,12), peak:[10],
     about:"Jakten på elg og hjort foregår om høsten. Viltkjøtt er magert og smaksrikt.",
     buy:["spesial","bonde"],
     recipes:[
-      {kind:"Klassisk", t:"Viltgryte", time:"2 t", steps:["Brun kjøttet.","Kok med kraft, einebær, timian og fløte.","Server med tyttebær og poteter."]},
-      {kind:"Restaurant", t:"Hjortefilet med traktkantarell og rødbeter", time:"50 min", steps:["Stek filet rosa.","Lag bakte rødbeter.","Server med traktkantarell og en mørk viltsaus."]}],
+      {kind:"Klassisk", t:"Viltgryte", time:"2 t", level:"Enkel", serves:4,
+        intro:"Høstens varmeste middag. Viltkjøtt som får småkoke med einebær og timian til det er mørt.",
+        ing:["800 g elg- eller hjortegryte i terninger","2 ss smør","1 løk","2 gulrøtter","10 einebær, knust","2 laurbærblad","1 ss timian","5 dl viltkraft","2 dl fløte","2 skiver brunost (kan sløyfes)","Salt og pepper","Rørte tyttebær og poteter til servering"],
+        steps:["Tørk kjøttet og brun det i smør i flere omganger. Krydre med salt og pepper.","Fres løk og gulrot i biter i samme gryte.","Ha kjøttet tilbake. Tilsett einebær, laurbær, timian og kraft.","Legg på lokk og la gryta småkoke i 1½ time, til kjøttet er mørt.","Rør inn fløte og eventuelt brunost. Kok i 10 minutter til.","Server med poteter og rørte tyttebær."],
+        tip:"Ikke brun for mye kjøtt på en gang. Da koker det i stedet for å få farge."},
+      {kind:"Restaurant", t:"Hjortefilet med traktkantarell og rødbeter", time:"1 t", level:"Middels", serves:4,
+        intro:"Rosa filet, bakte rødbeter og smørstekt sopp med en mørk viltsaus.",
+        ing:["600 g hjortefilet","4 rødbeter","200 g traktkantarell","3 dl viltkraft","1 dl rødvin","1 ss rips- eller tyttebærgelé","30 g kaldt smør","Timian","Salt og pepper"],
+        steps:["Pakk rødbetene i folie og bak dem på 200 grader i 50 minutter. Skrell og del dem.","Kok viltkraft og rødvin inn til halvparten. Rør inn gelé og pisk inn kaldt smør.","Brun filetene på alle sider og stek videre i ovnen på 150 grader til 54 grader inni.","Stek soppen tørr, og så i smør med timian.","La kjøttet hvile i 5 minutter, skjær i skiver og server med rødbeter, sopp og saus."],
+        tip:"Elgfilet kan brukes på samme måte."}],
     wine:{style:"Barolo eller nordlig Rhône", why:"Kraftig, med syre og krydder til vilt.", q:"barolo", af:"Alkoholfri rødvin"} },
 ];
+
+/* Named chefs' recipes, retold in our own words with credit and a link to the original. Appended after each item's own recipes. */
+const CHEF = {
+  asparges: [
+    {kind:"Kokk", t:"Asparges med hollandaise og spekeskinke", by:"Lise Finckenhagen", src:"NRK Mat", url:"https://www.nrk.no/mat/asparges-med-skinke-og-hollandes-1.15016774", time:"40 min", level:"Middels", serves:4,
+      intro:"Lise Finckenhagen gjør det enkelt: nykokt grønn asparges, en ekte hollandaise laget på klaret smør, og tynne skiver god spekeskinke ved siden av.",
+      ing:["2 bunter grønn asparges","Tynne skiver spekeskinke","## Hollandaise","300 g smør","1 stor sjalottløk","½ dl hvitvinseddik","1 dl vann","½ ts knust pepper","½ laurbærblad (kan sløyfes)","3 eggeplommer","Salt og noen dråper sitron","Gressløk eller kjørvel til pynt"],
+      steps:["Smelt smøret på svak varme til det skiller seg. Du skal bare bruke det klare, gule smøret på toppen. Hold det varmt.","Kok finhakket sjalottløk med eddik, vann, pepper og laurbær til det er igjen litt under 1 dl. Sil om du vil ha en glatt saus.","Pisk eggeplommene med den reduserte væsken i en bolle over et vannbad som så vidt småkoker. Bollen skal ikke røre vannet. Pisk til det blir tykt og luftig som eggedosis.","Ta bollen av varmen og pisk inn det varme smøret, først dråpevis og så i en tynn stråle. Smak til med salt og sitron. Sett sausen lunt.","Knekk av den treaktige enden på aspargesen. Tykke stilker kan skrelles på nederste halvdel.","Kok aspargesen i godt saltet vann i 2 til 3 minutter, til den er mør men fortsatt har litt spenst.","Legg asparges på tallerkener, skje over hollandaise og legg spekeskinke ved siden av. Pynt med urter."],
+      tip:"Blir sausen for varm, skiller den seg. Har det skjedd, pisk en ny eggeplomme i en ren bolle og pisk den skilte sausen inn i den, litt om gangen."},
+    {kind:"Kokk", t:"Smørbrød med asparges og pepperrotkrem", by:"Niklas Ekstedt", src:"BBC Food", url:"https://www.bbc.co.uk/food/recipes/nordic_smorrebrod_69435", time:"30 min", level:"Enkel", serves:4,
+      intro:"Den svenske stjernekokken Niklas Ekstedt legger både kokt og rå asparges på sprøtt rugbrød, med pepperrotkrem, lagret ost og sprøstekt sjalottløk.",
+      ing:["8 hvite asparges, skrellet","8 grønne asparges","4 skiver rugbrød","1 ss smør","100 g lagret ost (Västerbotten eller norsk lagret)","Dill","## Pepperrotkrem","1,5 dl crème fraîche","2 ss revet pepperrot","1 ts sitronsaft","Salt og hvit pepper","## Sprø sjalottløk","2 sjalottløk i tynne ringer","Olje til steking"],
+      steps:["Rør crème fraîche, pepperrot og sitron. Smak til med salt og pepper og sett kaldt.","Stek sjalottløkringene i litt olje på middels varme til de er gylne og sprø. La dem renne av på papir og strø over litt salt.","Kok halvparten av aspargesen i saltet vann i 2 til 3 minutter. Legg den rett i isvann.","Skjær resten av aspargesen i tynne strimler på langs med en potetskreller. Den skal spises rå.","Smør rugbrødet og rist det sprøtt i en panne eller under ovnsgrillen.","Legg både kokt og rå asparges på brødet. Klatt over pepperrotkrem, riv over ost og topp med sprø løk og dill."],
+      tip:"Pepperrot blir sterkere jo lenger den står. Smak deg frem."}],
+  nypoteter: [
+    {kind:"Kokk", t:"Nypoteter på rugbrød med rømme og rødløk", by:"Niklas Ekstedt", src:"BBC Food", url:"https://www.bbc.co.uk/food/recipes/swedish_new_potatoes_25334", time:"25 min", level:"Enkel", serves:4,
+      intro:"En svensk sommerklassiker fra Niklas Ekstedt: lunne nypoteter i skiver på ristet rugbrød, med rømme, smørstekt rødløk og masse dill.",
+      ing:["16 små nypoteter","4 ss smør","1 liten rødløk i tynne skiver","4 skiver rugbrød","1,25 dl rømme","Fersk dill","Salt og pepper"],
+      steps:["Skrubb potetene og kok dem i godt saltet vann i 10 til 15 minutter, til de er møre. Hell av og la dem dampe av et par minutter.","Smelt smøret i en panne og stek rødløken på middels varme i 3 til 4 minutter, til den er myk og blank.","Del potetene i to og krydre med salt og pepper.","Rist rugbrødet i en tørr panne.","Smør rømme på brødet, legg på potetene og skje over løken med smøret. Topp med mye dill."],
+      tip:"Prøv med en skive gravlaks eller litt løyrom på toppen."}],
+  blomkal: [
+    {kind:"Kokk", t:"Ostegratinert blomkål med tre oster", by:"Lise Finckenhagen", src:"NRK Mat", url:"https://www.nrk.no/mat/ostegratinert-blomkal-1.13127345", time:"50 min", level:"Enkel", serves:4,
+      intro:"Lise Finckenhagens vri på en gammel klassiker. Blomkålen ovnsstekes først så den får smak og farge, før den dekkes av en ostesaus med tre oster.",
+      ing:["2 mellomstore blomkål","4 hvitløksfedd med skall","2 kvister timian","½ sitron","2 til 4 ss olivenolje","Salt og pepper","## Ostesaus","2 ss smør","2 ss hvetemel","3 dl melk","1 dl fløte","150 g hvitost eller cheddar","50 g blåmuggost","50 g parmesan","Revet muskat","## Til servering","Spekeskinke eller sprø bacon (valgfritt)","Vårløk eller persille"],
+      steps:["Sett ovnen på 210 grader. Del blomkålen i grove buketter og legg dem på et stekebrett med knuste hvitløksfedd og timian.","Drypp over olje og sitronsaft, krydre med salt og pepper og vend alt sammen. Stek i 20 til 25 minutter, til blomkålen er mør og har fått farge.","Legg blomkålen tett i en ildfast form. Klem hvitløken ut av skallet og ha den i formen.","Ostesaus: Smelt smøret, rør inn melet og la det frese i et par minutter. Visp inn melk og fløte og la sausen småkoke i 2 minutter mens du rører.","Ta kjelen av varmen og rør inn hvitost, blåmuggost og halvparten av parmesanen. Smak til med muskat og pepper.","Hell sausen over blomkålen, strø over resten av parmesanen og gratiner øverst i ovnen til den er gyllen.","Server med skinke eller bacon, og strø over vårløk eller urter."],
+      tip:"Ovnsstekingen gir mye mer smak enn å koke blomkålen. Ikke hopp over den."},
+    {kind:"Kokk", t:"Ovnsbakt blomkål med hasselnøtter og granateple", by:"Yotam Ottolenghi", src:"The Happy Foodie, fra boka «Jerusalem»", url:"https://thehappyfoodie.co.uk/recipes/ottolenghi-roasted-cauliflower-and-hazelnut-salad/", time:"50 min", level:"Enkel", serves:4,
+      intro:"En av Ottolenghis mest kjente salater. Sprø, brunstekt blomkål møter ristede hasselnøtter, granateple og en søtsyrlig dressing med kanel og allehånde.",
+      ing:["1 blomkål (ca. 650 g)","5 ss olivenolje","1 stilk stangselleri","30 g hasselnøtter","1 neve bladpersille","50 g granateplekjerner","⅓ ts kanel","⅓ ts malt allehånde","1 ss sherryeddik","1½ ts lønnesirup","Salt og pepper"],
+      steps:["Sett ovnen på 220 grader.","Del blomkålen i små buketter. Vend dem med 3 ss olje, ½ ts salt og pepper, og spre dem utover et stekebrett.","Stek øverst i ovnen i 25 til 35 minutter, til blomkålen er sprø og brun i kantene. Ha den i en stor bolle og la den bli lunken.","Senk ovnen til 170 grader og rist hasselnøttene i ca. 15 minutter. Avkjøl litt og grovhakk dem.","Skjær sellerien i tynne, skrå skiver.","Bland nøtter, selleri, persille, granateple, kanel, allehånde, eddik, lønnesirup og resten av oljen inn i blomkålen.","Smak til med salt og pepper og server i romtemperatur."],
+      tip:"Brun farge er smak. La blomkålen få god tid i ovnen."}],
+  kal: [
+    {kind:"Kokk", t:"Brunet spisskål i kraft med stekt fisk", by:"Marcus Wareing", src:"BBC Food", url:"https://www.bbc.co.uk/food/recipes/braised_cabbage_in_a_72453", time:"45 min", level:"Middels", serves:4,
+      intro:"Michelin-kokken Marcus Wareing bruner kålbåter hardt i jerngryte og lar dem trekke møre i en kraft med soya, urter og litt chili. Til det: stekt hvit fisk og ris.",
+      ing:["1 spisskål, delt i fire båter","Olivenolje","1 løk i tynne skiver","2 hvitløksfedd, knust med skall","½ grønn chili","2 kvister rosmarin","1 neve persille","1 neve oregano","3 dl grønnsakskraft","2 ss lys soyasaus","2 ss riseddik","4 stykker lysing, torsk eller sei (ca. 200 g hver)","Kokt ris"],
+      steps:["Sett ovnen på 200 grader.","Varm en jerngryte med olje. Legg kålbåtene med snittflaten ned og krydre med salt og pepper. Brun dem godt, 4 til 5 minutter på hver side.","Ha i løk, hvitløk og chili og la det steke med i 2 til 3 minutter. Rør inn hakkede urter og la det frese et par minutter på lav varme.","Hell i kraft, soya og eddik. Legg på lokk og sett gryta i ovnen i 20 minutter, til kålen er mør helt inn.","Stek fisken i olje med skinnsiden ned, og snu den. Ha i en skvett soya, riseddik og litt kraft, og la det koke 2 til 3 minutter.","Server kål med kraft, fisk og ris."],
+      tip:"Vanlig hodekål fungerer også. Skjær den i smalere båter og gi den litt lenger tid."}],
+  gronnkal: [
+    {kind:"Kokk", t:"Julekveite med sprø grønnkål og karamellisert løk", by:"Máret Rávdná Buljo", src:"NRK Mat", url:"https://www.nrk.no/mat/julekveite-med-sprostekt-gronnkal-og-karamellisert-lok-1.15274499", time:"40 min", level:"Enkel", serves:4,
+      intro:"Den samiske matgründeren Máret Rávdná Buljo lager julemat etter samiske tradisjoner. Kveite i fløte, sprøstekt grønnkål og søtsur løk, med tyttebær ved siden av.",
+      ing:["800 g kveite i stykker","1 dl hvetemel","1 ss salt","1 ts pepper","1 ss smør","3 dl vann","1 dl fløte","1 bunt grønnkål","Olivenolje","1 løk","1 ts smør","1 ss sukker","1 ss balsamicoeddik","4 til 8 poteter","1 stor gulrot","Tyttebærsyltetøy"],
+      steps:["Kok potetene. Riv gulroten.","Bland mel, salt og pepper på en tallerken og vend kveitestykkene i det.","Stek fisken i smør i 1 minutt på hver side. Hell i vannet og la fisken trekke på svak varme i ca. 10 minutter.","Hell i fløten og la sausen tykne litt.","Skyll og tørk grønnkålen godt, og riv bladene fra stilkene. Fres dem i olje med litt salt til de er sprø. La dem renne av på papir.","Stek løken i biter i smør med salt og pepper. Når den blir brun, strø over sukker og rør inn balsamico.","Server kveite med saus, grønnkål, løk, poteter, gulrot og tyttebær."],
+      tip:"Grønnkålen må være helt tørr før den stekes, ellers blir den seig i stedet for sprø."},
+    {kind:"Kokk", t:"Potetkumler med stekt grønnkål og mandler", by:"Niklas Ekstedt", src:"BBC Food", url:"https://www.bbc.co.uk/food/recipes/swedish_dumplings_with_09851", time:"1½ t", level:"Middels", serves:4,
+      intro:"Niklas Ekstedts svenske kroppkakor, fylt med flesk og løk. Han serverer dem med smør, tyttebær og en frisk salat av stekt grønnkål med revne mandler.",
+      ing:["800 g melne poteter","1 ss smør","1 liten løk","200 g bacon eller kokt flesk","½ ts allehånde","1 egg","200 til 250 g hvetemel","Salt og pepper","4 ss tyttebærsyltetøy","## Grønnkål","250 g grønnkål uten stilker","2 ss solsikkeolje","50 g mandler, revet eller i flak","1 fedd hvitløk","2 ss olivenolje","1 ss hvitvinseddik"],
+      steps:["Kok potetene møre, hell av vannet og la dem dampe tørre i 10 minutter. Mos dem helt glatte og la dem avkjøle seg.","Fyll: Fres finhakket løk i smør til den er myk. Ha i flesk i små terninger og allehånde, og stek i 5 minutter. Avkjøl.","Bland egg, 200 g mel og salt inn i potetmosen. Kna til en myk deig som ikke kleber. Tilsett mer mel ved behov.","Del deigen i 24 biter. Flat ut hver bit, legg en skje fyll i midten og lukk godt rundt.","Kok kumlene i saltet vann i 8 til 10 minutter, til de flyter opp.","Stek grønnkålen raskt i varm olje til den er mørk grønn og litt sprø. Vend med mandler, hvitløk, olivenolje, eddik og salt.","Server kumlene med smeltet smør, tyttebær og grønnkålsalat."],
+      tip:"Kumlene kan stekes i smør dagen etter. Da blir de sprø utenpå."}],
+  rosenkal: [
+    {kind:"Kokk", t:"Rosenkål med chimichurri-majones", by:"Eli Anne Sundset", src:"NRK Mat (Kvelden før kvelden)", url:"https://www.nrk.no/mat/oppskrift-pa-rosenkal-med-chimichurri-majones-og-solsikkekjerner-fra-kvelden-for-kvelden-2025-1.17695328", time:"45 min", level:"Middels", serves:4,
+      intro:"Kokken Eli Anne Sundset gjør julens rosenkål til hovedattraksjonen. Den stekes gyllen, glaseres i smør og vendes i grønn chimichurri, med majones og sprø solsikkekjerner på toppen.",
+      ing:["600 g rosenkål","100 g smør","1 dl vann","Olje, salt, pepper og sitron","## Chimichurri","70 g bladpersille","70 g gressløk","2 fedd hvitløk","2 grønne chili","10 g honning","Saft og skall av 1 lime","2 dl olivenolje","½ ts salt","## Chimichurri-majones","1 egg","1 ts dijonsennep","4 dl nøytral olje","2 ss sitronsaft","1 ts salt","6 ss chimichurri","## Sprø solsikkekjerner","100 g solsikkekjerner","1 dl solsikkeolje","½ dl vann","En klype salt"],
+      steps:["Chimichurri: Kjør urter, hvitløk, chili, honning, lime, olivenolje og salt i en blender til en grønn, litt flytende saus.","Majones: Ha egg, sennep, sitron, salt og 6 ss chimichurri i en høy beholder. Drypp inn oljen mens du kjører med stavmikser, til majonesen er tykk.","Solsikkekjerner: Kok kjerner, olje, vann og salt i en panne til vannet er borte og kjernene er gylne. Sil av oljen og la dem tørke på papir.","Rens rosenkålen og del den i to eller fire.","Stek rosenkålen i litt olje til den har gyllen stekeflate. Ha i smør og vann og la den småkoke til den er mør. Krydre med salt, pepper og sitron.","Vend inn litt chimichurri, legg rosenkålen i en skål og topp med majones, solsikkekjerner og friske urter."],
+      tip:"Chimichurrien er også god på grillet kjøtt og fisk."},
+    {kind:"Kokk", t:"Rosenkål med brunt smør og svart hvitløk", by:"Yotam Ottolenghi", src:"BBC Food", url:"https://www.bbc.co.uk/food/recipes/brussels_sprouts_with_00057", time:"20 min", level:"Enkel", serves:4,
+      intro:"Ottolenghi baker rosenkålen på høy varme og vender den i mørkt brunet smør med svart hvitløk, timian og karve. Tahini og sitron til slutt.",
+      ing:["450 g rosenkål, delt i to","1 ss olivenolje","En klype karve","12 fedd svart hvitløk","2 ss frisk timian","30 g smør","30 g gresskarkjerner, ristet","1½ ts sitronsaft","1 ss tahini","Salt"],
+      steps:["Sett ovnen på 240 grader og legg bakepapir på et brett.","Vend rosenkålen med olje og salt og bak i ca. 10 minutter, til den er brun men fortsatt sprø.","Knus karve i en morter, og mos inn svart hvitløk og timian til en grov pasta.","Varm smøret i en stor panne til det er mørkt brunt, ca. 3 minutter.","Ha i hvitløkpasta, rosenkål, gresskarkjerner og en klype salt. Rør i 30 sekunder og ta pannen av varmen.","Rør inn sitronsaft, legg over på et fat og drypp over tahini."],
+      tip:"Svart hvitløk er søt og mild, nesten som lakris. Den finnes i godt utstyrte butikker og asiatiske butikker."}],
+  kalrot: [
+    {kind:"Kokk", t:"Kålrotstappe med kraft", by:"Lise Finckenhagen", src:"NRK Mat", url:"https://www.nrk.no/mat/kalrotstappe-1.6914312", time:"40 min", level:"Enkel", serves:8,
+      intro:"Lise Finckenhagens stappe til pinnekjøttet. Hemmeligheten er gulrot og noen poteter i stappen, og en skvett kraft fra kjøttet.",
+      ing:["2 kg kålrot","4 gulrøtter","6 mandelpoteter","2 liter vann","6 ss smør","2 dl kraft fra pinnekjøtt (eller annen kraft)","Fløte (valgfritt)","Salt og pepper"],
+      steps:["Skrell kålrot, gulrot og poteter, og skjær alt i jevne biter.","Kok grønnsakene møre i vannet, ca. 25 minutter.","Hell av vannet og mos grønnsakene.","Rør inn smør og kraft.","Smak til med salt og pepper. Vil du ha den ekstra myk, rør inn en skvett fløte."],
+      tip:"Har du ikke pinnekjøttkraft, bruk litt av kokevannet fra kjøttet du serverer."},
+    {kind:"Kokk", t:"Melkesyregjæret kålrot", by:"Tareq Taylor", src:"NRK Mat", url:"https://www.nrk.no/mat/melkesyregjaeret-kalrot-1.12456154", time:"30 min + ca. 1 måned", level:"Middels", serves:"1 stort glass",
+      intro:"Tareq Taylor gjærer kålrot i en saltlake med dill, chili og koriander. Etter noen uker er den syrlig, sprø og full av smak, perfekt til vilt, pølser og smørbrød.",
+      ing:["1 kg kålrot","1 liter vann","1 dl salt uten jod","1 dl eddik (12 %)","10 dillkroner","2 røde chili","2 ss korianderfrø","Et helt rent glass med tett lokk"],
+      steps:["Kok opp vann, salt og eddik til saltet har løst seg. La laken bli helt kald.","Skrell kålroten og skjær den i staver på ca. 2 cm.","Skyll dillkronene godt.","Legg kålrot, dill, chili og korianderfrø i glasset og hell over kald lake. Sett på lokket.","La glasset stå mørkt i romtemperatur i 2 til 3 dager, så gjæringen kommer i gang.","Sett det så litt kjøligere, rundt 15 grader, i to uker. Flytt det til slutt i kjøleskapet i tre til fire uker."],
+      tip:"Alt må være helt rent, og kålroten må ligge under laken hele tiden. Legg gjerne en liten tallerken oppå."}],
+  rodbeter: [
+    {kind:"Kokk", t:"Ovnsbakte rødbeter med balsamico", by:"Lise Finckenhagen", src:"NRK Mat", url:"https://www.nrk.no/mat/ovnsbakte-rodbeter-1.7283991", time:"50 min", level:"Enkel", serves:4,
+      intro:"Lise Finckenhagens bakte rødbeter med sjalottløk, hvitløk, fennikelfrø og balsamico. Godt både varmt og kaldt, til kjøtt, fisk og postei.",
+      ing:["400 g små rødbeter","4 sjalottløk","2 fedd hvitløk","4 ss balsamicoeddik","4 ss olivenolje","½ ts knuste fennikelfrø","Salt og pepper"],
+      steps:["Sett ovnen på 200 grader.","Skrell rødbetene og del dem i fire båter.","Skjær sjalottløk og hvitløk i tynne skiver.","Bland alt i en ildfast form med fennikelfrø, eddik og olje. Krydre med salt og pepper.","Dekk formen med folie og bak i ca. 40 minutter, til rødbetene er helt møre."],
+      tip:"Bruk hansker når du skreller rødbeter, ellers blir fingrene røde."},
+    {kind:"Kokk", t:"Rødbetsalat med varmrøkt laks og pepperrot", by:"Raymond Blanc", src:"BBC Food", url:"https://www.bbc.co.uk/food/recipes/brandonrostsmokedsal_93502", time:"50 min", level:"Enkel", serves:4,
+      intro:"Den franske mesterkokken Raymond Blanc damper rødbeter i flere farger, vender dem i olje og balsamico og serverer dem med varmrøkt laks og en frisk pepperrotkrem.",
+      ing:["480 g rødbeter i ulike farger (vanlige, gule, polka)","2 ss god olivenolje","2 ts balsamicoeddik","30 g sjalottløk i tynne skiver","120 g varmrøkt laks","1 neve rødbetblader eller babyspinat","## Pepperrotkrem","100 g crème fraîche","1 ts revet fersk pepperrot","2 ss hakket dill","Salt"],
+      steps:["Damp rødbetene under lokk i 35 til 40 minutter, til en kniv går lett inn.","La dem bli lunkne og gni av skallet. Skjær dem i biter på ca. ½ cm.","Vend rødbetene med olje, balsamico og sjalottløk. Smak til med salt og pepper.","Rør crème fraîche med pepperrot, dill og salt.","Fordel salaten på tallerkener, legg flak av laks over og strø på dill. Server med pepperrotkremen og noen blader ved siden av."],
+      tip:"Hold de ulike fargene hver for seg til slutt, ellers farger de røde de andre."}],
+  sellerirot: [
+    {kind:"Kokk", t:"Saltbakt sellerirot med luftig kryddersmør", by:"Reneé Fagerhøi", src:"NRK Mat", url:"https://www.nrk.no/mat/bakt-sellerirot-med-kryddersmor-1.12894848", time:"2 t 15 min", level:"Enkel", serves:4,
+      intro:"Kokken Reneé Fagerhøi baker hele sellerirøtter på et lag grovt salt til de er fløyelsmyke inni, og serverer dem med pisket urtesmør.",
+      ing:["1 til 2 sellerirøtter","Grovt salt","150 g smør","1 ss sitronsaft","Friske urter, f.eks. persille, rosmarin og timian","Salt"],
+      steps:["Sett ovnen på 180 grader. Børst jorden av selleriroten, men la skallet være på.","Strø et tykt lag grovt salt på et stekebrett og sett selleriroten oppå.","Bak i ca. 2 timer, til den er helt mør. Den er perfekt ved 88 grader inni.","Pisk romtemperert smør til det er hvitt og luftig. Pisk inn sitronsaft, salt og hakkede urter.","Del selleriroten i båter og server med kryddersmøret."],
+      tip:"Velg urter etter hovedretten. Rosmarin og timian passer til lam, persille og dill til fisk."},
+    {kind:"Kokk", t:"Bakt sellerirot med røkt ørret og kaperssalsa", by:"Yotam Ottolenghi", src:"BBC Food", url:"https://www.bbc.co.uk/food/recipes/baked_celeriac_with_34623", time:"1 t 45 min", level:"Enkel", serves:4,
+      intro:"Ottolenghi gjør den stygge selleriroten til stjernen. Den bakes myk i folie med timian, og toppes med pepperrotkrem, røkt ørret og en frisk salsa av kapers og urter.",
+      ing:["1 sellerirot, skrubbet, delt i to på langs","2 ss olivenolje","1 neve timiankvister","80 g crème fraîche","20 g fersk pepperrot, revet","150 g røkt ørret eller laks","2 ts sitronsaft","Flaksalt og pepper","## Salsa","20 g små kapers","1 ss hakket persille","1 ts hakket estragon","1½ ss olivenolje"],
+      steps:["Sett ovnen på 180 grader.","Legg hver selleri-halvdel på et stort stykke folie. Gni inn med olje, timian, salt og mye pepper, og pakk folien tett rundt.","Bak i ca. 1 time, til selleriroten er myk. Pakk ut og la den bli romtemperert, ca. 30 minutter.","Rør crème fraîche med pepperrot, salt og pepper, og sett kaldt.","Bland alle ingrediensene til salsaen.","Skjær hver halvdel i fire lange båter. Legg to på hver tallerken, med pepperrotkrem, ørret og salsa på toppen. Drypp over sitron."],
+      tip:"Bruk norsk røkt fjellørret hvis du får tak i det."}],
+  pastinakk: [
+    {kind:"Kokk", t:"Ovnsbakt pastinakksuppe med rosmarin", by:"James Martin", src:"BBC Food", url:"https://www.bbc.co.uk/food/recipes/roast_parsnip_and_79879", time:"35 min", level:"Enkel", serves:6,
+      intro:"Den britiske TV-kokken James Martin baker pastinakken i ovnen før den kokes til suppe. Det gir en søt, litt nøtteaktig smak.",
+      ing:["600 g pastinakk","4 ss olivenolje","50 g smør","225 g løk i tynne skiver","1 ss tørket rosmarin","2 grønnsaksbuljongterninger","7,5 dl melk","7,5 dl vann","Salt og pepper"],
+      steps:["Sett ovnen på 200 grader. Skrell pastinakken og skjær den i grove biter.","Vend den i halve oljen og stek i ca. 15 minutter, til den er gyllen og mør.","Varm resten av oljen og smøret i en stor kjele. Fres løk og rosmarin under lokk i 3 til 4 minutter.","Ha i pastinakk, buljong, melk og vann, og kok opp.","La suppen småkoke i 5 minutter, til pastinakken er helt myk.","Kjør suppen glatt med stavmikser og smak til med salt og pepper."],
+      tip:"Topp med sprø bacon, ristede hasselnøtter eller en klatt rømme."}],
+  purre: [
+    {kind:"Kokk", t:"Pai med bacon og purre", by:"Lise Finckenhagen", src:"NRK Mat", url:"https://www.nrk.no/mat/pai-med-bacon-og-purre-1.7571961", time:"1 t 45 min", level:"Middels", serves:8,
+      intro:"Lise Finckenhagens quiche med mørdeig, sprø bacon, myk purre og mye ost. Ikke vær redd for paibunnen, sier hun. Det er bare å sette i gang.",
+      ing:["## Paibunn","250 g hvetemel","125 g kaldt smør","Ca. 1 dl kaldt vann","## Fyll","1 purre i tynne skiver","150 g bacon i små biter","200 g revet ost","3 egg","3 dl crème fraîche eller matfløte","Salt og pepper","Olje til steking"],
+      steps:["Smuldre kaldt smør i terninger sammen med melet. Tilsett vann litt om gangen og kna raskt til en smidig deig.","La deigen hvile i kjøleskapet i minst 30 minutter. Kjevle den ut og legg den i en terteform.","Prikk bunnen med en gaffel. Legg på folie og tørre erter eller ris, og forstek ved 180 grader i ca. 15 minutter.","Stek bacon og purre i litt olje. Fordel det i bunnen og dryss over osten.","Visp egg og crème fraîche, og smak til med salt og pepper. Hell over fyllet.","Stek paien ved 180 grader i ca. 45 minutter, til den har hevet seg litt og er fast når du rister lett på formen."],
+      tip:"Paien er god lunken med en grønn salat. Den kan også fryses."}],
+  gresskar: [
+    {kind:"Kokk", t:"Gresskarsuppe med parmesan og stekt sopp", by:"Bryn Williams", src:"BBC Food", url:"https://www.bbc.co.uk/food/recipes/pumpkinandparmesanso_92784", time:"45 min", level:"Middels", serves:4,
+      intro:"Den walisiske kokken Bryn Williams koker parmesan inn i suppen for dybde, og topper med ristede gresskarkjerner, små gresskarterninger og smørstekt steinsopp.",
+      ing:["50 g smør","1 løk, hakket","1 kg gresskar, skrelt og i terninger (ta vare på kjernene)","8 dl varm grønnsakskraft","110 g parmesan (gjerne med skall)","Salt og pepper","## Topping","25 g gresskarkjerner","4 ss olje","3 ts olivenolje","25 g gresskar i små terninger","110 g steinsopp i terninger","2 ss gressløk","25 g parmesan i små terninger"],
+      steps:["Fres løken i smør på lav varme i 8 til 10 minutter, til den er myk men uten farge.","Ha i gresskar og stek i 2 til 3 minutter. Hell i kraften og kok opp.","Rør inn parmesan og la suppen småkoke i 8 til 10 minutter. Kjør den glatt, og sil den gjerne for ekstra silkemyk suppe.","Rist gresskarkjernene i en tørr panne. Ha i olje og stek dem gylne i 4 til 5 minutter.","Stek de små gresskarterningene i litt olivenolje i 1 til 2 minutter. Stek soppen gyllen i resten av oljen, og vend inn gressløk.","Hell suppen i skåler og legg sopp, gresskar, kjerner og parmesanbiter i midten."],
+      tip:"Har du ikke steinsopp, bruk kantarell eller sjampinjong."},
+    {kind:"Kokk", t:"Gresskarravioli med amaretti og salviesmør", by:"James Martin", src:"BBC Food", url:"https://www.bbc.co.uk/food/recipes/pumpkin_and_amaretti_97092", time:"1½ t", level:"Avansert", serves:4,
+      intro:"En gammel norditaliensk kombinasjon som James Martin har gjort kjent på TV. Søt gresskarfyll med knuste mandelkjeks, i hjemmelaget pasta med brunt smør og sprø salvie.",
+      ing:["## Pasta","300 g hvetemel tipo 00","3 egg","1 ss olivenolje","En klype salt","## Fyll","1,7 kg gresskar, skrelt og i biter","2 ss olivenolje","5 amarettikjeks, knust","1 ts sitronsaft","½ ts malt ingefær","## Saus og topping","110 g smør","½ sitron","200 g gresskar i små terninger","3 ss pinjekjerner","20 små salvieblader","Olje til steking","110 g revet parmesan"],
+      steps:["Kjør mel, egg, olje og salt i en foodprosessor til det ligner smuler. Kna til en glatt deig i 5 minutter, og la den hvile kaldt i 30 minutter.","Bak gresskarbitene med olje, salt og pepper på 210 grader i ca. 20 minutter. Kjør til puré og rør inn amaretti, sitron og ingefær.","Kjør pastadeigen tynn i en pastamaskin, og skjær ut ruter på ca. 6 x 6 cm.","Legg en skje fyll på halvparten av rutene, pensle kantene med vann, legg en rute over og trykk godt rundt.","Stek gresskarterninger og pinjekjerner gylne i litt olje. Stek salviebladene sprø i varm olje.","Kok raviolien i saltet vann i 2 til 3 minutter. Brun smøret og smak til med sitron.","Vend raviolien i smøret og topp med gresskar, pinjekjerner, salvie og parmesan."],
+      tip:"Har du ikke pastamaskin, bruk ferske lasagneplater fra butikken."}],
+  jordskokk: [
+    {kind:"Kokk", t:"Jordskokksuppe med spekeskinke og daddel", by:"Lise Finckenhagen", src:"NRK Mat", url:"https://www.nrk.no/mat/jordskokksuppe-1.10854928", time:"35 min", level:"Enkel", serves:4,
+      intro:"Lise Finckenhagens fløyelsmyke jordskokksuppe, laget på melk i stedet for kraft. Hun topper den med sprø spekeskinke og søt daddel, men gir mange andre forslag også: pinnekjøtt, laks med eple eller stekte kamskjell.",
+      ing:["300 g rensede jordskokker","2 sjalottløk","2 fedd hvitløk","2 ss smør","½ dl hvitvin","Ca. 8 dl melk (eller halv melk, halv matfløte)","Salt og pepper","Noen dråper sitron","## Topping","Sprøstekt spekeskinke","Litt hakket daddel","Grovhakket gressløk"],
+      steps:["Hakk sjalottløk og hvitløk. Skjær jordskokkene i små biter.","Smelt smøret i en kjele og fres grønnsakene på middels varme uten at de får farge.","Hell i hvitvinen og la den koke nesten helt inn.","Ha i melken og la suppen småkoke i ca. 20 minutter, til jordskokkene er helt møre. Rør av og til, så melken ikke svir seg.","Kjør suppen glatt med en stavmikser. Smak til med salt, pepper og noen dråper sitron.","Stek spekeskinke i strimler sprø i en tørr panne og bland med litt daddel. Legg det på suppen og strø over gressløk."],
+      tip:"Jordskokk trenger ikke skrelles. Skrubb dem godt under rennende vann."},
+    {kind:"Kokk", t:"Ovnsbakt jordskokk med sprø smørsmuler", by:"Richard Corrigan", src:"BBC Food", url:"https://www.bbc.co.uk/food/recipes/roastedjerusalemarti_84832", time:"40 min", level:"Enkel", serves:6,
+      intro:"Den irske Michelin-kokken Richard Corrigan forkoker jordskokkene og baker dem under et teppe av smørstekte brødsmuler. Godt tilbehør i stedet for poteter.",
+      ing:["500 g jordskokk, skrelt","25 g smør","100 g ferske brødsmuler","Salt"],
+      steps:["Kok jordskokkene i saltet vann i ca. 15 minutter, til de er møre. Hell av godt.","Sett ovnen på 200 grader.","Smelt smøret i en panne og stek brødsmulene sprø og lett gylne.","Legg jordskokkene i en ildfast form og dekk dem med smulene.","Bak i 20 minutter og server med en gang."],
+      tip:"Lag ferske smuler av gårsdagens loff i en hurtigmikser."}],
+  ramslok: [
+    {kind:"Kokk", t:"Gnocchi med ramsløk og kyllinglever", by:"Tareq Taylor", src:"NRK Mat", url:"https://www.nrk.no/mat/ramslok-med-gnocchi-og-kyllinglever-1.10898358", time:"20 min", level:"Enkel", serves:4,
+      intro:"Tareq Taylor plukker ramsløk i skogen og steker den med løk, chili og kyllinglever. Med gnocchi, kapers og parmesan blir det en rask vårmiddag.",
+      ing:["600 g gnocchi","500 g renset kyllinglever","1 bunt ramsløk (20 til 25 blader)","1 til 2 sjalottløk","2 cm rød chili","2 til 3 ss olivenolje","1 dl kapers","1 dl grovhakket persille","½ sitron, saft og skall","½ dl revet parmesan","Salt"],
+      steps:["Kok gnocchien etter anvisningen på pakken og la den renne av.","Hakk sjalottløk, ramsløk og chili.","Varm en stor panne med olje. Stek kyllingleveren raskt på høy varme.","Ha i løk, ramsløk og chili, og stek til alt har fått fin farge.","Vend inn kapers og gnocchi. Smak til med sitron og salt.","Strø over persille og parmesan og server med en gang."],
+      tip:"Kyllinglever skal være rosa inni. Stekes den for lenge, blir den tørr og kornete."},
+    {kind:"Kokk", t:"Ramsløksuppe med sprø potet og bacon", by:"Lisa Allen", src:"BBC Food", url:"https://www.bbc.co.uk/food/recipes/wild_garlic_soup_with_17660", time:"3 t (mest trekketid)", level:"Avansert", serves:4,
+      intro:"Lisa Allen, kjøkkensjef på Michelin-restauranten Northcote i England, lager en dypgrønn vårsuppe på en hjemmelaget ramsløkkraft, med bakt hvitløk, sprø potet og bacon.",
+      ing:["## Kraft","400 g løk i tynne skiver","400 g ramsløk","1 kvist timian","8 dl vann","## Suppe","50 g hvitløk (hele hoder)","50 g smør","100 g løk","150 g poteter i tynne skiver","25 g fløte","25 g ramsløkstilker","Salt","## Topping","50 g røkt bacon i terninger","1 liten potet i små terninger","1 kvist timian, 1 fedd hvitløk","½ dl rømme","Små ramsløkblader"],
+      steps:["Kraft: Kok opp løk, ramsløk og timian med vannet. La det småkoke i 30 minutter, ta av varmen og la det trekke under lokk i 2 timer. Sil.","Pakk hvitløkshodene i folie og bak dem på 180 grader i 30 til 40 minutter. Klem ut den myke hvitløken.","Stek bacon og potetterninger med timian og hvitløk i litt olje til alt er gyllent og sprøtt. La det renne av på papir.","Fres løken myk i smør. Ha i potetskiver og bakt hvitløk og la det surre uten farge til potetene er møre.","Varm fløte og ramsløkkraft, hell det over potetene og kok opp. Ha i ramsløkstilkene, og kjør suppen helt glatt.","Server suppen med en skje rømme, sprø potet og bacon, og noen små ramsløkblader."],
+      tip:"Kjør suppen rett før servering. Står den varm lenge, mister den den grønne fargen."}],
+  skrei: [
+    {kind:"Kokk", t:"Skinnstekt skrei med sellerimos og baconsmør", by:"Lise Finckenhagen", src:"NRK Mat", url:"https://www.nrk.no/mat/skinnstekt-skreirygg-med-selleri--og-potetstappe-og-baconsmor-1.10867772", time:"50 min", level:"Middels", serves:4,
+      intro:"Lise Finckenhagen sier skrei ikke trenger mye tilbehør. Hun kortsalter ryggen, steker den med sprø skinn og serverer den med selleri- og potetstappe og et smør med bacon, kapers og vårløk.",
+      ing:["600 til 800 g skreirygg med skrapet skinn","Grovt havsalt","Pepper og olje","## Stappe","300 g mandelpoteter","200 g sellerirot","1½ dl crème fraîche eller melk","2 ss smør","## Baconsmør","100 g bacon","150 g smør","2 ss kapers","2 vårløk","1 fedd hvitløk","Revet skall av ½ sitron","1 liten bunt dill"],
+      steps:["Strø et jevnt lag grovt salt over fisken og la den ligge i 20 minutter. Skyll godt i kaldt vann, tørk den og del i fire stykker.","Kok poteter og selleri i biter møre. Hell av vannet, la dem dampe tørre og mos dem. Rør inn crème fraîche og smør, og smak til.","Skjær bacon i små biter og stek det i smøret på middels varme til baconet er sprøtt og smøret gyllent.","Rør inn hakket kapers, vårløk, hvitløk og sitronskall. Ha i dill rett før servering.","Stek fisken i olje med skinnsiden ned i ca. 5 minutter, til skinnet er sprøtt. Snu og stek et par minutter til.","Fisken er klar når den flaker seg ved et lett trykk. Server med stappe og baconsmør."],
+      tip:"Kortsaltingen gjør fisken fastere og gir bedre smak. Ikke hopp over den."},
+    {kind:"Kokk", t:"Oliventrukket skrei med linser", by:"Stig Juelsen", src:"NRK Mat", url:"https://www.nrk.no/mat/oliventrukket-skrei-1.6595125", time:"1 t", level:"Middels", serves:4,
+      intro:"Kokken Stig Juelsen lar skreien trekke i varm olivenolje og hvitvin i stedet for vann. Fisken blir fastere og får mer smak. Til det: linser med bacon og en sprø romanosalat.",
+      ing:["800 g skreifilet","3 dl olivenolje","1 dl hvitvin","## Linser","200 g Puy-linser","100 g bacon","1 gulrot, 100 g stangselleri, 100 g fennikel","2 sjalottløk, ½ purre, 3 fedd hvitløk","1 laurbærblad","1,5 til 2 dl kyllingkraft","## Salat","3 romanosalater","1 dl majones","2 ss rømme","1 ss grov sennep","1 ss sitronsaft"],
+      steps:["Bløtlegg linsene i vann i 15 minutter.","Stek bacon i terninger sprøtt. Finhakk grønnsakene og fres dem møre i en vid kjele.","Ha i bacon, laurbær, linser og kraft. La det småkoke i ca. 25 minutter, til linsene er møre. Smak til.","Salt fisken godt og la den ligge i 5 minutter.","Kok opp hvitvinen og ha i oljen. Legg fisken i og la den trekke på svak varme i 5 til 7 minutter. Løft den ut og la den hvile under folie.","Kjør oljen og vinen med en stavmikser til en saus, og smak til med salt og pepper.","Rør dressingen og vend den med salaten rett før servering. Server fisk, saus, linser og salat."],
+      tip:"Oljen skal være varm, ikke frese. Fisken skal trekke, ikke steke."}],
+  torsk: [
+    {kind:"Kokk", t:"Kokt torsk med sandefjordsmør", by:"Andreas Myhrvold", src:"NRK Mat", url:"https://www.nrk.no/mat/juletorsk-1.6881694", time:"30 min", level:"Enkel", serves:4,
+      intro:"Kokken Andreas Myhrvolds juletorsk, som smaker like godt resten av vinteren. Torsk i skiver som trekker i saltet vann, med en blank smørsaus av fløte, smør og persille.",
+      ing:["1 kg torsk i skiver","Salt (1 dl per liter vann)","Hel pepper","2 laurbærblad","## Sandefjordsmør","½ dl kremfløte","200 g smør i terninger","1 til 2 ss sitronsaft","2 ss finhakket persille","Salt og pepper","## Til servering","Kokte poteter og gulrøtter"],
+      steps:["Kok opp vann med salt, pepperkorn og laurbær.","Legg fisken forsiktig i og la den trekke på svak varme, uten å koke, i 10 til 12 minutter, til den så vidt slipper beina.","Sandefjordsmør: Kok opp fløten. Senk varmen og pisk inn smøret, én terning om gangen, til sausen er tykk og blank.","Smak til med sitron, salt og pepper. Sausen må ikke koke, da skiller den seg.","Rør inn persillen rett før servering.","Server fisken nykokt med smøret, poteter og gulrøtter."],
+      tip:"La smøret ligge på benken en stund før du starter, så smelter det jevnere inn i sausen."},
+    {kind:"Kokk", t:"Torsk i bakepapir med olivensaus", by:"Marcus Wareing", src:"BBC Food", url:"https://www.bbc.co.uk/food/recipes/cod_en_papillote_with_91644", time:"30 min", level:"Enkel", serves:1,
+      intro:"Marcus Wareings middag for én. Torsk dampet i en pakke av bakepapir med sitron, oppå en rask tomatsaus med paprika, chili, kapers og oliven.",
+      ing:["1 torskefilet (ca. 180 g)","1 sitron","1 ss olivenolje","1 rød paprika, finhakket","½ rød chili","1 ss kapers","En klype herbes de Provence","1 boks hakkede tomater","1 neve grønne og svarte oliven","Salt og pepper","Godt brød"],
+      steps:["Fres paprika og chili sakte i olje med litt salt og pepper.","Rør inn kapers og urter i et minutt, og hell i tomatene. La sausen småkoke mens fisken lages.","Sett ovnen på 180 grader.","Legg fisken på et stort ark bakepapir. Drypp over olje, krydre og legg tre sitronskiver oppå. Brett papiret til en tett pakke.","Bak pakken på et varmt stekebrett i 12 til 15 minutter.","Rør hakkede oliven inn i sausen. Legg sausen på tallerkenen, fisken over og server med brød og resten av sitronen."],
+      tip:"Pakken kan også legges rett på glørne på grillen, pakket i folie. Da tar det 5 til 10 minutter."}],
+  makrell: [
+    {kind:"Kokk", t:"Grillet makrell med sommerkål og kefirdressing", by:"Lise Finckenhagen", src:"NRK Mat", url:"https://www.nrk.no/mat/makrell-med-sommerkal-pa-grillen-1.13572703", time:"35 min", level:"Enkel", serves:4,
+      intro:"Lise Finckenhagen griller makrellen og sommerkålen side om side, og serverer med en frisk kefirdressing og et gressløksmør med ingefær.",
+      ing:["4 små makrell, hele eller i fileter","1 til 2 sommerkål","Olivenolje, flaksalt og pepper","## Kefirdressing","3 dl kefir","Saft av ½ sitron","2 ts flytende honning","1 fedd hvitløk","Urter: gressløk, persille, ramsløk og/eller dill","## Gressløksmør","100 g romtemperert smør","1 liten bunt gressløk","1 til 2 ss revet frisk ingefær"],
+      steps:["Kjør smør, gressløk og ingefær sammen med en stavmikser.","Visp kefir, sitron, honning, finhakket hvitløk og urter. Smak til med salt og pepper.","Fjern de ytterste kålbladene og del kålen i fire til seks båter. Pensle snittflatene med olje.","Grill kålen på høy varme i 3 til 4 minutter på hver side, til den er gyllen og så vidt mør.","Lag noen små snitt i skinnet på fisken, pensle med olje og krydre. Hel fisk krydres også i buken.","Grill fisken på høy varme til kjøttet slipper beina.","Server fisk og kål med dressing og en klatt gressløksmør."],
+      tip:"Rester av gressløksmøret kan fryses i en rull og brukes på stekt fisk."},
+    {kind:"Kokk", t:"Grillet makrell med soya, lime og fennikel", by:"Raymond Blanc", src:"BBC Food", url:"https://www.bbc.co.uk/food/recipes/filletofmackerelwith_93673", time:"1 t", level:"Middels", serves:4,
+      intro:"Raymond Blanc marinerer makrellen kort i en lun, søtsyrlig lake før den grilles. En dressing av soya, lime og ingefær skjærer gjennom fettet, og en sprø fennikelsalat gjør det lett.",
+      ing:["4 makrellfileter uten bein","1 ss olje","## Lake","2,5 dl eplecidereddik","2,5 dl vann","40 g sukker","35 g rødløk i tynne skiver","Noen korianderstilker","½ ts rosa pepper","3 til 4 sitronskiver","## Dressing","1 ss soyasaus","1 ss vann","Saft av 1 lime","1 ts fersk ingefær, finhakket","½ ts mørkt muscovadosukker","## Salat","1 fennikel i papirtynne skiver","1 ss olivenolje","Saft av ½ lime","1 neve ruccola","1 ts fennikelfrø, ristet","Salt og en klype kajenne"],
+      steps:["Varm opp alle ingrediensene til laken til den er lunken, rundt 60 grader. Hell den i en flat form og la den bli kald.","Legg makrellfiletene med kjøttsiden ned i laken og la dem ligge i 20 minutter.","Varm alt til dressingen til sukkeret har løst seg.","Legg fennikelskivene i isvann i 20 minutter så de blir sprø. La dem renne av.","Ta fisken ut av laken, tørk den og lag noen skrå snitt i skinnet.","Legg filetene med skinnet opp på et oljet brett og grill øverst i ovnen på høyeste varme i 4 til 5 minutter, til skinnet er sprøtt.","Vend fennikel, ruccola, olje, lime og salt. Legg fisken oppå, skje dressing rundt og strø over fennikelfrø."],
+      tip:"Laken gjør fisken litt fastere og gir en mild syrlighet."}],
+  sild: [
+    {kind:"Kokk", t:"Stekt sild med løksaus", by:"James og Adam Price", src:"NRK Mat", url:"https://www.nrk.no/mat/stekt-sild-med-loksaus-1.13492136", time:"40 min", level:"Enkel", serves:4,
+      intro:"Brødrene Price fra dansk TV lager en klassisk dansk rett: sildefileter vendt i rugmel og stekt sprø, med en søtsur løksaus og nypoteter med persille.",
+      ing:["12 til 16 sildefileter","3 til 4 dl rugmel","2 ss smør og 2 ss olje til steking","## Løksaus","4 store løk","100 g smør","1 ss hvetemel","6 dl fiske- eller hønsekraft","2 til 3 laurbærblad","1 dl fløte","Eddik, sukker, salt og pepper etter smak","## Til servering","Nypoteter og mye hakket persille"],
+      steps:["Del løkene i to og skjær dem i tynne skiver.","Fres løken i smøret på lav varme til den er myk og blank, men uten farge.","Skru opp varmen, rør inn melet og la det frese et minutt.","Hell i kraften, legg i laurbær og la sausen koke rolig i 10 minutter.","Ha i fløten, kok opp, og smak til med eddik, sukker, salt og pepper. Den skal være søtsur.","Strø litt salt på silden, vend den i rugmel og stek den sprø i smør og olje.","Server med løksaus og kokte nypoteter med persille."],
+      tip:"Smak sausen til flere ganger. Balansen mellom søtt og surt er det som gjør retten."},
+    {kind:"Kokk", t:"Pochert sild med sennep- og dillpotetsalat", by:"Simon Rimmer", src:"BBC Food", url:"https://www.bbc.co.uk/food/recipes/herringwithdillandmu_88218", time:"30 min", level:"Enkel", serves:4,
+      intro:"Den britiske TV-kokken Simon Rimmer trekker sild i en kraft med hvitvin og lime, og serverer den på en potetsalat med sennep, dill og et lite stikk av karri.",
+      ing:["4 sildefileter","## Kraft","1 dl vann","1 dl hvitvin","Saft av 2 lime","1 ss hvitvinseddik","1 ts hel hvit pepper","2 laurbærblad","1 ts salt","## Potetsalat","250 g kokte nypoteter","1 dl majones","1 ss grov sennep","1 ss hakket dill","Saft av ½ sitron","½ ts karripasta","Salt og pepper","Dill og sitronbåter til pynt"],
+      steps:["Kok opp alle ingrediensene til kraften. Skru ned til svak varme.","Legg i silden og la den trekke i ca. 12 minutter, til den er gjennomkokt.","Del potetene i to og legg dem i en bolle.","Rør majones, sennep, dill, sitron, karripasta, salt og pepper. Vend potetene i dressingen.","Løft silden opp av kraften, legg den på potetsalaten og pynt med dill og sitron."],
+      tip:"Retten er god både lun og kald, og fungerer fint i matpakken dagen etter."}],
+  hummer: [
+    {kind:"Kokk", t:"Hummer thermidor", by:"James Martin", src:"BBC Food", url:"https://www.bbc.co.uk/food/recipes/lobster_thermidor_16349", time:"1 t", level:"Avansert", serves:2,
+      intro:"Den franske festklassikeren, slik James Martin lager den. Hummerkjøtt i en kremet saus med sennep og sopp, lagt tilbake i skallet og gratinert med parmesan.",
+      ing:["1 kokt hummer, ca. 1,5 kg","50 g smør","2 sjalottløk","1,25 dl hvitvin","5 dl fiskekraft","2,5 dl kremfløte","1 ts dijonsennep","100 g kantarell","2 ss hakket persille","En skvis sitron","25 g revet parmesan","2 eggeplommer","25 g ferske brødsmuler","Salt og pepper"],
+      steps:["Del hummeren på langs, ta ut kjøttet og skjær det i biter. Rengjør skallene og legg dem på et stekebrett.","Sett ovnsgrillen på høyeste varme.","Fres finhakket sjalottløk i halve smøret i 3 til 4 minutter. Hell i vinen og kok inn til halvparten.","Ha i kraften og kok litt inn. Rør inn fløte og sennep og la sausen tykne i 3 til 4 minutter.","Stek soppen i resten av smøret i et par minutter.","Rør sopp og hummerkjøtt inn i sausen sammen med persille, sitron og halve parmesanen.","Pisk inn eggeplommene og la det tykne på lav varme i 1 til 2 minutter. Ikke la det koke.","Fyll skallene, strø over brødsmuler og resten av osten, og gratiner til toppen er gyllen."],
+      tip:"James Martin serverer den med tynne pommes frites, men grønn salat og brød er også godt."}],
+  krabbe: [
+    {kind:"Kokk", t:"Krabbesalat med grillet kål og blomkarsepuré", by:"Christopher Haatuft", src:"NRK Mat", url:"https://www.nrk.no/mat/krabbesalat-med-grillet-kal-og-blomkarsepure-1.13064169", time:"1 t", level:"Middels", serves:2,
+      intro:"Bergenskokken Christopher Haatuft (kjent fra restaurant Lysverket) viser at krabbe kan være mer enn pålegg. Frisk krabbesalat, svidd kål, en grønn puré av blomkarse og sprø krutonger.",
+      ing:["## Krabbesalat","1 dl renset krabbekjøtt","1 ss finhakket sjalottløk","1 ss hakket persille","1 ss hakket gressløk","½ ss revet sitronskall","Litt kaldpresset rapsolje og sitronsaft","## Blomkarsepuré","2,5 dl fløte og 2,5 dl vann","125 g skrelte poteter","75 g blomkarseblader","25 g spinat","½ ss revet pepperrot","Salt","## Kål og krutonger","½ hvitkål","Brød i terninger","Rapsolje, smør, timian og hvitløk"],
+      steps:["Bland krabbekjøtt, sjalottløk og urter. Smak til med sitronskall, sitronsaft og litt olje. Sett kaldt.","Kok tynne potetskiver møre i fløte og vann. Kjør dem i en blender med pepperrot, blomkarse og spinat til en glatt puré. Avkjøl den raskt i en bolle over is, så den holder fargen.","Del kålen i båter, men la kjernen holde bladene sammen. Pensle med olje og grill til de er litt svidde og varme. Legg dem oppå hverandre så de damper ferdig om de er for harde.","Stek brødterninger i olje til de får farge. Ha i hvitløk, timian og en god klatt smør, og stek til de er gylne. La dem renne av.","Legg puré på tallerkenen, kålbåt ved siden av, krabbesalat over og krutonger til slutt."],
+      tip:"Blomkarse er den vanlige sommerblomsten nasturtium. Har du ikke, bruk ruccola og litt mer spinat."},
+    {kind:"Kokk", t:"Slik renser du en krabbe", by:"Mitch Tonks", src:"BBC Food", url:"https://www.bbc.co.uk/food/recipes/dressedcrab_90206", time:"45 min", level:"Middels", serves:4,
+      intro:"Mitch Tonks er en av Storbritannias mest kjente sjømatkokker. Her er hans metode for å plukke en krabbe og anrette den pent i sitt eget skall, med brunt kjøtt på den ene siden og hvitt på den andre. Oppskriften har også en video.",
+      ing:["1 stor krabbe, 1 til 1,5 kg, kokt eller levende","Grovt brød","God majones","Sitronbåter","Persille (valgfritt)"],
+      steps:["Er krabben levende: Kok den i godt saltet vann i 20 til 30 minutter. Stå den på «nesen» så vannet renner ut mens den avkjøles.","Vri av beina og klørne.","Legg krabben på ryggen og press kroppen opp fra skallet med tommelen. Bruk en kniv som spak om det trengs.","Fjern de grå, svampete gjellene. Ta ut magesekken og de harde hinnene i skallet.","Skrap ut det brune kjøttet med en skje og mos det med en gaffel.","Knekk klørne og beina, og plukk ut det hvite kjøttet. Pass på bitene av brusk.","Del kroppen og plukk ut det hvite kjøttet med en liten skje eller et krabbejern.","Legg brunt kjøtt på den ene siden av skallet og hvitt på den andre. Server med brød, majones og sitron."],
+      tip:"Plukk kjøttet over en ren bolle, og kjenn gjennom det hvite kjøttet med fingrene for å finne skallbiter."}],
+  blaskjell: [
+    {kind:"Kokk", t:"Blåskjell med ramsløk", by:"Lise Finckenhagen", src:"NRK Mat", url:"https://www.nrk.no/mat/blaskjell-og-ramslok-1.8081338", time:"30 min", level:"Enkel", serves:4,
+      intro:"Lise Finckenhagens vårrett. Blåskjell dampet i hvitvin eller eplesider, og kraften kjøres med fløte, smør og ramsløk til en skummende grønn suppe.",
+      ing:["1 kg blåskjell","1 liten løk","2 fedd hvitløk","2 ss olivenolje","2 dl hvitvin, eplesider eller vann","2 dl matfløte","1 ss smør","1 bunt ramsløk (ca. 50 g)","Salt og pepper","Godt brød"],
+      steps:["Vask skjellene godt i kaldt vann. Kast knuste skjell og skjell som er åpne og ikke lukker seg når du banker på dem.","Fres finhakket løk og hvitløk i olje i en stor kjele.","Ha i skjell og vin. Legg på lokk og damp til skjellene åpner seg. Rist kjelen underveis. Kast skjell som ikke åpner seg.","Sil kraften over i en ny kjele. Ha i fløten og kok opp.","Ha i smør og grovhakket ramsløk, og kjør med en stavmikser til det skummer godt. Smak til.","Legg skjellene i dype tallerkener og hell over den grønne kraften. Server med brød."],
+      tip:"Utenfor ramsløksesongen kan du bruke en neve spinat og litt hvitløk."},
+    {kind:"Kokk", t:"Moules marinière med fløte", by:"Rick Stein", src:"rickstein.com", url:"https://rickstein.com/blog/recipe-moules-mariniere-from-rick-steins-cornwall/", time:"20 min", level:"Enkel", serves:4,
+      intro:"Den britiske sjømatlegenden Rick Stein lager sin moules marinière med et bouquet garni og en skvett fløte til slutt. Hvitvin eller sider, du velger.",
+      ing:["1,75 kg blåskjell","2 sjalottløk","1 fedd hvitløk","15 g smør","1 bouquet garni (persille, timian og laurbær bundet sammen)","1 dl tørr hvitvin eller sider","1,2 dl kremfløte","1 neve persille","Sprøtt brød"],
+      steps:["Skyll skjellene og kast de som er åpne og ikke lukker seg.","Riv av skjegget, skrap av rur og skyll igjen.","Fres finhakket sjalottløk og hvitløk i smør med bouquet garni i en stor kjele. Kjelen skal ikke være mer enn halvfull med skjell.","Ha i skjellene og vinen. Legg på lokk og damp på høy varme i 3 til 4 minutter. Rist kjelen av og til.","Ta ut bouquet garni. Rør inn fløte og hakket persille og ta kjelen av varmen.","Server i store, varme skåler med mye brød."],
+      tip:"Rick Stein sier fløten kan sløyfes hvis du vil ha en lettere rett."}],
+  kamskjell: [
+    {kind:"Kokk", t:"Kamskjell med chorizo og paprika", by:"Lise Finckenhagen", src:"NRK Mat", url:"https://www.nrk.no/mat/kamskjell-med-chorizo-og-paprika-1.11586810", time:"20 min", level:"Enkel", serves:4,
+      intro:"Lise Finckenhagen kombinerer søte kamskjell med krydret chorizo og grillet paprika. Raskt, fargerikt og med spansk stemning.",
+      ing:["8 rensede kamskjell","100 g chorizo, helst rå","2 sjalottløk","2 grillede paprika (piquillo fra glass)","1 til 2 ts sherryeddik","Olivenolje","1 neve persilleblader","Salt og pepper"],
+      steps:["Skjær chorizo i små biter, sjalottløk i tynne skiver og paprika i strimler.","Fres chorizo og løk i en god skvett olivenolje i noen minutter.","Ha i paprika og eddik. Trekk pannen av varmen og smak til med salt og pepper.","Tørk kamskjellene og stek dem raskt på høy varme i en annen panne, ca. 1 minutt på hver side.","Vend kamskjellene med chorizoblandingen, strø over persille og server."],
+      tip:"Fettet fra chorizoen er fullt av smak. La det være igjen i pannen."},
+    {kind:"Kokk", t:"Kamskjell med eple og blodpudding", by:"James Martin", src:"BBC Food", url:"https://www.bbc.co.uk/food/recipes/scallops_with_apple_19964", time:"45 min", level:"Middels", serves:4,
+      intro:"James Martin setter søte kamskjell sammen med salt blodpudding og eple på tre måter: stekt, rå i salat og som vaniljepuré.",
+      ing:["12 kamskjell uten rogn","200 g blodpudding i skiver","8 skiver bacon","2 ss rapsolje","100 g smør","2 grønne epler i skiver til steking","## Salat","2 grønne epler i fyrstikker","En neve brønnkarse eller salat","3 ss rapsolje, 1 ss hvitvinseddik, ½ sitron","## Eplepuré","300 g syrlige epler","40 g smør","20 g sukker","1 vaniljestang"],
+      steps:["Sett ovnen på 200 grader. Legg baconet mellom to stekebrett og stek det sprøtt i 8 til 10 minutter.","Eplepuré: Kok eplebiter med smør, sukker og vaniljefrø til de faller fra hverandre, 4 til 5 minutter. Kjør glatt og sil.","Stek blodpuddingen i olje i 2 til 3 minutter. Legg i kamskjellene og stek 1 til 2 minutter på hver side. Ha i halve smøret og øs over.","Stek epleskivene gylne i resten av smøret.","Vend eplestaver og salat i dressingen av olje, eddik og sitron.","Anrett salat, kamskjell, blodpudding og stekt eple med prikker av puré og bacon på toppen."],
+      tip:"Norsk blodpølse eller blodpudding fra slakteren fungerer fint."}],
+  osters: [
+    {kind:"Kokk", t:"Gratinerte østers med urtehollandaise", by:"Lise Finckenhagen", src:"NRK Mat", url:"https://www.nrk.no/mat/gratinerte-osters-1.12203929", time:"40 min", level:"Avansert", serves:"24 østers",
+      intro:"For deg som ikke liker rå østers. Lise Finckenhagen legger en skje luftig hollandaise med krem og urter på hver østers og gratinerer dem gylne.",
+      ing:["24 levende østers","Grovt havsalt til brettet","200 g usaltet smør","3 eggeplommer","3 ss vann","2 ss sitronsaft eller hvitvinseddik","1 dl fløte","2 ss friske urter: dill, persille, kjørvel og/eller estragon","Salt, pepper og kajennepepper"],
+      steps:["Åpne østersene og hell av vannet. Strø grovt salt på et stekebrett med folie og sett østersene stødig i saltet.","Smelt smøret rolig på svak varme uten å røre. Bruk bare det klare smøret som legger seg på toppen.","Pisk eggeplommer, vann og sitron i en bolle over et vannbad som ikke koker, til det tykner som eggedosis.","Pisk inn det klarede smøret, litt om gangen, til sausen er tykk og luftig.","Ta bollen av varmen og smak til med salt, pepper og kajenne. Pisk fløten til myk krem og vend den inn med urtene.","Legg en skje saus på hver østers og gratiner under ovnsgrillen til de er gyllenbrune. Server med en gang."],
+      tip:"Hold øye med ovnen. Det går fort fra gyllen til brent."},
+    {kind:"Kokk", t:"Østers med sjalottløkvinaigrette", by:"Anne Hjernøe", src:"NRK Mat (Frilandshagen)", url:"https://www.nrk.no/mat/osters-med-sjalottloksvinaigrette-1.7663370", time:"40 min", level:"Enkel", serves:"Etter ønske",
+      intro:"Den danske kokken Anne Hjernøe åpner østers med en grov hagehanske på den ene hånden. Til dem serverer hun den klassiske franske mignonette-sausen.",
+      ing:["Så mange levende østers du vil","1 sjalottløk per 8 til 10 østers","Hvitvin","Hvitvinseddik","Nykvernet sort pepper"],
+      steps:["Skrell sjalottløken og skjær den i bittesmå terninger.","Ha løken i en skål og dekk med like deler hvitvin og hvitvinseddik.","Kvern over sort pepper.","La vinaigretten stå kjølig i en halvtime.","Åpne østersene og server med en liten skje vinaigrette på hver."],
+      tip:"En tykk hanske eller et brettet kjøkkenhåndkle beskytter hånden når du åpner østers."}],
+  kongekrabbe: [
+    {kind:"Kokk", t:"Grillet kongekrabbe med urtesmør", by:"Andreas Ingul", src:"Vinmonopolet", url:"https://www.vinmonopolet.no/mat-og-drikke/oppskrifter/grillet-kongekrabbe-med-ramsloksmor", time:"40 min", level:"Middels", serves:4,
+      intro:"Kokken Andreas Ingul griller kongekrabbe og smelter et grønt smør med ramsløk, dill og persille over. Til det: grillet hjertesalat, grillet sitron og sprøtt surdeigsbrød.",
+      ing:["1 kg kongekrabbebein, gjerne rå og frosne","1 lite surdeigsbrød","4 hjertesalater","1 ss olivenolje","2 sitroner","Salt og pepper","## Urtesmør","250 g romtemperert smør","2 til 3 ss ramsløkpuré eller en stor neve fersk ramsløk","1 liten bunt persille","1 liten bunt dill","1 sjalottløk","1 sitron, skall og saft"],
+      steps:["Kjør alle ingrediensene til urtesmøret i en foodprosessor til det er glatt, grønt og luftig.","Skjær krabbebeina i tre mens de fortsatt er litt frosne, og del hver bit på langs. La dem tine sakte i kjøleskapet.","Varm grillen. Del salatene på langs og skjær brødet i skiver.","Pensle brødet med olje og grill det i ca. 2 minutter. Grill sitronene med snittflaten ned.","Grill krabben med skallet opp i ca. 2 minutter. Legg den på et brett med kjøttsiden opp.","Smør rikelig med urtesmør på kjøttet. Sett brettet tilbake på grillen under lokk i noen minutter, til smøret smelter.","Server med brød, grillet sitron og salat. Øs smeltet smør over salaten."],
+      tip:"Urtesmøret kan også varmes i ovnen hvis du ikke har grill."}],
+  kantarell: [
+    {kind:"Kokk", t:"Risotto med kantarell", by:"Lise Finckenhagen", src:"NRK Mat", url:"https://www.nrk.no/mat/risotto-med-kantarell-1.7608956", time:"35 min", level:"Middels", serves:3,
+      intro:"En av Lise Finckenhagens favoritter med sopp. Kantarell, salvie og hvitvin i en kremet risotto med parmesan og en dråpe sitron.",
+      ing:["200 g risottoris (arborio eller carnaroli)","300 g kantarell","2 sjalottløk","2 fedd hvitløk","1 ss frisk salvie (kan sløyfes)","2 ss olivenolje","2 ss smør","1,5 dl tørr hvitvin","Ca. 8 dl varm kraft (sopp eller kylling) eller vann","70 g revet parmesan","2 ts sitronsaft","Salt og pepper"],
+      steps:["Rens soppen og del den i passe biter.","Fres sjalottløk og hvitløk i olivenolje i en vid kjele. Ha i smør, sopp og salvie og la det frese i 3 minutter.","Rør inn risen og fres den til den er blank.","Hell i vinen og la den koke nesten helt inn.","Ha i varm kraft, én øse om gangen. Rør til væsken er trukket inn før du har i mer.","Fortsett til risen er al dente, ca. 20 minutter.","Rør inn parmesan og smak til med sitron, salt og pepper."],
+      tip:"Risotto skal være «flytende» når den serveres. Den tykner fort på tallerkenen."},
+    {kind:"Kokk", t:"Knust jordskokk med kantarell og brunt smør", by:"Niklas Ekstedt", src:"BBC Food", url:"https://www.bbc.co.uk/food/recipes/roasted_jerusalem_77427", time:"50 min", level:"Enkel", serves:2,
+      intro:"Niklas Ekstedt baker jordskokk og knuser den lett, og topper med smørstekt kantarell, svidd mais, hasselnøtter, løpstikke og brunt smør. En høstrett full av jordsmaker.",
+      ing:["500 g jordskokk, delt på langs","1 ss olje","1 maiskolbe, kjerner skåret av","4 ss smør","300 g kantarell","3 ss finhakket sjalottløk","3 ss ristede hasselnøtter","En neve løpstikke (eller selleriblad og persille)","Salt"],
+      steps:["Sett ovnen på 190 grader. Vend jordskokken i olje og salt og bak i ca. 40 minutter, til den er gyllen og myk.","Stek maiskornene i en tørr, varm panne til de er blanke og litt svidde. Salt.","Stek kantarellene gylne i 1 ss smør. Salt.","Brun resten av smøret til det lukter nøtter. Hell det over i en kald kjele så det stopper, og rør inn sjalottløken.","Knus jordskokken lett med en potetstamper og legg den på et fat.","Topp med mais, kantareller, hasselnøtter og løpstikke, og hell over det brune smøret."],
+      tip:"Løpstikke er en gammel norsk hageurt med kraftig sellerismak."}],
+  traktkantarell: [
+    {kind:"Kokk", t:"Kremet soppsuppe med stekt skogsopp", by:"Kjartan Skjelde", src:"NRK Mat (Førkveld)", url:"https://www.nrk.no/mat/soppsuppe-1.8333692", time:"35 min", level:"Enkel", serves:4,
+      intro:"Kokken Kjartan Skjelde kaller den sopphøstens beste suppe. Halvparten av soppen kokes til en silkemyk suppe, den andre halvparten stekes og legges på toppen.",
+      ing:["700 g skogsopp, gjerne traktkantarell","3 ss solsikkeolje","4 ss smør","1 fedd hvitløk","5 sjalottløk","3 dl kyllingkraft eller vann","2 dl fløte","30 g smør","Salt, pepper og sitron"],
+      steps:["Skjær 300 g sopp i biter, grovhakk hvitløken og finhakk 3 sjalottløk.","Stek sopp, løk og hvitløk i olje og smør til løken er blank, 1 til 2 minutter.","Hell i kraft og fløte og la det koke i ca. 20 minutter.","Kjør suppen i en blender med 30 g smør. Sil den og smak til med salt, pepper og sitron.","Stek resten av soppen med 2 finhakkede sjalottløk i olje og smør til løken er blank. Smak til.","Hell suppen i skåler og legg den stekte soppen oppi."],
+      tip:"Tørket traktkantarell gir mye smak. Bløtlegg en neve og bruk bløtleggingsvannet i suppen."}],
+  steinsopp: [
+    {kind:"Kokk", t:"Toast med skogsopp og estragon", by:"Stig Juelsen", src:"NRK Mat", url:"https://www.nrk.no/mat/pannestekt-toast-med-skogsopp-og-estragon-1.6575685", time:"20 min", level:"Enkel", serves:4,
+      intro:"Kokken Stig Juelsens soppsmørbrød. Steinsopp eller annen skogsopp stekt med tomat, chili og estragon, på loff stekt gyllen i smør.",
+      ing:["400 g steinsopp eller annen skogsopp","1 sjalottløk","⅓ rød chili","2 fedd hvitløk","2 plommetomater","2 ss smør, pluss litt til brødet","1 dl estragonblader","4 skiver loff","God olivenolje","Salt og pepper"],
+      steps:["Rens soppen og skjær den i passe biter.","Skjær sjalottløk, chili og hvitløk i tynne skiver, og tomatene i terninger.","Stek soppen og grønnsakene i smør til soppen er gyllen.","Vend inn estragon og smak til med salt og pepper. Ta soppen ut av pannen.","Ha litt mer smør i pannen og stek brødskivene gyllenbrune.","Legg soppen på brødet og drypp over litt god olivenolje."],
+      tip:"Fungerer med kantarell, fåresopp og vanlig sjampinjong også."},
+    {kind:"Kokk", t:"Bakte egg med steinsopp", by:"Delia Smith", src:"BBC Food", url:"https://www.bbc.co.uk/food/recipes/eggsencocottewithmor_67958", time:"1 t", level:"Middels", serves:4,
+      intro:"Delia Smith er Storbritannias store matlærer. Her bakes egg i små former oppå en konsentrert, mørk soppmasse med steinsopp, og dekkes med crème fraîche.",
+      ing:["4 store, ferske egg","10 g tørket steinsopp (eller 50 g fersk)","3 sjalottløk","110 g sjampinjong eller portobello","¼ muskatnøtt, revet","25 g smør","3 ss crème fraîche","Salt og pepper","4 små ildfaste former, godt smurt"],
+      steps:["Bløtlegg den tørkede soppen i 1,5 dl kokende vann i 30 minutter. Sil og klem ut vannet. Ta vare på vannet til suppe eller saus.","Legg av fire biter steinsopp. Kjør resten med sjalottløk, sjampinjong, muskat, salt og pepper til det er finhakket.","Smelt smøret og la soppmassen surre uten lokk på lav varme i 25 til 30 minutter, til all væske er borte og den er mørk og konsentrert.","Sett ovnen på 180 grader og kok opp vann.","Rør 1 ss crème fraîche inn i soppen og fordel den i formene. Lag en liten grop og knekk et egg i hver. Krydre.","Smør resten av crème fraîchen over eggene og legg en bit steinsopp på hver.","Sett formene i en langpanne og hell kokende vann rundt. Bak i 15 til 18 minutter, til hviten har stivnet og plommen fortsatt er myk."],
+      tip:"Soppmassen kan lages dagen før."}],
+  piggsopp: [
+    {kind:"Kokk", t:"Soppsuppe med hvitvin og timian", by:"Lise Finckenhagen", src:"NRK Mat", url:"https://www.nrk.no/mat/soppsuppe-1.7293809", time:"45 min", level:"Enkel", serves:4,
+      intro:"Mye god sopp, hvitvin, fløte og timian. Lise Finckenhagen bruker blandet sopp, og piggsopp passer perfekt. Litt av soppen stekes og legges på toppen.",
+      ing:["800 g blandet sopp, gjerne piggsopp","4 ss smør","1 ss olivenolje","1 løk","2 fedd hvitløk (kan sløyfes)","1 til 2 ss frisk timian","1,5 dl hvitvin (kan sløyfes)","5 dl kylling- eller grønnsakskraft","5 dl melk","2 dl fløte","Salt, pepper og sitronsaft","Gressløk eller persille","4 skiver ristet brød"],
+      steps:["Rens soppen. Skjær 500 g i små biter.","Fres løken i smør til den er blank og myk. Ha i soppen og timian og fres et par minutter til.","Hell i vinen og kok til halvparten er borte.","Ha i kraft og melk og la suppen småkoke i ca. 20 minutter.","Tilsett fløten og kjør suppen glatt. Spe med mer kraft eller melk hvis den er for tykk.","Smak til med salt, pepper og sitron.","Del resten av soppen i pene biter og stek den med hvitløk. Legg den i tallerkenene og hell suppen over. Server med brød."],
+      tip:"Suppen kan fryses. Stek bare soppen til toppingen fersk."},
+    {kind:"Kokk", t:"Kylling med fricassé av skogsopp", by:"Raymond Blanc", src:"BBC Food", url:"https://www.bbc.co.uk/food/recipes/poachedchickenwithaf_87652", time:"30 min", level:"Middels", serves:2,
+      intro:"Raymond Blancs franske klassiker. Kyllingbryst som dampes oppå små grønnsaker i smør og vann, og en blanding av skogsopp som får bare et minutt før den vendes med persillade og tomat.",
+      ing:["2 kyllingbryst uten skinn","1,25 dl vann","20 g smør","30 g gulrot, 30 g stangselleri, 30 g purre, 30 g squash, i små skiver","1 kvist estragon","150 g blandet skogsopp (piggsopp, kantarell, traktkantarell)","50 g sjampinjong i båter","½ fedd hvitløk, revet","1 ts finhakket sjalottløk","1 neve persille","40 g tomat uten kjerner, i terninger","Salt og pepper"],
+      steps:["Kok opp vann og smør i en panne med lokk.","Ha i grønnsakene og estragon og kok opp igjen.","Krydre kyllingen og legg den oppå grønnsakene. Legg på lokk og la det småkoke i 6 til 7 minutter.","Ha i soppen (traktkantarell sist, den trenger bare 30 sekunder) og damp i 1 minutt til.","Bland hvitløk, sjalottløk og persille til en persillade. Rør den inn med tomat, og smak til.","Sjekk at kyllingen er gjennomstekt. Skjær den skrått og server på grønnsakene med kraften over."],
+      tip:"Kyllingen er ferdig når saften er klar. Bruk gjerne et termometer: 72 grader inni."}],
+  jordbaer: [
+    {kind:"Kokk", t:"Jordbærkake med jordbærkrem og marsipan", by:"Lise Finckenhagen", src:"NRK Mat", url:"https://www.nrk.no/mat/jordbaerkake-1.11717704", time:"2 t + stivning", level:"Avansert", serves:12,
+      intro:"Lise Finckenhagens 17. mai-kake. Luftig mandelbunn, et lag med rørte bær, en rosa jordbærkrem i midten og krem og jordbær på toppen, med et bånd av marsipan rundt.",
+      ing:["## Bunn","5 egg","80 g sukker","100 g hvetemel","1 ts bakepulver","50 g mandelmel","## Jordbærkrem","300 g jordbær","5 ss sukker","3 gelatinplater","3 dl kremfløte","## Montering","1 dl rørte jordbær eller syltetøy","3 dl kremfløte","250 g marsipan (minst 50 % mandler)","1 kurv jordbær"],
+      steps:["Sett ovnen på 180 grader og kle en form på 22 til 24 cm med bakepapir.","Skill eggene. Visp plommer og sukker til eggedosis, og rør inn siktet mel, bakepulver og mandelmel.","Pisk hvitene til myk marengs. Rør inn en tredel i røren, og vend forsiktig inn resten.","Stek i 25 til 30 minutter. Avkjøl og del bunnen i to.","Legg den ene bunnen på et fat med kakeringen rundt. Smør over de rørte bærene.","Kjør jordbær og sukker til puré. Bløtlegg gelatin i kaldt vann i 6 minutter, og løs den opp i litt varm puré. Rør inn resten av puréen.","Pisk fløten til myk krem og vend den inn i puréen. Hell kremen over bunnen og legg den andre bunnen oppå. La kaken stivne i kjøleskapet i minst 3 timer.","Ta av ringen, smør pisket krem over, kjevle marsipan til et langt bånd og legg rundt kaken. Pynt med jordbær."],
+      tip:"Bunnen kan bakes dagen før. Pakk den i plast så den ikke tørker."},
+    {kind:"Kokk", t:"Marengs med jordbær og tykk krem", by:"Rick Stein", src:"BBC Food", url:"https://www.bbc.co.uk/food/recipes/meringueswithclotted_516", time:"3½ t (mest i ovnen)", level:"Enkel", serves:10,
+      intro:"Rick Stein holder det enkelt: store, sprø marengser, tykk krem og små, søte jordbær. Lag marengsen dagen før.",
+      ing:["6 eggehviter i romtemperatur","350 g sukker","3 dl tykk krem (clotted cream, eller pisket kremfløte blandet med litt mascarpone)","900 g små jordbær"],
+      steps:["Sett ovnen på 150 grader.","Pisk eggehvitene til myke topper. Pisk inn 110 g sukker.","Pisk inn 110 g til, en skje om gangen, til marengsen er stiv og blank.","Vend forsiktig inn resten av sukkeret.","Legg 20 store skjeer marengs på to brett med bakepapir. Stek i 15 minutter.","Senk ovnen til 110 grader og stek videre i 2 til 3 timer, til marengsene er sprø og tørre.","La dem bli kalde. Server med krem og jordbær."],
+      tip:"Bollen må være helt ren og fri for fett, ellers blir ikke marengsen stiv."}],
+  blabaer: [
+    {kind:"Kokk", t:"Blåbærpai med smuldretopp og vaniljesaus", by:"Lise Finckenhagen", src:"NRK Mat", url:"https://www.nrk.no/mat/blabaerpai-med-hjemmelaget-vaniljesaus-1.7273475", time:"1½ t", level:"Middels", serves:8,
+      intro:"Lise Finckenhagen bruker paideig i bunnen og smuldredeig på toppen, så det blir både pai og smuldrepai. Med hjemmelaget vaniljesaus.",
+      ing:["## Paideig","200 g hvetemel","150 g smør","1 ss melis","2 eggeplommer","## Fyll","300 g blåbær (frosne går fint)","2 dl blåbærsyltetøy","2,5 ss potetmel","## Smuldretopp","100 g hvetemel","100 g perlesukker","100 g smør","100 g hakkede nøtter og/eller havregryn","## Vaniljesaus","3 dl melk","3 dl fløte","1 vaniljestang","110 g sukker","6 eggeplommer"],
+      steps:["Smuldre mel, melis og smør. Ha i eggeplommene og arbeid raskt til en deig. La den hvile kaldt i minst 30 minutter.","Kjevle ut deigen og kle en paiform på 24 cm. Prikk bunnen og stek den gyllen på 180 grader i ca. 12 minutter.","Rør blåbær, syltetøy og potetmel og hell det i paiskallet.","Smuldre alt til toppen sammen og strø over bærene.","Stek paien på 180 grader i 20 til 25 minutter, til toppen er gyllen og sprø.","Vaniljesaus: Kok opp melk, fløte, vaniljestang og en tredel av sukkeret. Visp plommer med resten av sukkeret og hell den varme melken over mens du rører.","Ha alt tilbake i kjelen og varm forsiktig under omrøring til sausen tykner. Den må ikke koke. Sil og avkjøl."],
+      tip:"Vaniljesausen kan lages dagen før og serveres kald."},
+    {kind:"Kokk", t:"Panna cotta med kjernemelk og blåbær", by:"Paul Hollywood", src:"BBC Food", url:"https://www.bbc.co.uk/food/recipes/blueberry_and_buttermilk_71250", time:"30 min + 4 t", level:"Enkel", serves:5,
+      intro:"Bakeren Paul Hollywood lager en syrlig panna cotta med kjernemelk og blåbær inni, og en dyp rød blåbærsirup med stjerneanis over.",
+      ing:["3 dl kremfløte","70 g sukker","1 ts vaniljeekstrakt","2½ gelatinplater","3 dl kjernemelk","90 g blåbær","## Saus","100 g sukker","½ dl vann","1 stjerneanis","100 g blåbær"],
+      steps:["Legg gelatinen i kaldt vann.","Varm fløte, sukker og vanilje til sukkeret er oppløst og fløten så vidt koker.","Ta kjelen av varmen, klem vannet ut av gelatinen og rør den inn til den har løst seg. Rør inn kjernemelken.","Fordel blåbærene i fem små former og hell over kremen.","Sett kaldt i minst 4 timer, gjerne over natten.","Saus: Kok opp sukker, vann og stjerneanis til sirupen tykner litt. Ta av varmen og ha i blåbærene. Avkjøl.","Løsne panna cottaen med en kniv langs kanten og vend den ut på tallerkener. Hell over sausen."],
+      tip:"Dypp formene i varmt vann i noen sekunder, så slipper panna cottaen lettere."}],
+  multer: [
+    {kind:"Kokk", t:"Rørospudding med multer og krokan", by:"Lise Finckenhagen", src:"NRK Mat", url:"https://www.nrk.no/mat/rorospudding-med-multer-og-krokan-1.11211193", time:"30 min + stivning", level:"Middels", serves:4,
+      intro:"Lise Finckenhagen lager en kald pudding av tjukkmjølk fra Røros og ekte vanilje, og serverer den med multer og knust nøttekrokan.",
+      ing:["2,5 dl fløte","100 g sukker","1 vaniljestang","2½ gelatinplater","2,5 dl tjukkmjølk fra Røros (eller kesam/skyr)","200 g multer","Sukker etter smak","## Krokan","2 dl sukker","1 dl mandler, hasselnøtter eller pistasjnøtter"],
+      steps:["Bløtlegg gelatinen i kaldt vann. Del vaniljestangen på langs.","Kok opp fløte, sukker og vanilje. Klem vannet ut av gelatinen og løs den opp i den varme fløten.","Avkjøl til romtemperatur, og vend inn tjukkmjølken.","Fordel i glass eller skåler og sett i kjøleskapet til den har stivnet.","Krokan: Grovhakk nøttene. Smelt sukkeret til gyllen karamell. Skru av varmen, rør inn nøttene og hell ut på bakepapir.","Når krokanen er kald, knus den i en hurtigmikser eller hakk den med en brødkniv.","Smak multene til med sukker og server på puddingen med krokan."],
+      tip:"Pass godt på karamellen. Den skal bli gyllen, ikke mørkebrun."}],
+  tyttebaer: [
+    {kind:"Kokk", t:"Tyttebær i vann", by:"Alexandra De Paoli", src:"NRK Mat", url:"https://www.nrk.no/mat/tyttebaer-i-vann-1.12610692", time:"10 min + noen måneder", level:"Enkel", serves:"Så mange glass du vil",
+      intro:"Kokeboksforfatteren Alexandra De Paoli husker hvordan farfaren tok vare på tyttebær: bærene ble lagt på flasker med vann og sto til jul. En gammel konserveringsmetode uten sukker.",
+      ing:["Ferske tyttebær","Kokt, avkjølt vann","Helt rene glass eller flasker med lokk","Kremfløte og sukker til servering"],
+      steps:["Plukk bort blader og dårlige bær.","Fyll glassene med bær.","Hell over kokt, avkjølt vann så bærene dekkes.","Sett på lokk og la glassene stå kjølig i noen måneder.","Server bærene med kremfløte og sukker."],
+      tip:"Dette virker fordi tyttebær inneholder benzosyre, et naturlig konserveringsmiddel."},
+    {kind:"Kokk", t:"Wallenbergare med tyttebær", by:"Niklas Ekstedt", src:"BBC Food", url:"https://www.bbc.co.uk/food/recipes/wallenbergare_37897", time:"1 t", level:"Middels", serves:4,
+      intro:"En svensk husmannsklassiker fra Niklas Ekstedt. Saftige, panerte karbonader av kalvekjøtt og fløte, med potetmos, brunt smør, erter og raskt kokt tyttebær.",
+      ing:["500 g kalvekjøttdeig","500 g kål, finhakket","15 g salt","En klype hvit pepper","4 dl kremfløte","1 eggeplomme","300 g panko eller brødsmuler","Smør og olje til steking","## Potetmos","1 kg poteter","2 dl kremfløte","100 g smør","## Tyttebær","200 g tyttebær","75 g sukker","## Til servering","400 g erter","100 g smør, brunet"],
+      steps:["Sett ovnen på 130 grader.","Bland kjøttdeig, kål, salt og pepper godt. Rør inn fløten litt om gangen, og så eggeplommen.","Form til runde karbonader på ca. 160 g og vend dem i brødsmuler.","Stek dem gylne på begge sider i smør og olje, og stek ferdig i ovnen i 10 til 15 minutter, til 68 grader inni.","Kok potetene møre og mos med fløte og smør.","Kok tyttebær og sukker forsiktig i 5 minutter, til bærene sprekker.","Server med mos, tyttebær, erter og brunet smør."],
+      tip:"Alt må være kaldt når du blander farsen. Da tar den opp mer fløte og blir saftigere."}],
+  epler: [
+    {kind:"Kokk", t:"Tarte tatin", by:"Raymond Blanc", src:"delicious. magazine", url:"https://www.deliciousmagazine.co.uk/recipes/raymond-blancs-tarte-tatin/", time:"2 t + 1 t avkjøling", level:"Middels", serves:6,
+      intro:"Raymond Blanc er kjent for sin tarte tatin, den franske opp-ned-eplekaken. Eplene bakes i mørk karamell før butterdeigen legges over, og kaken vendes når den er lunken.",
+      ing:["900 g faste epler (ca. 6), skrelt, uten kjernehus, i kvarte båter","100 g sukker","60 g usaltet smør i terninger","30 g smeltet smør","300 g butterdeig, kjevlet til en sirkel på 24 cm"],
+      steps:["Sett ovnen på 180 grader.","Kok sukker og smørterninger i en tatin-form eller en ovnsfast stekepanne på middels varme til en mørk, gyllen karamell.","Legg eplebåtene tett i tett, først langs kanten og så i midten, med kjernesiden opp. Trykk lett så det ikke er hull. Pensle med smeltet smør.","Bak i 30 minutter.","Legg butterdeigen over og stapp kantene ned langs innsiden. Stikk noen hull i toppen.","Bak videre i 40 til 45 minutter, til deigen er gyllen og sprø.","La kaken stå i romtemperatur i ca. 1 time. Legg et fat over og vend kaken raskt."],
+      tip:"Raymond Blanc sier den er best 1 til 2 timer etter steking, mens den fortsatt er lun. Server med crème fraîche."},
+    {kind:"Kokk", t:"Tilslørte bondepiker med mascarponekrem", by:"Mats Paulsen", src:"NRK Mat", url:"https://www.nrk.no/mat/tilslorte-bondepiker-1.12361697", time:"40 min", level:"Enkel", serves:4,
+      intro:"«Rockekokken» Mats Paulsens versjon. Epler og pære kokes med vanilje, stjerneanis og kanel, smulene er kjeks med smør, og kremen får mascarpone og sitron.",
+      ing:["5 epler","1 pære","50 g sukker","1 dl vann","1 vaniljestang","2 stjerneanis","½ kanelstang","200 g digestivekjeks","40 g smør","3 dl kremfløte","2 dl mascarpone","2 ss melis","Litt sitron","Hvit sjokolade til pynt (valgfritt)"],
+      steps:["Kok opp sukker og vann i en panne.","Skrell epler og pære og skjær dem i små biter. Ha dem i pannen med stjerneanis, kanel, vaniljefrø og vaniljestang.","La fruktene koke møre, ca. 20 minutter. Avkjøl.","Knus kjeksene og bland med smeltet smør.","Pisk fløten til krem og rør den sammen med mascarpone, melis og litt sitron.","Legg frukt, smuler og krem lagvis i glass.","Pynt med hvit sjokolade som er smeltet og brunet i en tørr panne, hvis du vil."],
+      tip:"Ta ut stjerneanis og kanel før du legger lagene."}],
+  plommer: [
+    {kind:"Kokk", t:"Tilslørte plommer med kardemomme", by:"Lise Finckenhagen", src:"NRK Mat", url:"https://www.nrk.no/mat/tilslorte-plommer-1.13117260", time:"40 min", level:"Enkel", serves:4,
+      intro:"Lise Finckenhagen bytter ut eplene i tilslørte bondepiker med plommekompott krydret med vanilje, kanel og kardemomme.",
+      ing:["10 til 15 plommer","150 g sukker","1 dl vann eller søt hvitvin","1 vaniljestang","1 kanelstang","2 hele grønne kardemommer (eller ¼ ts malt)","1 ss sitronsaft","Litt potetmel (valgfritt)","3 dl kremfløte","## Smuler","3 dl loffsmuler","3 ss smør","3 ss sukker"],
+      steps:["Del plommene og fjern steinen. Splitt vaniljestangen og skrap ut frøene.","Kok plommer, sukker, vin, vanilje, kanel, kardemomme og sitron i en tykkbunnet kjele til plommene er helt møre.","Jevn eventuelt kompotten med litt potetmel rørt ut i kaldt vann. Avkjøl.","Smelt smøret i en panne, ha i smuler og sukker, og stek under omrøring til de er gylne og sprø. Avkjøl.","Pisk fløten til myk krem.","Legg kompott, smuler og krem lagvis i glass eller en bolle."],
+      tip:"Kompotten er også god til vafler, grøt og is."},
+    {kind:"Kokk", t:"Hermetiserte plommer", by:"Lars Barmen", src:"NRK Mat", url:"https://www.nrk.no/mat/hermetiserte-plommer-1.8327934", time:"45 min", level:"Middels", serves:"1 glass (0,75 l)",
+      intro:"Lars Barmen viser hvordan du tar vare på høstens plommer ved å hermetisere dem i sukkerlake. Klare til dessert når det er mørkt ute.",
+      ing:["7 røde plommer","1 liter vann","500 g sukker","1 hermetikkglass med lokk og ring (0,75 l)","1 kjøkkenhåndkle"],
+      steps:["Kok opp vann og sukker til en lake.","Legg plommene i glasset og fyll på med varm lake.","Sett på lokket og skru ringen lett til.","Legg et håndkle i bunnen av en stor kjele, sett glasset oppå og fyll kjelen med vann.","Kok opp og la glasset trekke i ca. 20 minutter.","Løft opp glasset, skru ringen helt til og snu det for å sjekke at det er tett."],
+      tip:"Glasset må være helt rent. Kok det gjerne i 10 minutter før du fyller det."}],
+  paerer: [
+    {kind:"Kokk", t:"Pærer kokt i hvitvin og syltet ingefær", by:"Niklas Ekstedt", src:"NRK Mat", url:"https://www.nrk.no/mat/vinkokte-paerer-med-syltet-ingefaer-1.7682985", time:"1 t + 1 døgn for mandler", level:"Enkel", serves:4,
+      intro:"Niklas Ekstedt koker pærer i hvitvin med syltet ingefær og serverer dem med krem, lønnesirup og spirede mandler som smaker som ferske.",
+      ing:["4 pærer, gjerne Conference","75 cl hvitvin","1 dl syltet ingefær med lake","Litt muscovadosukker (valgfritt)","2 dl økologiske mandler","3 dl kremfløte","Lønnesirup eller lys sirup"],
+      steps:["Dagen før: Legg mandlene i vann og la dem stå mørkt i et døgn. Gni av skallet med et kjøkkenhåndkle.","Skrell pærene.","Lag en lake av hvitvin og syltet ingefær. Smak til med litt sukker. Den skal være søt som dessertvin.","La pærene trekke i laken på lav varme i 30 til 45 minutter.","Pisk fløten til krem.","Del pærene i to og server med krem, mandler og et dryss sirup."],
+      tip:"Ekstedt sier metoden med spirede nøtter virker enda bedre med valnøtter."},
+    {kind:"Kokk", t:"Vinpocherte og bakte pærer med nøtter og honning", by:"Michel Roux Jr.", src:"BBC Food", url:"https://www.bbc.co.uk/food/recipes/roast_pear_and_poached_61540", time:"1 t + gjerne 1 døgn", level:"Middels", serves:4,
+      intro:"Michel Roux Jr. lager pærer på to måter til ost og spekemat. Hele pærer kokt i hvitvin med chili og kanel, og halve pærer bakt med valnøtter, mandler og honning.",
+      ing:["## Pocherte pærer","4 pærer, skrelt med stilken på","1 flaske tørr hvitvin (75 cl)","300 g sukker","1 rød chili","1 kanelstang","2 nellik","1 laurbærblad","## Bakte pærer","2 pærer, delt og uten kjernehus","16 valnøtter og 16 mandler, hakket","1 liten sjalottløk, finhakket","4 ss flytende honning","1 sitron, skall og saft","En klype chiliflak","Olivenolje","## Til servering","Spekemat, blåmuggost og en mild hvitmuggost"],
+      steps:["Sett pærene oppreist i en kjele og hell over vin, sukker og krydder. La dem småkoke til de er møre. Legg på lokk og la dem avkjøle seg i laken, gjerne et døgn.","Ta litt av laken og kok den inn til en tykk sirup. Pensle pærene med den rett før servering.","Sett ovnen på 180 grader.","Legg pærehalvdelene i en form. Bland nøtter, sjalottløk, honning, sitronskall og sitronsaft, og legg det på snittflaten.","Strø over chiliflak, drypp over olje og bak i 15 til 20 minutter. Dekk med folie hvis toppen blir for mørk.","Skjær de pocherte pærene i vifter og server begge slags på et brett med ost og spekemat."],
+      tip:"Du kan bruke rødvin i stedet for hvitvin. Da blir pærene dyprøde."}],
+  lam: [
+    {kind:"Kokk", t:"Lammestek med hvitløk og rosmarin", by:"Jan Kåre Johansen", src:"NRK Mat (NRK Trøndelag)", url:"https://www.nrk.no/mat/lammestek-med-hvitlok-og-rosmarin-1.7597145", time:"3½ t", level:"Enkel", serves:6,
+      intro:"Radiokokken i NRK Trøndelag steker lammelåret sakte på lav temperatur, med hvitløk og rosmarin stukket inn i kjøttet, og lager saus på stekesjyen.",
+      ing:["1 lammelår, ca. 2,5 kg","2 ts salt","1 ts pepper","Rosmarin","3 fedd hvitløk","1 løk i båter","3 gulrøtter","Ca. 1 liter vann","## Saus","Ca. 8 dl stekesjy","4 ss hvetemel rørt ut i kaldt vann","1 ss solbærsaft eller rødvin","1 ts soyasaus","Salt og pepper"],
+      steps:["Gni lammelåret inn med salt og pepper.","Skjær hvitløken i tynne båter. Stikk små lommer i kjøttet med en kniv og stikk inn hvitløk og rosmarinkvister.","Legg løk og gulrot i en langpanne og lammelåret oppå. Stikk inn et steketermometer, men ikke inn mot beinet. Hell på vannet.","Stek på 125 grader i 2 til 3 timer. Ved 70 grader er steken rosa, ved 76 grader er den gjennomstekt.","La steken hvile under folie i minst et kvarter.","Sil stekesjyen, rør inn jevningen og la sausen koke i ca. 10 minutter. Smak til med solbærsaft, soya, salt og pepper."],
+      tip:"Lav temperatur gir en jevnt rosa og saftig stek helt ut til kanten."},
+    {kind:"Kokk", t:"Langtidsstekt lammebog med sommergrønnsaker", by:"Raymond Blanc", src:"BBC Food", url:"https://www.bbc.co.uk/food/recipes/slow_roasted_shoulder_of_04540", time:"4 t", level:"Middels", serves:6,
+      intro:"«Minimal innsats, maksimal lammeopplevelse», sier Raymond Blanc. Lammebogen stekes oppå bein og avskjær, så den får en dyp kraft å trekke i, og serveres med smørbraiserte grønnsaker.",
+      ing:["1,5 kg lammebog","1 ts havsalt og ½ ts pepper","2 kvister rosmarin og 3 salvieblader, finhakket","2 ss olivenolje","2 ss rapsolje","700 g lammebein og avskjær (spør slakteren)","1 hvitløk, delt på tvers","1 dl tørr hvitvin","4 dl vann","1 laurbærblad, 3 kvister timian","## Grønnsaker","2 ss smør og 1 ss olivenolje","2 løk i båter","250 g gulrot","3 blader mangold","2 hjertesalater i båter","250 g gule beter","Persille"],
+      steps:["Rist skinnet lett med en skarp kniv. Gni inn med salt, pepper, urter og olivenolje og la det stå i romtemperatur i en time.","Sett ovnen på 230 grader. Brun bein og avskjær lett i rapsolje i en langpanne på platen, 7 til 10 minutter. Ha i hvitløken.","Legg lammet oppå beina og stek i 20 minutter.","Kok vinen raskt opp i en liten kjele i 30 sekunder.","Øs kjøttet med fettet og hell av overflødig fett. Ha i vin, vann, laurbær og timian.","Senk ovnen til 150 grader, dekk med folie og stek i ca. 3 timer, til kjøttet er helt mørt. Øs av og til.","Braiser grønnsakene i smør og olje med litt vann under lokk til de er møre. Server med lammet og den silte kraften."],
+      tip:"Beina gir kraften smak og løfter steken, så varmen kommer jevnt rundt."}],
+  elg: [
+    {kind:"Kokk", t:"Telehiv: elgstek fra fryseren", by:"Bodil Nordjore", src:"NRK Mat", url:"https://www.nrk.no/mat/elgstek-med-telehiv-1.12707646", time:"10 t + 4 til 6 t i lake", level:"Enkel", serves:"6 til 8",
+      intro:"Telehiv er en kjent jegermetode. Bodil Nordjore setter en stivfrossen elgstek rett i ovnen på 90 grader i ti timer, og legger den så i en krydret lake. Resultatet er mørt og saftig pålegg eller middagskjøtt.",
+      ing:["1 til 2 kg frossen elgstek","## Lake","1,2 liter vann","2 dl salt","2 ss sukker","1 laurbærblad","12 knuste einebær","1 ts grovmalt pepper"],
+      steps:["Legg den frosne steken i en langpanne og stek på 90 grader varmluft i ca. 10 timer.","Stikk inn et steketermometer etter 8 til 9 timer. Kjøttet er ferdig ved 65 grader inni. Store stykker kan trenge opp til 12 timer.","Kok alle ingrediensene til laken i 3 til 5 minutter og la den bli kald.","Hell den kalde laken over den varme steken.","La steken ligge i laken i 4 til 6 timer, ikke lenger, ellers blir den for salt.","Skjær i tynne skiver og server som pålegg, eller varm med saus, tyttebær og poteter."],
+      tip:"Start om kvelden, så er steken ferdig til frokost."},
+    {kind:"Kokk", t:"Viltwellington med sopp og skinke", by:"Rick Stein", src:"BBC Food", url:"https://www.bbc.co.uk/food/recipes/venison_wellington_63151", time:"1 t 45 min", level:"Avansert", serves:"4 til 6",
+      intro:"Rick Steins viltversjon av den britiske festretten. Indrefilet av hjort pakket inn i soppfarse og spekeskinke, og bakt i butterdeig. Fungerer like godt med elg.",
+      ing:["750 g indrefilet eller ytrefilet av hjort eller elg","1 ss olje","50 g smør","1 liten rødløk","1 fedd hvitløk","400 g sjampinjong, finhakket","1 ts frisk timian","2 til 3 ss sherry","8 til 10 skiver spekeskinke","500 g butterdeig","1 egg, sammenpisket","Salt og pepper","## Saus","50 g smør","1 rødløk","1 ss hvetemel","3 dl rødvin","3 dl kraft","1 ss rips- eller kvedegelé"],
+      steps:["Tørk kjøttet, krydre og brun det raskt på alle sider i en varm panne. Avkjøl, pakk i plast og sett kaldt i 20 minutter.","Fres løk og hvitløk i smør. Ha i sopp og timian og stek i 10 minutter, til væsken er borte og det er som en postei. Ha i sherry og kok inn. Avkjøl.","Legg skinkeskivene overlappende på et bakepapir. Smør soppen over, legg kjøttet nederst og rull stramt. Sett kaldt.","Kjevle butterdeigen litt større enn et A4-ark. Legg rullen på, pakk deigen rundt og lukk skjøtene. Pensle med egg og sett kaldt i 15 minutter.","Stek på 200 grader i 25 til 30 minutter, til deigen er gyllen og kjøttet er ca. 54 grader inni. La hvile i 10 minutter.","Saus: Fres løk i smør, rør inn mel, og spe med vin og kraft. Kok inn og smak til med gelé."],
+      tip:"Alt må være kaldt når du pakker inn. Da blir deigen sprø og ikke bløt."},
+    {kind:"Kokk", t:"Hjortefilet med skogssmør og sopp", by:"Hanne Frosta", src:"NRK Mat", url:"https://www.nrk.no/mat/hjortefilet-med-sopp-1.7818329", time:"30 min", level:"Enkel", serves:2,
+      intro:"Kokken Hanne Frosta steker hjortefilet enkelt og serverer den med et «skogssmør» av tyttebær og granolje, og sopp stekt med frukt.",
+      ing:["340 g hjortefilet (elg går også)","Salt","1 ss olje og 1 ss smør til steking","## Skogssmør","100 g romtemperert smør","2 ss granolje (eller hakket rosmarin eller timian)","2 ss tyttebær","Litt hakket bladpersille","## Tilbehør","Traktkantarell eller piggsopp","Smør","Pære, eple eller plomme i biter","Kokte poteter"],
+      steps:["Bland smør, granolje eller urter, tyttebær og persille. Rull smøret i plast og legg det kaldt.","Varm pannen med olje og smør. Oljen gjør at smøret ikke brenner så fort.","Krydre filetene med salt og stek dem i 4 minutter på én side. Snu og stek ferdig.","Kjenn på kjøttet: slapt er rått, halvmykt er medium, og fast er godt stekt.","Rens soppen og stek den i smør. Vend inn frukten rett før servering.","Server kjøttet med en skive skogssmør, sopp og kokte poteter."],
+      tip:"Granolje lager du ved å helle varm olje over friske granskudd om våren og la det trekke i noen uker."}],
+};
+for (const it of ITEMS) it.recipes = it.recipes.concat(CHEF[it.id] || []);
 
 /* ---------- state ---------- */
 const TODAY = new Date().getMonth() + 1;
@@ -951,42 +1535,43 @@ function renderSeason() {
 }
 
 /* ---------- detail sheet ---------- */
-let current = null, recipeIdx = 0;
+const dlg = $("sheet");
+// The sheet shows either one item (#/id) or one of its recipes (#/id/n). Each step is a history entry, so the phone's back button works.
+let current = null, recipeIdx = -1;
 
-function recipeItems(it, rc) { return Array.isArray(rc.ing) && rc.ing.length ? rc.ing : [it.name]; }
+const isHead = x => x.startsWith("## ");
+function recipeItems(it, rc) { return Array.isArray(rc.ing) && rc.ing.length ? rc.ing.filter(x => !isHead(x)) : [it.name]; }
+const kindLabel = rc => rc.kind === "Kokk" ? rc.by : rc.kind === "Restaurant" ? "Inspirert av restaurant" : "Klassisk";
 
-function recipeHtml(it, rc, i) {
-  const has = Array.isArray(rc.ing) && rc.ing.length;
-  const allIn = recipeItems(it, rc).every(x => list.some(l => l.text === x && l.from === rc.t));
-  const facts = [rc.kind === "Restaurant" ? "Inspirert av restaurant" : "Klassisk", rc.time, rc.level, rc.serves ? `${rc.serves} pers.` : null].filter(Boolean);
-  return `<article class="recipe" style="--c:${CATS[it.cat].color}">
-    <div class="facts">${facts.map(f => `<span class="pill">${esc(f)}</span>`).join("")}</div>
-    <h4>${esc(rc.t)}</h4>
-    <div class="cols${has ? " two" : ""}">
-      ${has ? `<div><h5>Du trenger</h5><ul class="ing">${rc.ing.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
-      <div><h5>Slik gjør du</h5><ol class="steps">${rc.steps.map(s => `<li><span>${esc(s)}</span></li>`).join("")}</ol></div>
-    </div>
-    ${rc.tip ? `<p class="tip"><b>Tips:</b> ${esc(rc.tip)}</p>` : ""}
-    <div class="actions"><button type="button" class="btn${allIn ? " done" : ""}" data-add="${i}">${allIn ? "Lagt i handlelisten ✓" : has ? "Legg ingrediensene i handlelisten" : `Legg ${esc(it.name.toLowerCase())} i handlelisten`}</button></div>
-  </article>`;
+function recipeCard(it, rc, i) {
+  const meta = [rc.time, rc.level, rc.kind === "Kokk" ? rc.src : null].filter(Boolean).join(" · ");
+  return `<li><a class="rcard${rc.kind === "Kokk" ? " chef" : ""}" href="#/${it.id}/${i}" data-r="${i}">
+    <span class="who">${rc.kind === "Kokk" ? `<b>${esc(rc.by)}</b>` : esc(kindLabel(rc))}</span>
+    <span class="rt">${esc(rc.t)}</span>
+    <span class="meta">${esc(meta)}</span>
+    <span class="go" aria-hidden="true">→</span></a></li>`;
 }
 
-function renderRecipe() {
-  const it = current;
-  $("recipe-tabs").innerHTML = it.recipes.map((rc, i) => `<button type="button" role="tab" id="rt-${i}" aria-selected="${i === recipeIdx}" data-r="${i}">${rc.kind === "Restaurant" ? "Restaurant" : "Klassisk"}</button>`).join("");
-  $("recipe-body").innerHTML = recipeHtml(it, it.recipes[recipeIdx], recipeIdx);
+function recipeList(it, skip) {
+  const own = [], chef = [];
+  it.recipes.forEach((rc, i) => { if (i !== skip) (rc.kind === "Kokk" ? chef : own).push(recipeCard(it, rc, i)); });
+  let h = "";
+  if (own.length) h += `<div class="rgroup"><h4>Våre oppskrifter</h4><ul class="rlist">${own.join("")}</ul></div>`;
+  if (chef.length) h += `<div class="rgroup"><h4>Fra kjente kokker</h4><ul class="rlist">${chef.join("")}</ul></div>`;
+  return h;
 }
 
-function openItem(id) {
-  const it = ITEMS.find(x => x.id === id); if (!it) return;
-  current = it; recipeIdx = 0;
+const topbar = back => `<div class="topbar">${back ? `<button type="button" id="sheet-back">← ${esc(back)}</button>` : "<span></span>"}<button type="button" id="sheet-close">Lukk</button></div>`;
+
+function renderItem(it) {
   const c = CATS[it.cat].color;
   const st = status(it, month);
-  let h = `<button class="close" type="button" id="sheet-close">Lukk</button>
+  const chefs = it.recipes.filter(rc => rc.kind === "Kokk").length;
+  let h = `${topbar("")}
     <div class="head">${art(it, "x", 600, 200)}<h2 id="sheet-title">${flair(it.name)}</h2></div>
     <div class="pills">${st ? `<span class="pill solid">${esc(st)}</span>` : `<span class="pill">Ikke i sesong i ${MONTHS[month - 1]}</span>`}<span class="pill">${esc(CATS[it.cat].name)}</span><span class="pill">${rangeText(it)}</span></div>
     <p class="lede">${esc(it.about)}</p>
-    <div class="sec"><h3>Lag dette</h3><div class="tabs" role="tablist" id="recipe-tabs"></div><div id="recipe-body"></div></div>
+    <div class="sec" style="--c:${c}"><h3>Oppskrifter <small>${it.recipes.length}</small></h3>${chefs ? `<p class="hint">${chefs === 1 ? "Én oppskrift" : `${chefs} oppskrifter`} fra kjente kokker, med lenke til originalen.</p>` : ""}${recipeList(it, -1)}</div>
     <div class="sec"><h3>Sesong gjennom året</h3>${bar(it, month, true)}<div class="barlabels">${MSHORT.map(m => `<span>${m[0].toUpperCase()}</span>`).join("")}</div></div>
     <div class="sec"><h3>Hvor får du tak i det</h3><ul class="where" style="--c:${c}">${it.buy.map(b => `<li><div><div>${BUY[b][0]}</div><span>${BUY[b][1]}</span></div></li>`).join("")}</ul></div>`;
   if (it.forage) h += `<div class="sec"><h3>Plukk eller fisk selv</h3><p><b style="font-weight:500">Hvor:</b> ${esc(it.forage.where)}</p><p>${esc(it.forage.tip)}</p>
@@ -995,11 +1580,70 @@ function openItem(id) {
   h += `<div class="sec"><h3>Drikke til</h3><div class="wine"><div class="style">${esc(it.wine.style)}</div><p>${esc(it.wine.why)}</p>
       <a href="https://www.vinmonopolet.no/search?q=${encodeURIComponent(it.wine.q)}" target="_blank" rel="noopener">Se utvalget hos Vinmonopolet ↗</a>
       <div class="af">Uten alkohol: ${esc(it.wine.af)}</div></div></div>`;
+  return h;
+}
+
+function renderRecipe() {
+  const it = current, i = recipeIdx, rc = it.recipes[i];
+  const has = Array.isArray(rc.ing) && rc.ing.length;
+  const allIn = recipeItems(it, rc).every(x => list.some(l => l.text === x && l.from === rc.t));
+  const facts = [rc.time, rc.level, rc.serves ? (typeof rc.serves === "number" ? `${rc.serves} pers.` : rc.serves) : null].filter(Boolean);
+  const host = rc.src ? rc.src.split(" (")[0].split(",")[0] : "";
+  let h = `${topbar(it.name)}
+    <div class="rhead">${art(it, "r", 600, 140)}</div>
+    <div class="rtitle"><span class="eyebrow">${esc(it.name)} · ${esc(kindLabel(rc))}</span><h2 id="sheet-title">${esc(rc.t)}</h2></div>
+    <div class="pills">${facts.map(f => `<span class="pill">${esc(f)}</span>`).join("")}</div>
+    ${rc.intro ? `<p class="lede">${esc(rc.intro)}</p>` : ""}`;
+  if (rc.kind === "Kokk") h += `<div class="credit" style="--c:${CATS[it.cat].color}">
+      <div>Oppskrift fra <b>${esc(rc.by)}</b> · ${esc(rc.src)}</div>
+      <p>Dette er vår versjon, fortalt med egne ord. Originalen har kokkens egne mengder, bilder og tips.</p>
+      <a class="btn ghost" href="${esc(rc.url)}" target="_blank" rel="noopener">Se originalen hos ${esc(host)} ↗</a></div>`;
+  h += `<article class="recipe" style="--c:${CATS[it.cat].color}">
+    <div class="cols${has ? " two" : ""}">
+      ${has ? `<div><h5>Du trenger</h5><ul class="ing">${rc.ing.map(x => isHead(x) ? `<li class="sub">${esc(x.slice(3))}</li>` : `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
+      <div><h5>Slik gjør du</h5><ol class="steps">${rc.steps.map(s => `<li><span>${esc(s)}</span></li>`).join("")}</ol></div>
+    </div>
+    ${rc.tip ? `<p class="tip"><b>Tips:</b> ${esc(rc.tip)}</p>` : ""}
+    <div class="actions"><button type="button" class="btn${allIn ? " done" : ""}" data-add="${i}">${allIn ? "Lagt i handlelisten ✓" : has ? "Legg ingrediensene i handlelisten" : `Legg ${esc(it.name.toLowerCase())} i handlelisten`}</button></div>
+  </article>`;
+  if (it.recipes.length > 1) h += `<div class="sec" style="--c:${CATS[it.cat].color}"><h3>Flere oppskrifter med ${esc(it.name.toLowerCase())}</h3>${recipeList(it, i)}</div>`;
   $("sheet-body").innerHTML = h;
-  renderRecipe();
-  const dlg = $("sheet");
+}
+
+function showSheet(id, r) {
+  const it = ITEMS.find(x => x.id === id); if (!it) return false;
+  const same = current === it && recipeIdx === r && dlg.open;
+  current = it; recipeIdx = r;
+  if (r >= 0 && it.recipes[r]) renderRecipe();
+  else { recipeIdx = -1; $("sheet-body").innerHTML = renderItem(it); }
   if (!dlg.open) dlg.showModal();
-  dlg.scrollTop = 0;
+  if (!same) dlg.scrollTop = 0;
+  return true;
+}
+
+// Hash routes: #/kantarell is the item, #/kantarell/2 its third recipe
+let closing = false;
+function route() {
+  const m = location.hash.match(/^#\/([a-z]+)(?:\/(\d+))?$/);
+  if (closing) {
+    // Stepped back past everything we pushed; a deep link may still sit underneath
+    closing = false;
+    if (m) history.replaceState(null, "", location.pathname + location.search);
+  } else if (m && showSheet(m[1], m[2] === undefined ? -1 : +m[2])) return;
+  current = null; recipeIdx = -1;
+  if (dlg.open) dlg.close();
+}
+// history.state.d counts the sheet entries we pushed; .from is the hash we came from
+const depth = () => (history.state && history.state.d) || 0;
+function go(hash) { history.pushState({ d: depth() + 1, from: location.hash }, "", hash); route(); }
+function closeSheet() {
+  const d = depth();
+  if (d > 0) { closing = true; history.go(-d); }
+  else { history.replaceState(null, "", location.pathname + location.search); route(); }
+}
+function backToItem() {
+  if (history.state && history.state.from === `#/${current.id}`) history.back();
+  else { history.replaceState({ d: depth(), from: history.state && history.state.from }, "", `#/${current.id}`); route(); }
 }
 
 function addRecipe(i) {
@@ -1057,14 +1701,24 @@ function setView(v) {
 $("months").addEventListener("click", e => { const b = e.target.closest("button[data-m]"); if (!b) return; month = +b.dataset.m; renderSeason(); });
 $("today-btn").addEventListener("click", () => { month = TODAY; renderSeason(); });
 $("filters").addEventListener("click", e => { const b = e.target.closest("button[data-c]"); if (!b) return; cat = b.dataset.c; store.set("sesong-cat", cat); renderSeason(); });
-$("list").addEventListener("click", e => { const b = e.target.closest(".card"); if (b) openItem(b.dataset.id); });
-$("rail").addEventListener("click", e => { const b = e.target.closest(".hcard"); if (b) openItem(b.dataset.id); });
-const dlg = $("sheet");
+$("list").addEventListener("click", e => { const b = e.target.closest(".card"); if (b) go(`#/${b.dataset.id}`); });
+$("rail").addEventListener("click", e => { const b = e.target.closest(".hcard"); if (b) go(`#/${b.dataset.id}`); });
 dlg.addEventListener("click", e => {
-  if (e.target === dlg || e.target.id === "sheet-close") { dlg.close(); return; }
-  const t = e.target.closest("[data-r]"); if (t) { recipeIdx = +t.dataset.r; renderRecipe(); return; }
+  if (e.target === dlg || e.target.id === "sheet-close") { closeSheet(); return; }
+  if (e.target.id === "sheet-back") { backToItem(); return; }
+  const r = e.target.closest("a[data-r]");
+  if (r) {
+    e.preventDefault();
+    // Recipe to recipe replaces the entry, so "back" always returns to the item
+    if (recipeIdx >= 0) { history.replaceState(history.state, "", `#/${current.id}/${r.dataset.r}`); route(); }
+    else go(`#/${current.id}/${r.dataset.r}`);
+    return;
+  }
   const a = e.target.closest("[data-add]"); if (a) addRecipe(+a.dataset.add);
 });
+// Esc closes the whole sheet the same way the button does, so history stays in step
+dlg.addEventListener("cancel", e => { e.preventDefault(); closeSheet(); });
+window.addEventListener("popstate", route);
 $("tab-season").addEventListener("click", () => setView("season"));
 $("tab-list").addEventListener("click", () => setView("list"));
 $("list-body").addEventListener("change", e => {
@@ -1090,4 +1744,5 @@ $("copy-list").addEventListener("click", () => {
 
 updateCount();
 renderSeason();
+route();
 </script>
