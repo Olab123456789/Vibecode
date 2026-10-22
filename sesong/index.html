@@ -307,11 +307,46 @@ dialog::backdrop { background: rgba(30, 24, 16, .5); }
 .about h2 { font-size: var(--step-1); color: var(--ink); font-weight: 400; margin-bottom: 6px; }
 .about ul { margin: 0; padding-left: 1.1em; display: flex; flex-direction: column; gap: 4px; }
 .about p { margin: 0; }
+.hol-now { display: flex; flex-direction: column; gap: 12px; }
+.hol-now > .eyebrow { font-size: var(--step--1); color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+.hnow {
+  border: 0; border-top: 4px solid var(--c); text-align: left; cursor: pointer; border-radius: 6px; padding: 16px;
+  background: var(--card); box-shadow: var(--shadow); display: grid; gap: 14px; min-width: 0; transition: transform .18s ease;
+}
+.hnow .txt { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.hnow .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.hnow h2 { font-size: var(--step-3); font-weight: 300; letter-spacing: -0.035em; }
+.hnow p { margin: 0; color: var(--muted); max-width: 46ch; }
+.hnow .menu { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 0.9375rem; }
+.hnow .menu span::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--c); margin-right: 6px; transform: translateY(-1px); }
+.hnow .go { font-weight: 500; font-size: 0.9375rem; margin-top: 2px; }
+@media (min-width: 720px) { .hnow { grid-template-columns: 3fr 2fr; align-items: center; padding: 20px; } .hnow .pics { order: 2; height: 200px; } }
+.pics { display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: 4px; height: 140px; border-radius: 4px; overflow: hidden; }
+.pics img { width: 100%; height: 100%; object-fit: cover; display: block; background: var(--hair); }
+.sheet .head .pics { height: 220px; }
+.sheet .rhead .pics { height: 120px; }
+.hol {
+  scroll-snap-align: start; border: 0; text-align: left; cursor: pointer; border-radius: 6px; padding: 14px;
+  background: var(--card); box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 4px; min-width: 0; transition: transform .18s ease;
+}
+.hol .pics { height: 96px; margin-bottom: 6px; }
+.hol h3 { font-size: 1.625rem; font-weight: 400; }
+.hol .sub { color: var(--muted); font-size: 0.875rem; }
+.hol .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; border-top: 1px solid var(--hair); padding-top: 8px; margin-top: 6px; font-size: 0.875rem; }
+.rail.hrail { grid-auto-columns: minmax(200px, 62%); }
+@media (min-width: 720px) { .rail.hrail { grid-auto-columns: minmax(220px, 24%); } }
+@media (hover: hover) { .hnow:hover, .hol:hover { transform: translateY(-2px); } }
+.hnow:active, .hol:active { transform: scale(.98); }
+.uses { display: flex; gap: 6px; flex-wrap: wrap; }
+.uses a { text-decoration: none; }
+.uses .dot { width: 8px; height: 8px; border-radius: 50%; }
+.uses .st { color: var(--muted); }
+
 .tagline { text-align: center; color: var(--muted); font-size: 0.9375rem; margin: 0; }
 
 @media (prefers-reduced-motion: reduce) {
-  .card, .hcard, .toast { transition: none; } dialog[open] { animation: none; }
-  .card:active, .hcard:active { transform: none; }
+  .card, .hcard, .hnow, .hol, .toast { transition: none; } dialog[open] { animation: none; }
+  .card:active, .hcard:active, .hnow:active, .hol:active { transform: none; }
 }
 </style>
 </head>
@@ -329,6 +364,8 @@ dialog::backdrop { background: rgba(30, 24, 16, .5); }
       <p id="hero-text"></p>
     </section>
 
+    <section class="hol-now" id="hol-now" aria-label="Høytid" hidden></section>
+
     <section class="feature" aria-labelledby="feat-title">
       <div class="feature-head"><h2 id="feat-title">På sitt beste nå</h2><span>Sveip for flere</span></div>
       <div class="rail" id="rail"></div>
@@ -342,6 +379,11 @@ dialog::backdrop { background: rgba(30, 24, 16, .5); }
     <div class="filters" id="filters" role="group" aria-label="Filtrer etter type"></div>
 
     <main id="list" class="wrap" style="gap:32px"></main>
+
+    <section class="feature" aria-labelledby="hol-title">
+      <div class="feature-head"><h2 id="hol-title">Høytider gjennom året</h2><span>Tradisjonsmat</span></div>
+      <div class="rail hrail" id="hol-rail"></div>
+    </section>
 
     <section class="about" aria-label="Om Sesong">
       <div>
@@ -1407,6 +1449,198 @@ const CHEF = {
 };
 for (const it of ITEMS) it.recipes = it.recipes.concat(CHEF[it.id] || []);
 
+/* ---------- holidays ----------
+   Each holiday: days(y) gives [start, main day, end] for that year; lead is how many days before start it shows at the top.
+   recipes mixes new recipes with {ref:item id, t:title} pointing at a recipe that already sits on an item. uses links a recipe to items. */
+const ymd = (y, m, d) => new Date(y, m - 1, d);
+const plus = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+function easter(y) {
+  const a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const n = h + l - 7 * m + 114;
+  return ymd(y, Math.floor(n / 31), n % 31 + 1);
+}
+// Last Thursday of a month (m is 1-12)
+function lastThursday(y, m) { const d = new Date(y, m, 0); return plus(d, -((d.getDay() + 3) % 7)); }
+const one = d => [d, d, d];
+
+const RODKAL = {kind:"Kokk", group:"Tilbehør", uses:["kal"], t:"Rødkål med appelsin og fiken", by:"Lise Finckenhagen", src:"NRK Mat", url:"https://www.nrk.no/mat/rodkal-1.6914179", time:"1 t 15 min", level:"Enkel", serves:"6–8 pers.",
+  intro:"Lise Finckenhagen koker rødkålen med appelsin, julekrydder og tørket fiken. Den passer like godt til ribbe som til and.",
+  ing:["1 middels rødkål","2 ss smør","1 rødløk i tynne skiver","3 dl presset appelsinjuice","1 ts malt nellik eller allehånde","1 kanelstang","1 stjerneanis","4 ss sukker","1 dl sherryeddik eller rødvinseddik","100 g tørket fiken","Salt og pepper"],
+  steps:["Skjær rødkålen i tynne strimler.","Fres kål og løk i smør i en stor kjele.","Ha i appelsinjuice, krydder, sukker og eddik. Vent med fikenen.","Kok opp og la det småkoke i omtrent en time.","Hakk fikenen og rør den inn mot slutten.","Smak til med salt og pepper."],
+  tip:"Litt ribbefett, gløgg eller ripsgelé på slutten gir ekstra fylde."};
+
+const HOLIDAYS = [
+  { id:"jul", name:"Jul", color:"var(--terra)", lead:42, days:y => [ymd(y,12,24), ymd(y,12,24), ymd(y,12,26)], label:"Julaften",
+    pics:["gronnkal","kalrot","multer"], menu:["Ribbe","Pinnekjøtt","Lutefisk","Riskrem","Sandkaker","Gløgg"],
+    short:"Ribbe, pinnekjøtt og lutefisk, med riskrem, julekaker og gløgg.",
+    about:"Julemiddagen er den største mattradisjonen vi har. Ribbe og pinnekjøtt står på flest bord, men lutefisk, torsk og kveite er like ekte julemat mange steder. Mye av tilbehøret er vinterens egne råvarer, som kål, kålrot og grønnkål.",
+    regions:[
+      ["Østlandet, Sørlandet og Trøndelag","Ribbe med medisterkaker, surkål og rødkål. Ribbe er den vanligste julemiddagen i Norge."],
+      ["Vestlandet","Pinnekjøtt med kålrotstappe. Retten har spredd seg til hele landet, og mange har både ribbe og pinnekjøtt i jula."],
+      ["Nord-Norge","Både ribbe og pinnekjøtt, og fisk står sterkt. Kveite og torsk er vanlig i romjula, og i samiske hjem kan det bli rein."],
+      ["Langs kysten","Kokt torsk med sandefjordsmør eller lutefisk med bacon og ertestuing, ofte i førjulstiden eller i romjula."]],
+    note:"Grovt sagt. Hver familie har sin egen tradisjon.",
+    wine:{style:"Juleøl, eller en lett og frisk rødvin som Pinot Noir", why:"Ribbe og pinnekjøtt er fete og salte. Litt sødme i øl og frisk syre i lette rødviner holder balansen.", q:"pinot noir", af:"Julebrus eller alkoholfri gløgg"},
+    recipes:[
+      {kind:"Kokk", group:"Middag", uses:["sellerirot","purre","epler"], t:"Ribbe med sprø svor og saus av stekekraften", by:"Reneé Fagerhøi", src:"NRK Mat", url:"https://www.nrk.no/mat/renees-ribbe-med-spro-svor-og-saus-inspirert-av-ingrid-espelid-hovig-1.16225975", time:"3,5 t", level:"Middels", serves:"6–7 pers.",
+        intro:"Reneé Fagerhøi bygger på Ingrid Espelid Hovigs klassiske juleribbe. Ribba dampes først med svoren ned i en kraft av grønnsaker, epler og julekrydder, og den kraften blir til slutt sausen.",
+        ing:["2–2,7 kg svineribbe","5 ts salt","3 ts nykvernet sort pepper","## Til langpannen og sausen","1 liter vann","2 gulrøtter","½ sellerirot","1 purre","2 epler","3 sjalottløk","3 fedd hvitløk","10 hele sorte pepperkorn","6 nellikspiker","2 kanelstenger","1 ss malteddik eller sherryeddik"],
+        steps:["Gni salt og pepper godt inn i ribba på begge sider, gjerne to dager før. La den stå kaldt.","Sett ovnen på 180 grader. Skrell og del grønnsakene og eplene i like store biter, og fordel dem i en langpanne med krydderne og vannet.","Legg ribba med svoren ned i vannet, dekk med folie og la den dampe i ovnen i 1 time.","Snu ribba og skjær ruter i svoren med en skarp kniv. Legg den med svoren opp, gjerne over en ball av folie så den blir buet.","Senk til 160 grader og stek videre i 1½ til 2 timer. Fyll på vann underveis, så langpannen aldri blir tørr.","Skru på grillelementet og 250 grader til svoren bobler og blir sprø. Det går fort, så bli stående ved ovnen.","La ribba hvile i rundt 40 minutter. Imens lager du sausen.","Sil kraften fra langpannen og press de myke grønnsakene gjennom silen. Skum av fettet som legger seg på toppen.","Kok opp sausen, spe med vann om den er for tykk, og smak til med salt, pepper og en skvett eddik."],
+        tip:"Spar fettet du skummer av. Det er perfekt i surkålen og rødkålen."},
+      {kind:"Kokk", group:"Middag", uses:["lam","kalrot"], t:"Pinnekjøtt", by:"Lise Finckenhagen", src:"NRK Mat", url:"https://www.nrk.no/mat/pinnekjott-1.6914328", time:"3 t + utvanning", level:"Enkel", serves:"Regn 400 g per pers.",
+        intro:"Lise Finckenhagens pinnekjøtt er så enkelt som det skal være. Vann ut kjøttet i god tid, og damp det sakte over bjørkepinner til det slipper beinet.",
+        ing:["Ca. 400 g uvannet pinnekjøtt per person","Bjørkepinner uten bark, eller en metallrist","Vann","Julepølser (kan sløyfes)"],
+        steps:["Del pinnekjøttet mellom hvert ribbein, eller kjøp det ferdig oppdelt.","Legg kjøttet i rikelig med vann i romtemperatur i ca. 30 timer. Lunkent vann går raskere om du er sent ute.","Legg bjørkepinner eller en rist i bunnen av en vid kjele, og fyll vann opp til pinnene.","Legg kjøttet over, sett på lokk og la det dampe på svak varme i ca. 3 timer, til det er mørt og løsner fra beina. Følg med så det ikke koker tørt.","Legg i pølsene de siste 20 minuttene.","Vil du ha sprø overflate, kan du brune kjøttet noen minutter under grillelementet i ovnen."],
+        tip:"Sjekk pakken. Produsentene salter ulikt, så utvanningstiden kan variere."},
+      {ref:"kalrot", t:"Kålrotstappe med kraft", group:"Tilbehør"},
+      {kind:"Kokk", group:"Tilbehør", uses:["kal"], t:"Surkål til ribbe", by:"Bent Stiansen", src:"NRK Mat", url:"https://www.nrk.no/mat/surkal-til-ribbe-1.11429937", time:"1 t 15 min", level:"Enkel", serves:8,
+        intro:"Mesterkokk Bent Stiansens surkål kan lages opptil fire dager før. Den blir bare bedre av å stå.",
+        ing:["1,5 kg hodekål","1 liter vann","2 dl hvit eddik (7 %)","2 dl sukker","2 ts salt","2 ss karve","1 ts malt hvit pepper","1 dl fett fra ribba"],
+        steps:["Fjern den harde midten og skjær kålen i tynne strimler.","Ha kålen i en kjele med vann, eddik, sukker, salt, karve og pepper.","Kok under lokk i omtrent en time, til kålen er mør og noe av væsken har kokt inn.","Rør inn ribbefett rett før servering. Det gjør smaken rundere."],
+        tip:"Lag den gjerne et par dager før. Da har du én ting mindre å tenke på på julaften."},
+      RODKAL,
+      {kind:"Kokk", group:"Middag", uses:["torsk"], t:"Lutefisk med bacon og ertestuing", by:"Steinar Lindstrøm", src:"NRK Mat (Mat med Steinar og Gro)", url:"https://www.nrk.no/mat/lutefisk-med-tradisjonelt-tilbehoyr-1.13288055", time:"45 min", level:"Enkel", serves:"3–4 pers.",
+        intro:"Kokk Steinar Lindstrøm damper lutefisken i kjelen og serverer den med det klassiske tilbehøret: poteter, bacon og ertestuing.",
+        ing:["1 kg lutefisk","1 ss salt","Poteter","Bacon","Ertestuing"],
+        steps:["Strø salt over fisken og la den stå i en halvtime før den skal kokes.","Kok opp litt vann i en vid kjele og legg i fisken.","Sett på lokk og la fisken dampe i rundt 15 minutter. Den er ferdig når den slipper beinet.","Kok poteter og ertestuing, og stek bacon sprøtt, mens fisken damper.","Server alt med en gang, mens fisken er varm."],
+        tip:"Bruk en kjele i rustfritt stål, og unngå sølvbestikk. Luten i fisken kan gi misfarging."},
+      {ref:"torsk", t:"Kokt torsk med sandefjordsmør", group:"Middag"},
+      {ref:"gronnkal", t:"Julekveite med sprø grønnkål og karamellisert løk", group:"Middag"},
+      {kind:"Kokk", group:"Dessert", uses:["jordbaer"], t:"Riskrem med rød saus", by:"Stig Juelsen", src:"NRK Mat", url:"https://www.nrk.no/mat/riskrem-med-rod-saus-1.6597114", time:"20 min", level:"Enkel", serves:4,
+        intro:"Stig Juelsen kjøper ferdig risgrøt når han lager riskrem. Da er han sikker på at risen er kokt nok. Den røde sausen lager han av frosne bær.",
+        ing:["4 dl kald risgrøt","3 dl kremfløte","4 ss sukker","1 vaniljestang","Hakkede mandler","## Rød saus","250 g bringebær eller jordbær, gjerne frosne","125 g sukker","## Hvis du vil ha mer smak","20 g frisk ingefær","½ chili","En god neve mynte"],
+        steps:["Skrap frøene ut av vaniljestangen. Pisk fløten med sukker og vaniljefrø til krem.","Vend kremen lett inn i den kalde grøten, og rør inn hakkede mandler.","Kjør bær og sukker glatt i en blender, og sil bort frøene.","Vil du ha mer smak, kjører du ingefær, chili og mynte sammen med bærene.","Server riskremen med den røde sausen over."],
+        tip:"Solbær eller kirsebær fungerer også i sausen."},
+      {ref:"multer", t:"Multekrem", group:"Dessert"},
+      {kind:"Kokk", group:"Kaker og drikke", uses:[], t:"Sandkaker", by:"Marit Røttingsnes Westlie", src:"NRK Mat (etter Ingrid Espelid Hovig)", url:"https://www.nrk.no/mat/sandkaker-1.9564371", time:"1 t + natten over", level:"Middels", serves:"Ca. 95 kaker",
+        intro:"Dette er Ingrid Espelid Hovigs berømte sandkaker, slik matblogger Marit Røttingsnes Westlie baker dem, med litt ekstra malte mandler. Formene trenger ikke smøres.",
+        ing:["250 g mykt smør","190 g melis","120 g mandler","1 egg","375 g hvetemel"],
+        steps:["Pisk smør og melis hvitt og luftig.","Mal mandlene fint. Rør 100 g av dem inn i smøret sammen med egg og mel.","Pakk deigen i plast og la den hvile i kjøleskapet til neste dag. Ta vare på resten av mandlene.","Sett ovnen på 180 grader, eller 160 grader med varmluft.","Rull deigen til små kuler på størrelse med en drue. Dypp fingrene i malte mandler og trykk kulene tynt ut i sandkakeformene, uten å gå over kanten.","Stek i 12 til 15 minutter, til de er lysegylne.","La kakene bli nesten kalde i formene. Snu formene og bank dem lett mot benken, så slipper kakene.","Avkjøl på rist og oppbevar i en tett boks."],
+        tip:"Fyll dem med multekrem til julemiddagen."},
+      {kind:"Kokk", group:"Kaker og drikke", uses:["epler"], t:"Gløgg med hjemmelaget kryddersirup", by:"Lise Finckenhagen", src:"NRK Mat", url:"https://www.nrk.no/mat/kryddersirup-til-hjemmelaget-glogg-1.12074640", time:"20 min", level:"Enkel", serves:"Ca. 1,5 liter",
+        intro:"Lise Finckenhagen koker en sirup av julekrydder som du blander med rødvin, hvitvin, eplesider eller eplemost. Med eplemost blir gløggen alkoholfri.",
+        ing:["2 dl sukker","4 dl vann","2 stjerneanis","1 ts hele kardemommekapsler","1 vaniljestang","2 biter kanelstang","12 nellik eller allehånde","4 skiver frisk ingefær","Ca. 1 liter rødvin, hvitvin, eplesider eller eplemost"],
+        steps:["Ha sukker, vann og alle krydderne i en kjele.","Kok i 10 til 15 minutter, til det tykner som en sirup.","Hell i vin, sider eller eplemost.","Varm forsiktig opp. Gløgg med alkohol skal ikke koke."],
+        tip:"Bytt sukkeret med 3½ dl saft, for eksempel solbær til rød gløgg eller rabarbra til hvit."}]},
+
+  { id:"nyttar", name:"Nyttår", color:"var(--sea)", lead:14, days:y => [ymd(y,12,31), ymd(y,12,31), ymd(y+1,1,1)], label:"Nyttårsaften",
+    pics:["hummer","osters","rosenkal"], menu:["Kalkun","Hummer","Østers","Kransekake"],
+    short:"Kalkun eller skalldyr, og kransekake til tolvslaget.",
+    about:"Nyttårsaften er festmiddag uten fasit. Kalkun har blitt vanlig, mange velger skalldyr, og kransekaken står klar til tolvslaget. Hummer, østers og rosenkål er alle i sesong nå.",
+    wine:{style:"Champagne eller annen tørr musserende", why:"Bobler og frisk syre passer til skalldyr, kalkun og tolvslaget.", q:"champagne brut", af:"Alkoholfri musserende"},
+    recipes:[
+      {ref:"osters", t:"Rå østers med sitron", group:"Forrett"},
+      {ref:"hummer", t:"Hummer thermidor", group:"Forrett"},
+      {kind:"Kokk", group:"Middag", uses:["epler","rosenkal"], t:"Kalkunbryst med spekeskinke og kryddersmør", by:"Lise Finckenhagen", src:"NRK Mat", url:"https://www.nrk.no/mat/kalkunbryst-med-spekeskinke-og-kryddersmor-1.12673316", time:"1 t 15 min", level:"Middels", serves:4,
+        intro:"Du trenger ikke en hel kalkun. Lise Finckenhagen fyller kryddersmør under skinnet på et kalkunbryst og pakker det inn i spekeskinke. Sausen lages på eplemost.",
+        ing:["1 kalkunbryst, 800–1000 g, gjerne med skinn","10 lange, tynne skiver spekeskinke","Litt olivenolje","Salt og pepper","## Kryddersmør","100 g mykt smør","1 ss revet sitronskall","1 ss revet appelsinskall","2 fedd hvitløk","2 ss hakkede urter, som estragon, persille eller timian","## Eplemostsaus","2 sjalottløk","1–2 ss smør","2,5 dl syrlig eplemost","2,5 dl kylling- eller kalkunkraft","2 dl fløte"],
+        steps:["Rør smøret med sitronskall, appelsinskall, hvitløk, urter, salt og pepper.","Løsne skinnet forsiktig på brystet så du får en lomme. Fyll det meste av smøret inn i lommen, og smør resten under den lille fileten.","Legg skinkeskivene omlagt på plastfolie, legg brystet med skinnsiden ned og rull skinken rundt. Bind gjerne med hyssing.","Legg brystet i en ildfast form med skjøten ned, og pensle med olje.","Stek i 20 minutter ved 200 grader, og deretter ca. 30 minutter ved 170 grader, til kjernen er 64 grader. Pensle med smøret i formen underveis.","La kjøttet hvile i minst 15 minutter før du skjærer det.","Sausen: Fres sjalottløk mykt i smør. Kok inn eplemosten til en tredjedel, ha i kraften og kok i 10 minutter. Ha i fløte og la det småkoke til sausen tykner. Smak til."],
+        tip:"Server med søtpoteter og rosenkål."},
+      {kind:"Kokk", group:"Dessert", uses:[], t:"Kransekake", by:"Ingrid Espelid Hovig", src:"NRK Mat", url:"https://www.nrk.no/mat/kransekake-1.13777509", time:"2 t + hvile", level:"Krevende",
+        intro:"Ingrid Espelid Hovigs kransekake er oppskriften mange stoler på. Hemmeligheten er å varme massen i kjelen, så blir ringene seige.",
+        ing:["500 g mandler, gjerne halvparten skåldede","500 g melis","2 dl eggehviter (ca. 6 egg)","Smør og hvetemel til formene","## Glasur","1 eggehvite","Siktet melis"],
+        steps:["Mal mandlene fint. For grovt malte mandler gir en deig som er vanskelig å få seig.","Ha mandler, melis og eggehvite i en kjele. Rør over god varme til massen er så varm at den nesten svir mot fingrene.","La massen bli kald under lokk. Trill den til en pølse, legg den i en plastpose og la den hvile i en halvtime til en time.","Pensle kransekakeformene med smeltet smør, dypp dem i mel og bank av det løse.","Trill ut pølser så tykke som en tommel og legg dem i formene. Start med de minste ringene.","Stek midt i ovnen ved 180 grader i ca. 15 minutter. Stek gjerne en prøvering først.","Avkjøl ringene raskt, og ta dem ut av formene først når de er kalde.","Rør eggehvite med siktet melis til en seig glasur. Sprøyt tynne sikksakkstriper på hver ring og bygg kaken fra den største og oppover."],
+        tip:"Frys kransekaken. Når den tiner i posen, blir ringene passe seige."}]},
+
+  { id:"paske", name:"Påske", color:"var(--ochre)", lead:28, days:y => { const e = easter(y); return [plus(e,-3), e, plus(e,1)]; }, label:"1. påskedag",
+    pics:["lam","skrei","ramslok"], menu:["Påskelam","Påskerøre","Skrei"],
+    short:"Lammestek, eggerøre til frokost og den siste skreien.",
+    about:"Påsken er lam, egg og appelsiner på hytta. Påskelammet stekes gjerne langsomt, skreien er fortsatt i sesong, og eggerøre hører med til påskefrokosten.",
+    wine:{style:"Rioja eller annen myk, krydret rødvin", why:"Passer til lam med hvitløk og urter uten å ta over.", q:"rioja", af:"Alkoholfri rødvin"},
+    recipes:[
+      {kind:"Kokk", group:"Frokost", uses:[], t:"Steinars påskerøre", by:"Steinar Lindstrøm", src:"NRK Mat (Mat med Steinar og Gro)", url:"https://www.nrk.no/mat/steinars-paskerore-1.13472491", time:"10 min", level:"Enkel", serves:"1 pers.",
+        intro:"Steinar Lindstrøms påskerøre er bare egg, fløte, salt og pepper. Hemmeligheten er middels varme, og at du rører hele tiden.",
+        ing:["2 egg","2 ss fløte","Salt og pepper","Litt olje eller smør til steking"],
+        steps:["Visp egg og fløte sammen med salt og pepper.","Varm en panne på middels varme med litt fett.","Hell i eggene og rør jevnt i et par minutter, til eggerøren er myk og saftig.","Smak til og server med en gang."],
+        tip:"Gang opp med antall personer. Godt med røkelaks, gressløk og ristet brød."},
+      {kind:"Kokk", group:"Middag", uses:["lam"], t:"Klassisk lammestek", by:"Stig Juelsen", src:"NRK Mat", url:"https://www.nrk.no/mat/klassisk-lammestek-1.6575555", time:"3 t", level:"Middels", serves:"8–10 pers.",
+        intro:"Stig Juelsen steker lammelåret på lav varme med hvitløk, persille og fennikel stukket inn i kjøttet. Et steketermometer bestemmer når det er ferdig.",
+        ing:["1 lammelår, ca. 3,5 kg","3 fedd hvitløk","1 bunt bladpersille","3 fennikel","3 gulrøtter","8 persillerøtter","20 perleløk eller 5 store rødløk","1 liter vann","Salt og pepper"],
+        steps:["Gni låret inn med salt og pepper.","Stikk små lommer i kjøttet med en kniv, og fyll dem med hvitløksbåter, persille og fenikkeltopper.","Legg låret i en langpanne, hell over ca. 1 liter vann og stikk inn et steketermometer. Det skal ikke treffe beinet.","Stek ved 125 grader i 2 til 3 timer. Har du god tid, kan du steke på 62 grader i 6 timer.","Legg grønnsakene rundt låret når det er omtrent 40 minutter igjen.","Ta ut låret ved 58 grader. Det blir rosa ved 60 grader og gjennomstekt ved 70.","La det hvile i 15 til 20 minutter under et kjøkkenhåndkle, og lag saus av kraften i langpannen."],
+        tip:"Server med potetstappe og stekt sopp."},
+      {ref:"skrei", t:"Skinnstekt skrei med sellerimos og baconsmør", group:"Middag"}]},
+
+  { id:"syttendemai", name:"17. mai", color:"var(--rose)", lead:21, days:y => one(ymd(y,5,17)), label:"Grunnlovsdagen",
+    pics:["jordbaer","asparges","ramslok"], menu:["Bløtkake","Pølse i lompe","Rømmegrøt","Asparges"],
+    short:"Frokost med venner, pølser i lompe og bløtkake.",
+    about:"Nasjonaldagen starter ofte med frokost sammen med venner og naboer. Mellom tog og leker blir det pølser i lompe, og om ettermiddagen bløtkake. Mange steder hører rømmegrøt og spekemat med. Asparges og ramsløk er i sesong.",
+    wine:{style:"Crémant eller annen tørr musserende", why:"Frisk og festlig til frokost med egg, asparges og spekemat.", q:"cremant", af:"Alkoholfri musserende eller brus"},
+    recipes:[
+      {ref:"asparges", t:"Asparges med hollandaise og spekeskinke", group:"Frokost"},
+      {kind:"Klassisk", group:"Mat", uses:[], t:"Pølse i lompe", time:"15 min", level:"Enkel", serves:4,
+        ing:["8 wienerpølser eller grillpølser","8 lomper","Sennep og ketchup","Sprøstekt løk","Rekesalat (kan sløyfes)"],
+        steps:["Legg pølsene i varmt vann som ikke koker, og la dem trekke i ca. 5 minutter. Koker vannet, sprekker de.","Eller grill dem til de er gylne.","Legg pølsa i lompa, og topp med sennep, ketchup og sprøstekt løk.","Rekesalat er et populært ekstra pålegg."],
+        tip:"Hold pølsene varme i en termos med varmt vann, så har du mat klar etter toget."},
+      {kind:"Kokk", group:"Mat", uses:[], t:"Rømmegrøt med spekemat", by:"Inge Johnsen", src:"NRK Mat", url:"https://www.nrk.no/mat/rommegrot--1.7619290", time:"20 min", level:"Enkel", serves:4,
+        intro:"Du trenger ikke kjøpe ferdig grøt. Kokk Inge Johnsen viser at rømmegrøt er både billig og enkel å lage selv.",
+        ing:["5 dl seterrømme","2 dl hvetemel","5 dl helmelk","1 ts salt","## Til servering","Sukker og kanel","Spekemat og flatbrød"],
+        steps:["Kok rømmen i 4 til 5 minutter.","Sikt i halvparten av melet og rør kraftig, så det ikke blir klumper.","La det koke til fettet skiller seg fra rømmen. Øs av fettet og ta vare på det.","Sikt inn resten av melet og rør godt.","Spe med melken litt om gangen mens du rører, og kok grøten jevn.","Smak til med salt. Server med smøret du øste av, sukker og kanel."],
+        tip:"Bruk seterrømme med mye fett. Lett rømme skiller ikke ut smør."},
+      {kind:"Kokk", group:"Kake", uses:["jordbaer"], t:"Bløtkake med jordbær og vaniljekrem", by:"Lise Finckenhagen", src:"NRK Mat", url:"https://www.nrk.no/mat/blotkake-med-jordbaer-og-vaniljekrem-1.14045435", time:"2 t + avkjøling", level:"Middels", serves:"12 biter",
+        intro:"Lise Finckenhagens bløtkake har tre lag sukkerbrød, ekte vaniljekrem, rørte jordbær og krem. Hun dynker bunnene med litt saft eller rom.",
+        ing:["## Sukkerbrød","4 egg, romtempererte","160 g sukker","100 g hvetemel","60 g potetmel","1 ts bakepulver","## Vaniljekrem","5 dl melk","100 g sukker","1 vaniljestang","5 eggeplommer","35 g maisenna","2 dl fløte","## Fyll og pynt","2 dl rørte jordbær eller jordbærsyltetøy","2 kurver jordbær","4 dl fløte","Litt saft, juice eller sukkerlake til dynking","Mynte, mandelflak eller spiselige blomster"],
+        steps:["Sett ovnen på 170 grader, og kle en springform på 22–24 cm med bakepapir.","Pisk egg og sukker til tykk og luftig eggedosis. Sikt inn mel, potetmel og bakepulver, og vend det forsiktig inn.","Stek på nest nederste rille i 40 til 45 minutter. Ikke åpne ovnsdøren de første 20 minuttene. Avkjøl på rist.","Vaniljekrem: Kok opp melk med halve sukkeret og vaniljen. Visp eggeplommer, resten av sukkeret og maisenna glatt.","Visp halve den varme melken inn i eggene, hell alt tilbake i kjelen og kok i 2 minutter under kraftig visping til kremen er tykk. Legg plast rett på kremen og avkjøl.","Visp opp den kalde vaniljekremen, og vend inn 2 dl pisket fløte.","Del sukkerbrødet i tre lag. Dynk bunnen, smør på rørte jordbær, strø over skivede jordbær og stryk på vaniljekrem. Gjenta med neste lag.","Legg på det siste laget, kle kaken med pisket krem og pynt med jordbær."],
+        tip:"Lag sukkerbrødet og vaniljekremen dagen før. Da er kaken rask å sette sammen på morgenen."}]},
+
+  { id:"sankthans", name:"Sankthans", color:"var(--sage)", lead:21, days:y => one(ymd(y,6,23)), label:"Sankthansaften",
+    pics:["makrell","nypoteter","jordbaer"], menu:["Grillet makrell","Nypoteter","Jordbærkake"],
+    short:"Bål, makrell på grillen, nypoteter og de første jordbærene.",
+    about:"Sankthansaften feires ute, med bål og grill. Makrellen er tilbake, de første nypotetene kommer, og jordbærsesongen starter.",
+    wine:{style:"Tørr rosé eller Riesling", why:"Frisk syre som tåler fet makrell og røyksmak.", q:"rose", af:"Alkoholfri rosé eller hylleblomstsaft"},
+    recipes:[
+      {kind:"Kokk", group:"Fra grillen", uses:["makrell"], t:"Grillet og einerrøykt makrell med bacon", by:"Andreas Viestad", src:"NRK Mat (Sommeråpent)", url:"https://www.nrk.no/mat/grillet-og-einerroykt-makrell-med-sitron-og-bacon-1.7201869", time:"30 min", level:"Middels", serves:4,
+        intro:"Andreas Viestad griller og røyker makrellen med einer i samme omgang. Baconet gir smak og holder skinnet på plass.",
+        ing:["4 hele makrell, renset","8 store skiver bacon","1 sitron i skiver","Salt og nykvernet pepper","Einerkvister til røyking"],
+        steps:["Tenn en kulegrill med lokk, og samle kullet på én side så du får en varm og en kjøligere sone.","Gni fisken med rikelig salt og pepper, både utenpå og inni buken.","Surr to baconskiver rundt hver fisk, og stikk sitronskiver inn under baconet.","Grill fisken over den varme sonen, gjerne i en fiskeklype, til baconet er sprøtt.","Flytt fisken til den kjølige siden. Legg einer på kullet og sett på lokket.","La fisken røyke i 5 til 7 minutter, til den flaker seg når du pirker i den."],
+        tip:"Fisken skal ikke være helt gjennomstekt før du røyker den. Røyken gjør resten."},
+      {ref:"makrell", t:"Grillet makrell med sommerkål og kefirdressing", group:"Fra grillen"},
+      {ref:"nypoteter", t:"Nypoteter med smør og dill", group:"Tilbehør"},
+      {ref:"jordbaer", t:"Jordbærkake med jordbærkrem og marsipan", group:"Dessert"}]},
+
+  { id:"farikal", name:"Fårikålens dag", color:"var(--sage)", lead:21, days:y => one(lastThursday(y,9)), label:"",
+    pics:["lam","kal"], menu:["Fårikål"],
+    short:"Norges nasjonalrett, siste torsdag i september.",
+    about:"Fårikål er kåret til Norges nasjonalrett, og den siste torsdagen i september er fårikålens dag. Da er både lammet og kålen på sitt aller beste.",
+    wine:{style:"Lett rødvin som Pinot Noir, eller en pils", why:"Lite garvestoff og frisk syre, som ikke kjemper mot kål og pepper.", q:"pinot noir", af:"Eplemost"},
+    recipes:[
+      {kind:"Kokk", group:"Middag", uses:["lam","kal"], t:"Fårikål", by:"Lise Finckenhagen", src:"NRK Mat", url:"https://www.nrk.no/mat/farikal-fra-lise-finckenhagen-1.6784343", time:"2–3 t", level:"Enkel", serves:4,
+        intro:"Lise Finckenhagens fårikål er den helt enkle, med lam, kål, salt og hel pepper. Mer trengs ikke.",
+        ing:["1,5 kg fårikålkjøtt","1,5 kg hodekål","4 ts hel sort pepper","2 ts salt","Ca. 3 dl vann","Poteter til servering"],
+        steps:["Del kålen i båter.","Legg kjøtt og kål lagvis i en stor kjele. Strø salt og pepper mellom hvert lag.","Hell over vannet og kok opp.","La gryten småputre under lokk til kjøttet er mørt og slipper beinet. Det tar ofte rundt to timer.","Server med kokte poteter."],
+        tip:"Legg et lag kjøtt med fettsiden ned i bunnen, så brenner ikke kålen seg fast."},
+      {kind:"Kokk", group:"Middag", uses:["lam","kal"], t:"Fårikål med jevnet kraft", by:"Stig Juelsen", src:"NRK Mat", url:"https://www.nrk.no/mat/farikal-fra-stig-juelsen-1.6575481", time:"2,5 t", level:"Enkel", serves:6,
+        intro:"Kokk Stig Juelsen vil ha kjøtt med litt fett, fra bog, nakke eller skank. Det gir mest smak. Vil du ha tykkere kraft, strør du litt mel mellom lagene.",
+        ing:["2 kg fårikålkjøtt av lam, gjerne bog eller nakke","2 kg hodekål","5 ts salt","10 hele pepperkorn","3 dl kokende vann","Litt hvetemel (kan sløyfes)"],
+        steps:["Del kålen i båter.","Legg kål og kjøtt lagvis i en stor kjele, med salt og pepper mellom lagene.","Strø et tynt lag hvetemel mellom lagene om du vil ha en jevnet kraft.","Hell på kokende vann og kok opp.","Sett på lokk og la det trekke på svak varme i 1 til 2½ time, til kjøttet er mørt."],
+        tip:"Fårikål blir enda bedre dagen etter."}]},
+
+  { id:"mortensaften", name:"Mortensaften", color:"var(--tan)", lead:21, days:y => one(ymd(y,11,10)), label:"",
+    pics:["epler","plommer","kal"], menu:["And med epler og svisker","Rødkål","Bondepiker"],
+    short:"And fylt med epler og svisker, med rødkål ved siden av.",
+    about:"Mortensaften er kvelden før Mortensdagen 11. november. Tradisjonen er størst i Danmark og Sør-Sverige, men mange her til lands har tatt den opp. Da står and eller gås på bordet, fylt med epler og svisker.",
+    wine:{style:"Beaujolais eller Pinot Noir", why:"Saftig rødvin med frisk syre passer til fet and og søtsyrlig rødkål.", q:"beaujolais", af:"Alkoholfri rødvin"},
+    recipes:[
+      {kind:"Kokk", group:"Middag", uses:["epler","plommer"], t:"Dansk and med epler og svisker", by:"Ingrid Espelid Hovig", src:"NRK Mat", url:"https://www.nrk.no/mat/dansk-and-1.13271773", time:"3 t", level:"Middels", serves:"3–4 pers.",
+        intro:"Ingrid Espelid Hovig lærte dansk and av Kirsten Askheim. Anda fylles med syrlige epler og svisker, og stekes sakte til skinnet blir sprøtt.",
+        ing:["1 and, ca. 2,5 kg","1–1½ ts salt","½ ts pepper","2–3 syrlige epler","Svisker uten stein","3–5 dl kraft","## Til sausen","Hals, krås og hjerte fra anda","Smør til bruning"],
+        steps:["Skyll og tørk anda godt, og plukk bort fjærrester.","Gni den med salt og pepper inni, og litt salt utenpå.","Skrell eplene, del dem i båter og fjern kjernehuset. Fyll anda med epler og svisker, og lukk åpningene med kjøttnåler eller tråd.","Stek på nederste rille ved 175 grader i en halvtime, til den har fått litt farge.","Hell over 1,5 dl kraft. Stek videre i ca. 2 timer, og hell over resten av kraften i to omganger.","Hell av stekesjyen, og stek anda 10 til 15 minutter til, til skinnet er sprøtt og brunt.","Mens anda steker: Brun hals, krås og hjerte i smør, dekk med vann og la det koke til kraft. Lag saus av kraften og sjyen når du har skummet av fettet.","La anda hvile i 10 minutter før du deler den."],
+        tip:"Server med rødkål, brun saus og karamelliserte småpoteter, slik danskene gjør."},
+      RODKAL,
+      {ref:"epler", t:"Tilslørte bondepiker", group:"Dessert"}]},
+];
+// Swap each {ref, t} for a copy of that item's recipe, so holiday pages can link to recipes that already exist
+for (const h of HOLIDAYS) {
+  h.holiday = true;
+  h.recipes = h.recipes.map(rc => {
+    if (!rc.ref) return rc;
+    const it = ITEMS.find(x => x.id === rc.ref), src = it && it.recipes.find(x => x.t === rc.t);
+    if (!src) { console.warn("Mangler oppskrift", rc.ref, rc.t); return null; }
+    return { ...src, group: rc.group, uses: [it.id] };
+  }).filter(Boolean);
+}
+
 /* ---------- state ---------- */
 const TODAY = new Date().getMonth() + 1;
 let month = TODAY;
@@ -1459,9 +1693,11 @@ function blobSvg(id, color, w = 300, h = 140) {
 }
 
 // Full-bleed photo when one exists; otherwise a brush stroke with the item's initial
+const colorOf = it => it.color || CATS[it.cat].color;
 function art(it, seed = "", w = 300, h = 140) {
+  if (it.holiday) return pics(it, seed);
   if (it.img) return `<div class="art photo"><img src="${esc(it.img)}" alt="${esc(it.name)}" loading="lazy"></div>`;
-  return `<div class="art">${blobSvg(it.id + seed, CATS[it.cat].color, w, h)}<span class="initial">${esc(it.name[0])}</span></div>`;
+  return `<div class="art">${blobSvg(it.id + seed, colorOf(it), w, h)}<span class="initial">${esc(it.name[0])}</span></div>`;
 }
 
 function rangeText(it) {
@@ -1552,6 +1788,66 @@ function renderSeason() {
     html += `<section class="group"><h2>${CATS[k].name} <small>${items.length}</small></h2><div class="grid">${items.map(card).join("")}</div></section>`;
   }
   $("list").innerHTML = html || `<p class="empty">Ingenting funnet.</p>`;
+  renderHolidays();
+}
+
+/* ---------- holidays on the season page ---------- */
+const WEEKDAYS = ["søndag","mandag","tirsdag","onsdag","torsdag","fredag","lørdag"];
+const today0 = () => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()); };
+// The coming (or ongoing) occurrence of a holiday
+function nextDates(h) {
+  const t = today0();
+  for (let y = t.getFullYear() - 1; ; y++) { const [start, main, end] = h.days(y); if (end >= t) return { start, main, end }; }
+}
+const dateText = d => `${WEEKDAYS[d.getDay()]} ${d.getDate()}. ${MONTHS[d.getMonth()]}`;
+const whenText = h => { const d = nextDates(h).main; return (h.label ? h.label + " " : "") + dateText(d); };
+function untilText(h) {
+  const t = today0(), { start, main, end } = nextDates(h);
+  if (t >= start && t <= end) return +t === +main ? "I dag" : "Nå";
+  const n = Math.round((main - t) / 864e5);
+  if (n === 1) return "I morgen";
+  if (n <= 31) return `Om ${n} dager`;
+  if (n <= 84) return `Om ${Math.round(n / 7)} uker`;
+  return `Om ${Math.round(n / 30.4)} måneder`;
+}
+const isNear = h => { const t = today0(), { start, end } = nextDates(h); return t >= plus(start, -h.lead) && t <= end; };
+const byNext = (a, b) => nextDates(a).start - nextDates(b).start;
+
+// Up to three item photos side by side; falls back to a brush stroke
+function pics(h, seed = "") {
+  const ps = h.pics.map(id => ITEMS.find(x => x.id === id)).filter(it => it && it.img);
+  if (!ps.length) return `<div class="art">${blobSvg(h.id + seed, h.color, 600, 200)}<span class="initial">${esc(h.name[0])}</span></div>`;
+  return `<div class="pics" style="--n:${ps.length}">${ps.map(it => `<img src="${esc(it.img)}" alt="" loading="lazy">`).join("")}</div>`;
+}
+
+function holNowCard(h) {
+  return `<button type="button" class="hnow" data-h="${h.id}" style="--c:${h.color}">
+    ${pics(h)}
+    <div class="txt">
+      <div class="tags"><span class="pill solid">${esc(untilText(h))}</span><span class="pill">${esc(whenText(h))}</span></div>
+      <h2>${flair(h.name)}</h2>
+      <p>${esc(h.short)}</p>
+      <div class="menu">${h.menu.map(m => `<span>${esc(m)}</span>`).join("")}</div>
+      <span class="go">Se ${h.recipes.length} oppskrifter →</span>
+    </div>
+  </button>`;
+}
+
+function holCard(h) {
+  return `<button type="button" class="hol" data-h="${h.id}" style="--c:${h.color}">
+    ${pics(h, "c")}
+    <h3>${flair(h.name)}</h3>
+    <div class="sub">${esc(whenText(h))}</div>
+    <div class="row"><span>${h.recipes.length} retter</span><span class="pill">${esc(untilText(h))}</span></div>
+  </button>`;
+}
+
+function renderHolidays() {
+  // Today: whatever is coming up soon. Another month: the holidays that fall in it.
+  const now = (month === TODAY ? HOLIDAYS.filter(isNear) : HOLIDAYS.filter(h => nextDates(h).main.getMonth() + 1 === month)).sort(byNext);
+  $("hol-now").hidden = !now.length;
+  $("hol-now").innerHTML = now.length ? `<div class="eyebrow">${month === TODAY ? "Høytid snart" : `Høytid i ${MONTHS[month - 1]}`}</div>${now.slice(0, 2).map(holNowCard).join("")}` : "";
+  $("hol-rail").innerHTML = HOLIDAYS.slice().sort(byNext).map(holCard).join("");
 }
 
 /* ---------- detail sheet ---------- */
@@ -1579,6 +1875,34 @@ function recipeList(it, skip) {
   if (own.length) h += `<div class="rgroup"><h4>Våre oppskrifter</h4><ul class="rlist">${own.join("")}</ul></div>`;
   if (chef.length) h += `<div class="rgroup"><h4>Fra kjente kokker</h4><ul class="rlist">${chef.join("")}</ul></div>`;
   return h;
+}
+
+// Holiday page: recipes grouped by course, then the seasonal items they use
+function holidayList(h, skip) {
+  const groups = new Map();
+  h.recipes.forEach((rc, i) => { if (i === skip) return; const g = rc.group || "Oppskrifter"; if (!groups.has(g)) groups.set(g, []); groups.get(g).push(recipeCard(h, rc, i)); });
+  return [...groups].map(([g, cards]) => `<div class="rgroup"><h4>${esc(g)}</h4><ul class="rlist">${cards.join("")}</ul></div>`).join("");
+}
+function usesChips(ids) {
+  return `<div class="uses">${ids.map(id => ITEMS.find(x => x.id === id)).filter(Boolean).map(it => {
+    const st = status(it, TODAY);
+    return `<a class="pill" href="#/${it.id}" data-go="${it.id}"><span class="dot" style="background:${CATS[it.cat].color}"></span>${esc(it.name)}${st ? ` <span class="st">· ${esc(st.toLowerCase())}</span>` : ""}</a>`;
+  }).join("")}</div>`;
+}
+function renderHoliday(h) {
+  const chefs = h.recipes.filter(rc => rc.kind === "Kokk").length;
+  const used = [...new Set(h.recipes.flatMap(rc => rc.uses || []))];
+  let s = `${topbar("")}
+    <div class="head">${pics(h, "x")}<h2 id="sheet-title">${flair(h.name)}</h2></div>
+    <div class="pills"><span class="pill solid">${esc(untilText(h))}</span><span class="pill">${esc(whenText(h))}</span></div>
+    <p class="lede">${esc(h.about)}</p>
+    <div class="sec" style="--c:${h.color}"><h3>Oppskrifter <small>${h.recipes.length}</small></h3>${chefs ? `<p class="hint">${chefs} av dem er fra kjente kokker, med lenke til originalen.</p>` : ""}${holidayList(h, -1)}</div>`;
+  if (used.length) s += `<div class="sec"><h3>Råvarene</h3><p class="hint">Trykk for å se sesong, hvor du får tak i dem og flere oppskrifter.</p>${usesChips(used)}</div>`;
+  if (h.regions) s += `<div class="sec"><h3>Rundt i landet</h3><ul class="where" style="--c:${h.color}">${h.regions.map(([r, t]) => `<li><div><div>${esc(r)}</div><span>${esc(t)}</span></div></li>`).join("")}</ul>${h.note ? `<p class="hint">${esc(h.note)}</p>` : ""}</div>`;
+  s += `<div class="sec"><h3>Drikke til</h3><div class="wine"><div class="style">${esc(h.wine.style)}</div><p>${esc(h.wine.why)}</p>
+      <a href="https://www.vinmonopolet.no/search?q=${encodeURIComponent(h.wine.q)}" target="_blank" rel="noopener">Se utvalget hos Vinmonopolet ↗</a>
+      <div class="af">Uten alkohol: ${esc(h.wine.af)}</div></div></div>`;
+  return s;
 }
 
 const topbar = back => `<div class="topbar">${back ? `<button type="button" id="sheet-back">← ${esc(back)}</button>` : "<span></span>"}<button type="button" id="sheet-close">Lukk</button></div>`;
@@ -1614,11 +1938,11 @@ function renderRecipe() {
     <div class="rtitle"><span class="eyebrow">${esc(it.name)} · ${esc(kindLabel(rc))}</span><h2 id="sheet-title">${esc(rc.t)}</h2></div>
     <div class="pills">${facts.map(f => `<span class="pill">${esc(f)}</span>`).join("")}</div>
     ${rc.intro ? `<p class="lede">${esc(rc.intro)}</p>` : ""}`;
-  if (rc.kind === "Kokk") h += `<div class="credit" style="--c:${CATS[it.cat].color}">
+  if (rc.kind === "Kokk") h += `<div class="credit" style="--c:${colorOf(it)}">
       <div>Oppskrift fra <b>${esc(rc.by)}</b> · ${esc(rc.src)}</div>
       <p>Dette er vår versjon, fortalt med egne ord. Originalen har kokkens egne mengder, bilder og tips.</p>
       <a class="btn ghost" href="${esc(rc.url)}" target="_blank" rel="noopener">Se originalen hos ${esc(host)} ↗</a></div>`;
-  h += `<article class="recipe" style="--c:${CATS[it.cat].color}">
+  h += `<article class="recipe" style="--c:${colorOf(it)}">
     <div class="cols${has ? " two" : ""}">
       ${has ? `<div><h5>Du trenger</h5><ul class="ing">${rc.ing.map(x => isHead(x) ? `<li class="sub">${esc(x.slice(3))}</li>` : `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
       <div><h5>Slik gjør du</h5><ol class="steps">${rc.steps.map(s => `<li><span>${esc(s)}</span></li>`).join("")}</ol></div>
@@ -1626,16 +1950,17 @@ function renderRecipe() {
     ${rc.tip ? `<p class="tip"><b>Tips:</b> ${esc(rc.tip)}</p>` : ""}
     <div class="actions"><button type="button" class="btn${allIn ? " done" : ""}" data-add="${i}">${allIn ? "Lagt i handlelisten ✓" : has ? "Legg ingrediensene i handlelisten" : `Legg ${esc(it.name.toLowerCase())} i handlelisten`}</button></div>
   </article>`;
-  if (it.recipes.length > 1) h += `<div class="sec" style="--c:${CATS[it.cat].color}"><h3>Flere oppskrifter med ${esc(it.name.toLowerCase())}</h3>${recipeList(it, i)}</div>`;
+  if (it.holiday && rc.uses && rc.uses.length) h += `<div class="sec"><h3>Råvarer i retten</h3>${usesChips(rc.uses)}</div>`;
+  if (it.recipes.length > 1) h += `<div class="sec" style="--c:${colorOf(it)}"><h3>${it.holiday ? `Mer til ${esc(it.name.toLowerCase())}` : `Flere oppskrifter med ${esc(it.name.toLowerCase())}`}</h3>${it.holiday ? holidayList(it, i) : recipeList(it, i)}</div>`;
   $("sheet-body").innerHTML = h;
 }
 
 function showSheet(id, r) {
-  const it = ITEMS.find(x => x.id === id); if (!it) return false;
+  const it = ITEMS.find(x => x.id === id) || HOLIDAYS.find(x => x.id === id); if (!it) return false;
   const same = current === it && recipeIdx === r && dlg.open;
   current = it; recipeIdx = r;
   if (r >= 0 && it.recipes[r]) renderRecipe();
-  else { recipeIdx = -1; $("sheet-body").innerHTML = renderItem(it); }
+  else { recipeIdx = -1; $("sheet-body").innerHTML = it.holiday ? renderHoliday(it) : renderItem(it); }
   if (!dlg.open) dlg.showModal();
   if (!same) dlg.scrollTop = 0;
   return true;
@@ -1723,9 +2048,12 @@ $("today-btn").addEventListener("click", () => { month = TODAY; renderSeason(); 
 $("filters").addEventListener("click", e => { const b = e.target.closest("button[data-c]"); if (!b) return; cat = b.dataset.c; store.set("sesong-cat", cat); renderSeason(); });
 $("list").addEventListener("click", e => { const b = e.target.closest(".card"); if (b) go(`#/${b.dataset.id}`); });
 $("rail").addEventListener("click", e => { const b = e.target.closest(".hcard"); if (b) go(`#/${b.dataset.id}`); });
+for (const el of [$("hol-now"), $("hol-rail")]) el.addEventListener("click", e => { const b = e.target.closest("[data-h]"); if (b) go(`#/${b.dataset.h}`); });
 dlg.addEventListener("click", e => {
   if (e.target === dlg || e.target.id === "sheet-close") { closeSheet(); return; }
   if (e.target.id === "sheet-back") { backToItem(); return; }
+  const g = e.target.closest("a[data-go]");
+  if (g) { e.preventDefault(); go(`#/${g.dataset.go}`); return; }
   const r = e.target.closest("a[data-r]");
   if (r) {
     e.preventDefault();
